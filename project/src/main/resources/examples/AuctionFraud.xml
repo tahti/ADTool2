@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="conjunctive">
+    <label>Auction Fraud</label>
+    <node refinement="conjunctive">
+      <label>Preparation Phase</label>
+      <node refinement="disjunctive">
+        <label>Ask Vera about Sam</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Subvert Verify</label>
+        </node>
+      </node>
+      <node refinement="conjunctive">
+        <label>Shop at Sam</label>
+        <node refinement="disjunctive">
+          <label>Acquire Malware</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Acquire Emails</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Acquire Chris CC</label>
+        </node>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Police Internet</label>
+        </node>
+      </node>
+      <node refinement="conjunctive">
+        <label>Send Emails</label>
+        <node refinement="conjunctive">
+          <label>Job Offer</label>
+          <node refinement="disjunctive">
+            <label>Rachel Accepts Job</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Train Rachel</label>
+            </node>
+          </node>
+          <node refinement="disjunctive">
+            <label>Send Job Ad to Emails</label>
+          </node>
+        </node>
+        <node refinement="conjunctive">
+          <label>Malware Distribution</label>
+          <node refinement="disjunctive">
+            <label>Tino Opens Attachment</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Train Tina</label>
+            </node>
+          </node>
+          <node refinement="disjunctive">
+            <label>Send Malware to Emails</label>
+          </node>
+        </node>
+      </node>
+    </node>
+    <node refinement="conjunctive">
+      <label>Buy from Alice</label>
+      <node refinement="disjunctive">
+        <label>Credentials from Tina</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Profile Credential Usage</label>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Purchase Goods</label>
+      </node>
+      <node refinement="disjunctive">
+        <label>Pay with Chris CC</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Check CCs for Theft</label>
+        </node>
+      </node>
+    </node>
+    <node refinement="conjunctive">
+      <label>Delivery Process</label>
+      <node refinement="disjunctive">
+        <label>Max to Rachel</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Mark Goods</label>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Rachel to Dave</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Stop in Transit</label>
+          <node refinement="disjunctive">
+            <label>Mark Goods</label>
+          </node>
+          <node refinement="disjunctive">
+            <label>Spot-check Drop Boxes</label>
+          </node>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Otto from Dave</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Spot-check Drop Boxes</label>
+        </node>
+      </node>
+    </node>
+    <node refinement="disjunctive">
+      <label>Otto sells to Perry</label>
+      <node refinement="disjunctive" switchRole="yes">
+        <label>Prevent Sale</label>
+        <node refinement="disjunctive">
+          <label>Police Pawn Brokers</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Revenue Checks</label>
+        </node>
+      </node>
+    </node>
+  </node>
+</adtree>

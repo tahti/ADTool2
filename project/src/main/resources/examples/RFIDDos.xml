@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="disjunctive">
+    <label>RFID Dos Attack</label>
+    <node refinement="disjunctive">
+      <label>Remove Tag</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Disable Tag</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Overload Tag</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Disable Reader</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Disable Backend</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Block Communication</label>
+    </node>
+  </node>
+</adtree>

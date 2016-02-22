@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="conjunctive" switchRole="yes">
+    <label>Data Confidentiality</label>
+    <node refinement="conjunctive">
+      <label>Network Security</label>
+      <node refinement="disjunctive">
+        <label>Access Control</label>
+        <node refinement="disjunctive">
+          <label>Passwords</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Dictionary Attack</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Strong Passwords</label>
+              <node refinement="disjunctive" switchRole="yes">
+                <label>Strong Passwords Attacks</label>
+                <node refinement="disjunctive">
+                  <label>Find Note</label>
+                </node>
+                <node refinement="disjunctive">
+                  <label>Same Password Different Account</label>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Firewalls</label>
+      </node>
+      <node refinement="disjunctive">
+        <label>IDS</label>
+      </node>
+    </node>
+    <node refinement="disjunctive">
+      <label>Physical Security</label>
+      <node refinement="disjunctive" switchRole="yes">
+        <label>Break In</label>
+        <node refinement="disjunctive">
+          <label>Back Door</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Lock</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Defeat Lock</label>
+              <node refinement="disjunctive">
+                <label>Force Open</label>
+              </node>
+              <node refinement="disjunctive">
+                <label>Acquire Keys</label>
+              </node>
+            </node>
+          </node>
+        </node>
+        <node refinement="disjunctive">
+          <label>Fire Escape</label>
+          <node refinement="disjunctive">
+            <label>Door</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Lock</label>
+              <node refinement="disjunctive" switchRole="yes">
+                <label>Defeat Lock</label>
+                <node refinement="disjunctive">
+                  <label>Force Open</label>
+                </node>
+                <node refinement="disjunctive">
+                  <label>Acquire Keys</label>
+                </node>
+              </node>
+            </node>
+          </node>
+          <node refinement="disjunctive">
+            <label>Window</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Reinforce</label>
+            </node>
+          </node>
+        </node>
+        <node refinement="disjunctive">
+          <label>Window</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Reinforce</label>
+          </node>
+        </node>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Security Guard</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Defeat Guard</label>
+            <node refinement="disjunctive">
+              <label>Bribe</label>
+            </node>
+            <node refinement="conjunctive">
+              <label>Overpower</label>
+              <node refinement="disjunctive">
+                <label>Outnumber</label>
+              </node>
+              <node refinement="disjunctive">
+                <label>Use Weapons</label>
+              </node>
+            </node>
+            <node refinement="disjunctive">
+              <label>Steal Keys</label>
+            </node>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Video Cameras</label>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+    <node refinement="disjunctive" switchRole="yes">
+      <label>Employee Attack</label>
+      <node refinement="disjunctive">
+        <label>Corruption</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Screening</label>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Social Engineering</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Sensitivity Training</label>
+        </node>
+      </node>
+    </node>
+  </node>
+</adtree>

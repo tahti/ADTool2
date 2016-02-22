@@ -1,0 +1,438 @@
+package lu.uni.adtool.ui.canvas;
+
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.GuiNode;
+import lu.uni.adtool.tree.Node;
+import lu.uni.adtool.ui.MultiLineInput;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+
+/**
+ * A handler for ADTreeCanvas.
+ *
+ * @author Piot Kordy
+ */
+public class ADTCanvasHandler extends AbstractCanvasHandler {
+  /**
+   * Constructs a new instance.
+   *
+   * @param canvas
+   *          parent canvas
+   */
+  public ADTCanvasHandler(final ADTreeCanvas canvas) {
+    super(canvas);
+    initPopupMenu();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see KeyListener#keyPressed(KeyEvent)
+   */
+  public void keyPressed(final KeyEvent e) {
+    boolean consume = true;
+    final Node node = this.canvas.getFocused();
+    if (e.isControlDown()) {
+      if (node != null) {
+        switch (e.getKeyCode()) {
+        case KeyEvent.VK_LEFT:
+          ((ADTreeCanvas) this.canvas).switchSibling(node, true);
+          break;
+        case KeyEvent.VK_RIGHT:
+          ((ADTreeCanvas) this.canvas).switchSibling(node, false);
+          break;
+        case KeyEvent.VK_J:
+          ((ADTreeCanvas) canvas).toggleOp(node);
+          break;
+        case KeyEvent.VK_I:
+          ((ADTreeCanvas) canvas).addCounter(node);
+          break;
+        case KeyEvent.VK_A:
+          ((ADTreeCanvas) canvas).addChild(node);
+          break;
+        case KeyEvent.VK_L:
+          menuNode = node;
+          changeLabelActionPerformed();
+          break;
+        case KeyEvent.VK_R:
+          ((ADTreeCanvas) canvas).removeTree(node);
+          break;
+        case KeyEvent.VK_S:
+          ((ADTreeCanvas) canvas).addSibling(node, !e.isShiftDown());
+          break;
+        default:
+          consume = false;
+        }
+      }
+      else {
+        consume = false;
+      }
+    }
+    else if (e.isShiftDown()) {
+      if (node != null) {
+        switch (e.getKeyCode()) {
+        case KeyEvent.VK_SPACE:
+          if (node != null) {
+            menuNode = node;
+            canvas.toggleAboveFold(menuNode);
+          }
+          break;
+        case KeyEvent.VK_R:
+          if (node != null) {
+            menuNode = node;
+            ((ADTreeCanvas) canvas).removeChildren(node);
+          }
+          break;
+        default:
+          consume = false;
+          break;
+        }
+      }
+      else {
+        consume = false;
+      }
+    }
+    else {
+      switch (e.getKeyCode()) {
+      case KeyEvent.VK_ENTER:
+        if (node != null) {
+          menuNode = node;
+          changeLabelActionPerformed();
+          canvas.setFocus(menuNode);
+        }
+        break;
+      case KeyEvent.VK_SPACE:
+        if (node != null) {
+          menuNode = node;
+          canvas.toggleFold(menuNode);
+        }
+        break;
+      default:
+        consume = false;
+      }
+    }
+    if (!consume) {
+      super.keyPressed(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see MouseListener#mouseClicked(MouseEvent)
+   */
+  public final void mouseClicked(final MouseEvent e) {
+    canvas.requestFocusInWindow();
+    final Node node = this.canvas.getNode(e.getX(), e.getY());
+    if (node != null) {
+      if (e.getModifiers() == InputEvent.BUTTON3_MASK || e.getModifiers() == InputEvent.CTRL_MASK) {
+        menuNode = node;
+        this.pmenu.show(e.getComponent(), e.getX(), e.getY());
+        setFocus(node);
+      }
+      else {
+        if (node.equals(canvas.getFocused())) {
+          menuNode = node;
+          changeLabelActionPerformed();
+          // canvas.toggleExpandNode(node);
+          // this.canvas.repaint();
+        }
+        else {
+          setFocus(node);
+        }
+      }
+    }
+  }
+
+  /**
+   * Set new focus and update context menu visibility.
+   *
+   * @param node
+   *          node to which we set focus.
+   */
+  public void setFocus(final Node node) {
+    if (node != null) {
+      final Node parent = canvas.getParentNode(node);
+      boolean canAddSibling;
+      if (parent == null) {
+        canAddSibling = false;
+      }
+      else {
+        canAddSibling = true;
+      }
+      boolean canFold;
+      boolean canFoldAbove;
+      if (((GuiNode) node).isFolded()) {
+        toggleFold.setText(Options.getMsg("handler.expandbelow.txt"));
+        canFold = true;
+      }
+      else {
+        toggleFold.setText(Options.getMsg("handler.foldbelow.txt"));
+        canFold = (node.getChildren().size() > 0);
+      }
+      if (((GuiNode) node).isAboveFolded()) {
+        toggleAboveFold.setText(Options.getMsg("handler.expandabove.txt"));
+        canFoldAbove = true;
+      }
+      else {
+        toggleAboveFold.setText(Options.getMsg("handler.foldabove.txt"));
+        canFoldAbove = (node.getParent() != null);
+      }
+      switchLeft.setVisible(
+          ((GuiNode) node).getLeftSibling() != null && ((GuiNode) node).getLeftSibling() != node &&
+          ((ADTNode)((GuiNode) node).getLeftSibling()).getRole() ==  ((ADTNode) node).getRole());
+      switchRight.setVisible(
+          ((GuiNode) node).getRightSibling() != null && ((GuiNode) node).getRightSibling() != node &&
+          ((ADTNode)((GuiNode) node).getRightSibling()).getRole() ==  ((ADTNode) node).getRole());
+      toggleAboveFold.setVisible(canFoldAbove);
+      toggleFold.setVisible(canFold);
+      addCounter.setVisible(!((ADTNode) node).isCountered());
+      addLeft.setVisible(canAddSibling);
+      addRight.setVisible(canAddSibling);
+      removeTree.setVisible(parent != null);
+      removeChildren.setVisible(canvas.getMiddleChild(node) != null);
+      // removeNode.setVisible(parent!=null);
+      this.pmenu.pack();
+    }
+    super.setFocus(node);
+  }
+
+  /**
+   * Initialise context menu.
+   *
+   */
+  private void initPopupMenu() {
+    this.pmenu = new JPopupMenu();
+    menuNode = null;
+    JMenuItem menuItem = new JMenuItem(Options.getMsg("handler.changelabel.txt"));
+    menuItem.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.changelabel.key")));
+    menuItem.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        changeLabelActionPerformed();
+      }
+    });
+    pmenu.add(menuItem);
+    menuItem = new JMenuItem(Options.getMsg("handler.changeoperator.txt"));
+    menuItem.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.changeoperator.key")));
+    menuItem.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).toggleOp(menuNode);
+        }
+      }
+    });
+    pmenu.add(menuItem);
+    toggleAboveFold = new JMenuItem(Options.getMsg("handler.foldabove.txt"));
+    toggleAboveFold.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.foldabove.key")));
+    toggleAboveFold.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          canvas.toggleAboveFold(menuNode);
+        }
+      }
+    });
+    pmenu.add(toggleAboveFold);
+    toggleFold = new JMenuItem(Options.getMsg("handler.foldbelow.txt"));
+    toggleFold.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.foldbelow.key")));
+    toggleFold.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          canvas.toggleFold(menuNode);
+        }
+      }
+    });
+    pmenu.add(toggleFold);
+
+    pmenu.addSeparator();
+
+    menuItem = new JMenuItem(Options.getMsg("handler.addchild.txt"));
+    menuItem.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.addchild.key")));
+    menuItem.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).addChild(menuNode);
+        }
+      }
+    });
+    pmenu.add(menuItem);
+
+    addCounter = new JMenuItem(Options.getMsg("handler.counter.txt"));
+    addCounter.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.counter.key")));
+    addCounter.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas)canvas).addCounter(menuNode);
+        }
+      }
+    });
+    pmenu.add(addCounter);
+
+    addLeft = new JMenuItem(Options.getMsg("handler.addleftsibling.txt"));
+    addLeft.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.addleftsibling.key")));
+    addLeft.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).addSibling(menuNode, true);
+        }
+      }
+    });
+    pmenu.add(addLeft);
+
+    addRight = new JMenuItem(Options.getMsg("handler.addrightsibling.txt"));
+    addRight.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.addrightsibling.key")));
+    addRight.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).addSibling(menuNode, false);
+        }
+      }
+    });
+    pmenu.add(addRight);
+    pmenu.addSeparator();
+
+    switchLeft = new JMenuItem(Options.getMsg("handler.switchleft.txt"));
+    switchLeft.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.switchleft.key")));
+    switchLeft.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).switchSibling(menuNode, true);
+        }
+      }
+    });
+    pmenu.add(switchLeft);
+
+    switchRight = new JMenuItem(Options.getMsg("handler.switchright.txt"));
+    switchRight.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.switchright.key")));
+    switchRight.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).switchSibling(menuNode, false);
+        }
+      }
+    });
+    pmenu.add(switchRight);
+
+    removeTree = new JMenuItem(Options.getMsg("handler.removetree.txt"));
+    removeTree.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.removetree.key")));
+    removeTree.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).removeTree(menuNode);
+        }
+      }
+    });
+    pmenu.add(removeTree);
+    removeChildren = new JMenuItem(Options.getMsg("handler.removechildren.txt"));
+    removeChildren
+        .setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("handler.removechildren.key")));
+    removeChildren.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent evt) {
+        if (menuNode != null) {
+          ((ADTreeCanvas) canvas).removeChildren(menuNode);
+        }
+      }
+    });
+    pmenu.add(removeChildren);
+    // pmenu.addSeparator();
+
+    // menuItem = new JMenuItem("Change Basic Assignment");
+    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K,
+    // InputEvent.CTRL_MASK));
+    // menuItem.addActionListener(new ActionListener() {
+    // public void actionPerformed(ActionEvent evt) {
+    // changeBAActionPerformed(evt);
+    // }
+    // });
+    // pmenu.add(menuItem);
+    // pmenu.addSeparator();
+
+    // menuItem = new JMenuItem("Collapse/Expand Node");
+    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T,
+    // InputEvent.CTRL_MASK));
+    // menuItem.addActionListener(new ActionListener() {
+    // public void actionPerformed(ActionEvent evt) {
+    // collapseActionPerformed();
+    // }
+    // });
+    // pmenu.add(menuItem);
+    // pmenu.addSeparator();
+
+    // menuItem = new JMenuItem("Properties");
+    // //menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+    // InputEvent.CTRL_MASK));
+    // menuItem.addActionListener(new ActionListener() {
+    // public void actionPerformed(ActionEvent evt) {
+    // propertiesActionPerformed(evt);
+    // }
+    // });
+    // pmenu.add(menuItem);
+  }
+
+  /**
+   * Checks if a string is a valid label
+   *
+   * @param s
+   * @return
+   */
+  private boolean validLabel(String s) {
+    return ((ADTreeCanvas) canvas).validLabel(s);
+  }
+
+  /**
+   * Displays a dialog to change the label of the node
+   *
+   */
+  private void changeLabelActionPerformed() {
+    if (menuNode != null) {
+      String s =
+          (String) MultiLineInput.showInputDialog(Options.getMsg("handler.dialog.newlabel.txt"),
+              Options.getMsg("handler.dialog.newlabel.title"), menuNode.getName());
+      if (s == null) {
+        return;
+      }
+      // If a string was returned, say so.
+      while (!validLabel(s.replaceAll("^ +| +$| +\n|\n +|(\n)[ \t]*\n|( )+", "$1"))) {
+        s = (String) MultiLineInput.showInputDialog(
+            "<html><body><font color=\"red\">" + Options.getMsg("handler.dialog.newlabel.invalid")
+                + ".</font> " + Options.getMsg("handler.dialog.newlabel.txt") + "</body></html>",
+            Options.getMsg("handler.dialog.newlabel.title"), s.trim());
+        if (s == null) {
+          return;
+        }
+      }
+      s = s.replaceAll("(?m)^ +| +$|^[ \t]*\r?\n|( )+", "$1");// replaceAll("(?m)^[
+                                                              // \t]*\r?\n",
+                                                              // "").replaceAll("^
+                                                              // +| +$| +\n|(
+                                                              // )+","$1");
+      menuNode.setName(s);
+      ((ADTreeCanvas) canvas).setLabel(menuNode, s);
+      ((ADTreeCanvas) canvas).setFocus(menuNode);
+    }
+  }
+
+  // private ADTreeCanvas canvas;
+  private JMenuItem toggleAboveFold;
+  private JMenuItem toggleFold;
+  private JMenuItem addCounter;
+  private JMenuItem addLeft;
+  private JMenuItem addRight;
+  private JMenuItem removeTree;
+  private JMenuItem removeChildren;
+  private JMenuItem switchLeft;
+  private JMenuItem switchRight;
+  // private Point2D dragStart;
+  // private boolean dragScroll;
+
+}

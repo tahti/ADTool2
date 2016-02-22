@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="disjunctive">
+    <label>RFID Dos Attack</label>
+    <node refinement="disjunctive">
+      <label>Remove Tag</label>
+      <node refinement="disjunctive">
+        <label>Remove Tag Self</label>
+        <node refinement="disjunctive">
+          <label>Infiltrate Building</label>
+          <node refinement="conjunctive">
+            <label>Breaking and Entering</label>
+            <node refinement="disjunctive">
+              <label>Get onto Premises</label>
+              <node refinement="disjunctive">
+                <label>Climb over Fence</label>
+                <node refinement="disjunctive" switchRole="yes">
+                  <label>Barbed Wire</label>
+                  <node refinement="disjunctive" switchRole="yes">
+                    <label>Guard Aganist Barbs</label>
+                    <node refinement="disjunctive">
+                      <label>Use Carpet on Barbs</label>
+                    </node>
+                    <node refinement="disjunctive">
+                      <label>Wear Protective Clothing</label>
+                    </node>
+                  </node>
+                </node>
+              </node>
+              <node refinement="disjunctive">
+                <label>Enter through Gate</label>
+              </node>
+            </node>
+            <node refinement="disjunctive">
+              <label>Get into Warehouse</label>
+              <node refinement="disjunctive">
+                <label>Enter through Door</label>
+                <node refinement="disjunctive" switchRole="yes">
+                  <label>Monitor with Biometric Sensors</label>
+                </node>
+              </node>
+              <node refinement="disjunctive">
+                <label>Enter through Loading Dock</label>
+              </node>
+            </node>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Monitor with Security Cameras</label>
+              <node refinement="disjunctive" switchRole="yes">
+                <label>Disable Cameras</label>
+                <node refinement="disjunctive">
+                  <label>Laser Cameras</label>
+                </node>
+                <node refinement="disjunctive">
+                  <label>Video Loop Cameras</label>
+                  <node refinement="disjunctive" switchRole="yes">
+                    <label>Employ Guards</label>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+          <node refinement="disjunctive">
+            <label>Pose as a Truck Driver</label>
+          </node>
+          <node refinement="conjunctive">
+            <label>Postal Trojan Attack</label>
+            <node refinement="disjunctive">
+              <label>Hide in a Box</label>
+            </node>
+            <node refinement="disjunctive">
+              <label>Be Sent to the Warehouse</label>
+              <node refinement="disjunctive" switchRole="yes">
+                <label>Sniffer Dog</label>
+                <node refinement="disjunctive" switchRole="yes">
+                  <label>Confuse Dog</label>
+                  <node refinement="disjunctive">
+                    <label>Distract Dog with Rats</label>
+                  </node>
+                  <node refinement="disjunctive">
+                    <label>Spray Pepper</label>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+          <node refinement="conjunctive">
+            <label>Visitor Attack</label>
+            <node refinement="disjunctive">
+              <label>Come as Visitor</label>
+            </node>
+            <node refinement="disjunctive">
+              <label>Hide in Bathroom</label>
+              <node refinement="disjunctive" switchRole="yes">
+                <label>Track Visitors</label>
+                <node refinement="disjunctive">
+                  <label>Escort Visitors</label>
+                </node>
+                <node refinement="disjunctive">
+                  <label>Register in Visitor's Log</label>
+                  <node refinement="disjunctive" switchRole="yes">
+                    <label>Fake Log Entry</label>
+                    <node refinement="disjunctive" switchRole="yes">
+                      <label>Attended Visitor's Log</label>
+                    </node>
+                  </node>
+                </node>
+                <node refinement="disjunctive">
+                  <label>Attend Visitor's Log</label>
+                </node>
+                <node refinement="disjunctive">
+                  <label>Presence Detectors on Premises</label>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+        <node refinement="disjunctive">
+          <label>Infiltrate Organisation</label>
+          <node refinement="disjunctive">
+            <label>Get Hired as Warehouse Staff</label>
+          </node>
+          <node refinement="disjunctive">
+            <label>Pose as Warehouse Employee</label>
+          </node>
+          <node refinement="disjunctive">
+            <label>Buy the Warehouse</label>
+          </node>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Background Check</label>
+          </node>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Other Person Removes Tag</label>
+        <node refinement="conjunctive">
+          <label>Bribe</label>
+          <node refinement="disjunctive">
+            <label>Identify Corruptible Subject</label>
+          </node>
+          <node refinement="disjunctive">
+            <label>Bribe Subject</label>
+          </node>
+          <node refinement="conjunctive" switchRole="yes">
+            <label>Thwart Employees</label>
+            <node refinement="disjunctive">
+              <label>Security Awareness Training</label>
+            </node>
+            <node refinement="disjunctive">
+              <label>Threaten to Fire Employees</label>
+            </node>
+          </node>
+        </node>
+        <node refinement="disjunctive">
+          <label>Threaten</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Blackmail</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Trick</label>
+          <node refinement="disjunctive">
+            <label>Send False Replacement Tag</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Authenticate Tag</label>
+              <node refinement="disjunctive" switchRole="yes">
+                <label>Break Authentication</label>
+              </node>
+            </node>
+          </node>
+          <node refinement="conjunctive">
+            <label>False Management Order</label>
+            <node refinement="disjunctive">
+              <label>Infiltrate Management</label>
+            </node>
+            <node refinement="disjunctive">
+              <label>Order Tag Replacement</label>
+            </node>
+          </node>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Security Awareness Training</label>
+          </node>
+        </node>
+      </node>
+      <node refinement="disjunctive" switchRole="yes">
+        <label>Attach with Strenger Adhesive</label>
+      </node>
+    </node>
+    <node refinement="disjunctive">
+      <label>Disable Tag</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Overload Tag</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Disable Reader</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Disable Backend</label>
+    </node>
+    <node refinement="disjunctive">
+      <label>Block Communication</label>
+      <node refinement="disjunctive">
+        <label>Block Tag Reader</label>
+        <node refinement="conjunctive">
+          <label>Shield Tag</label>
+          <node refinement="disjunctive">
+            <label>Be in Vicinity of Tag</label>
+            <node refinement="disjunctive" switchRole="yes">
+              <label>Secure Warehouse</label>
+            </node>
+          </node>
+          <node refinement="disjunctive">
+            <label>Faraday Cage</label>
+            <node refinement="disjunctive">
+              <label>Cage Around Reader</label>
+            </node>
+            <node refinement="disjunctive">
+              <label>Cage Around Tag</label>
+            </node>
+          </node>
+        </node>
+        <node refinement="disjunctive">
+          <label>Blocker Reader</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Blocker Tag</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Jam Signal</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Isolate Network</label>
+            <node refinement="disjunctive">
+              <label>Secure Warehouse</label>
+            </node>
+            <node refinement="disjunctive">
+              <label>Faraday Around Tag and Reader</label>
+            </node>
+          </node>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Block Reader Backend</label>
+        <node refinement="disjunctive">
+          <label>DoS in Network</label>
+        </node>
+      </node>
+    </node>
+  </node>
+</adtree>

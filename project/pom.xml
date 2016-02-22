@@ -1,0 +1,238 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>lu.uni.adtool</groupId>
+  <artifactId>ADTool</artifactId>
+  <version>2.0</version>
+  
+  <packaging>jar</packaging>
+  
+  <name>ADTool</name>
+  <url>http://satoss.uni.lu/members/piotr/adtool</url>
+  <description>ADTool - program to edit Attack-Defense Trees and Attack Trees with Sequential Conqunction.</description> 
+  
+  <developers>
+    <developer>
+      <id>pk</id>
+      <name>Piotr Kordy</name>
+      <email>piotr.kordy@uni.lu</email>
+      <organization>University of Luxembourg</organization>
+      <organizationUrl>http://www.uni.lu</organizationUrl>
+    </developer>
+  </developers>
+  
+  <organization>
+    <name>University of Luxembourg</name>
+    <url>http://www.uni.lu</url>
+  </organization>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <scm>
+    <connection>scm:svn:svn+ssh://pkordy@svn.gforge.uni.lu/svn/piotrkordy/projects/ADTool2/project</connection>
+    <url>scm:svn:svn+ssh://pkordy@svn.gforge.uni.lu/svn/piotrkordy/projects/ADTool2/project</url>
+  </scm>
+  <repositories>
+    <repository>
+      <id>sonatype-oss-snapshots</id>
+      <name>Sonatype OSS Maven Repository for Staging Snapshots</name>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency>
+      <groupId>org.dockingframes</groupId>
+      <artifactId>docking-frames-common</artifactId>
+      <version>1.1.2-SNAPSHOT</version>
+      <!--<version>1.1.1</version>-->
+    </dependency>
+    <dependency>
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>[0.9,)</version>
+    </dependency>  
+    <dependency>
+      <groupId>org.abego.treelayout</groupId>
+      <artifactId>org.abego.treelayout.core</artifactId>
+      <version>[1.0,)</version>
+    </dependency>
+    <dependency>
+       <groupId>com.itextpdf</groupId>
+       <artifactId>itextpdf</artifactId>
+       <version>[5.5,)</version>
+       <type>jar</type>
+     </dependency>
+     <dependency>
+       <groupId>com.itextpdf.tool</groupId>
+       <artifactId>xmlworker</artifactId>
+       <version>1.1.1</version>
+       <type>jar</type>
+     </dependency>
+  </dependencies>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <!--<resource>-->
+      <!--<directory>src/main/filtered-resources</directory>-->
+      <!--<filtering>true</filtering>-->
+      <!--</resource>-->
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+        <configuration>
+          <header>src/main/resources/header.txt</header>
+          <includes>
+            <include>src/**/*.java</include>
+          </includes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <version>1.2</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>create</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!--
+           doCheck and doUpdate actually talk to repository if it's true,
+           Check would check that there are no local changes.
+           Update would update it
+          -->
+          <docheck>false</docheck>
+          <doupdate>false</doupdate>
+          <!--
+           This ensures that even if we are not connected to scm than also
+           take the version from local .svn file
+          -->
+          <!--<revisiononscmfailure>-->
+            <!--
+             Generate sequence build number based on:
+             build number and timestamp     
+            -->
+            <!--<timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat>-->
+            <timestampFormat>{0, date, MMMMMMMM dd, yyyy}</timestampFormat>
+            <format>{0}</format>
+            <items>
+              <item>scmVersion</item>
+            </items>
+          <!--</revisiononscmfailure>-->
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <mainClass>lu.uni.adtool.Main</mainClass>
+            </manifest>
+            <!-- will put the entries into META-INF/MANIFEST.MF file -->
+            <manifestEntries>
+              <!--<implementation-version>${project.version}</implementation-version>-->
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+              <Url>${project.url}</Url>
+              <Date-Build>${timestamp}</Date-Build>
+              <Permissions>all-permissions</Permissions>
+              <!--<Implementation-Build-Date>${timestamp}</Implementation-Build-Date>-->
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>make-jar</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- bind to the packaging phase -->
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/jar.xml</descriptor>
+            <descriptor>src/main/assembly/src.xml</descriptor>
+          </descriptors>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              <mainClass>lu.uni.adtool.ADToolMain</mainClass>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+              <Url>${project.url}</Url>
+              <Date-Build>${timestamp}</Date-Build>
+              <Permissions>all-permissions</Permissions>
+            </manifestEntries>
+          </archive>
+        </configuration>
+<!--         <configuration> -->
+<!--           <archive> -->
+<!--             <manifest> -->
+<!--               <addClasspath>true</addClasspath> -->
+<!--               <addDefaultImplementationEntries>true</addDefaultImplementationEntries> -->
+<!--               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries> -->
+<!--               <mainClass>lu.uni.adtool.ADToolMain</mainClass> -->
+<!--             </manifest> -->
+<!--             <manifestEntries> -->
+<!--               <Implementation-Build>${buildNumber}</Implementation-Build> -->
+<!--               <Url>${project.url}</Url> -->
+<!--               <Date-Build>${timestamp}</Date-Build> -->
+<!--               <Permissions>all-permissions</Permissions> -->
+<!--             </manifestEntries> -->
+<!--           </archive> -->
+<!--           <descriptorRefs> -->
+<!--             <descriptorRef>jar-with-dependencies</descriptorRef> -->
+<!--             <descriptorRef>project</descriptorRef> -->
+<!--           </descriptorRefs> -->
+<!--                       rename the output file -->
+<!--                       <finalName> ${project.build.finalName}-full</finalName> -->
+<!--                       <appendAssemblyId>false</appendAssemblyId> -->
+<!--         </configuration> -->
+      </plugin>
+      
+    </plugins>
+  </build>
+</project>
+

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="disjunctive">
+    <label>Bank Account</label>
+    <node refinement="conjunctive">
+      <label>ATM</label>
+      <node refinement="disjunctive">
+        <label>PIN</label>
+        <node refinement="disjunctive">
+          <label>Eavesdrop</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Find Note</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Memorize</label>
+          </node>
+        </node>
+        <node refinement="disjunctive">
+          <label>Force</label>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Card</label>
+      </node>
+    </node>
+    <node refinement="conjunctive">
+      <label>Online</label>
+      <node refinement="disjunctive">
+        <label>Password</label>
+        <node refinement="disjunctive">
+          <label>Phishing</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Key Logger</label>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>User Name</label>
+      </node>
+      <node refinement="disjunctive" switchRole="yes">
+        <label>2nd Auth Factor</label>
+        <node refinement="disjunctive">
+          <label>Key Fobs</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>PIN Pad</label>
+        </node>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Malware</label>
+          <node refinement="disjunctive">
+            <label>Browser</label>
+          </node>
+          <node refinement="disjunctive">
+            <label>OS</label>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</adtree>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="disjunctive">
+    <label>Block Communication</label>
+    <node refinement="disjunctive">
+      <label>Block Tag Reader</label>
+      <node refinement="conjunctive">
+        <label>Shield Tag</label>
+        <node refinement="disjunctive">
+          <label>Be in Vicinity of Tag</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Secure Warehouse</label>
+          </node>
+        </node>
+        <node refinement="disjunctive">
+          <label>Faraday Cage</label>
+          <node refinement="disjunctive">
+            <label>Cage Around Reader</label>
+          </node>
+          <node refinement="disjunctive">
+            <label>Cage Around Tag</label>
+          </node>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Blocker Reader</label>
+      </node>
+      <node refinement="disjunctive">
+        <label>Blocker Tag</label>
+      </node>
+      <node refinement="disjunctive">
+        <label>Jam Signal</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Isolate Network</label>
+          <node refinement="disjunctive">
+            <label>Secure Warehouse</label>
+          </node>
+          <node refinement="disjunctive">
+            <label>Faraday Around Tag and Reader</label>
+          </node>
+        </node>
+      </node>
+    </node>
+    <node refinement="disjunctive">
+      <label>Block Reader Backend</label>
+      <node refinement="disjunctive">
+        <label>Dos in Network</label>
+      </node>
+    </node>
+  </node>
+</adtree>

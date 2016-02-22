@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><adtree>
+  <node refinement="conjunctive">
+    <label>Breaking and Entering</label>
+    <node refinement="disjunctive">
+      <label>Get onto Premises</label>
+      <node refinement="disjunctive">
+        <label>Climb over Fence</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Barbed Wire</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Guard Aganist Barbs</label>
+            <node refinement="disjunctive">
+              <label>Use Carpet on Barbs</label>
+            </node>
+            <node refinement="disjunctive">
+              <label>Wear Protective Clothing</label>
+            </node>
+          </node>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Enter through Gate</label>
+      </node>
+    </node>
+    <node refinement="disjunctive">
+      <label>Get into Warehouse</label>
+      <node refinement="disjunctive">
+        <label>Enter through Door</label>
+        <node refinement="disjunctive" switchRole="yes">
+          <label>Monitor with Biometric Sensors</label>
+        </node>
+      </node>
+      <node refinement="disjunctive">
+        <label>Enter through Loading Dock</label>
+      </node>
+    </node>
+    <node refinement="disjunctive" switchRole="yes">
+      <label>Monitor with Security Cameras</label>
+      <node refinement="disjunctive" switchRole="yes">
+        <label>Disable Cameras</label>
+        <node refinement="disjunctive">
+          <label>Laser Cameras</label>
+        </node>
+        <node refinement="disjunctive">
+          <label>Video Loop Cameras</label>
+          <node refinement="disjunctive" switchRole="yes">
+            <label>Employ Guards</label>
+          </node>
+        </node>
+      </node>
+    </node>
+  </node>
+</adtree>
