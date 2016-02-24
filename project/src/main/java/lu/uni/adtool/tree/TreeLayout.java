@@ -1,29 +1,39 @@
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.Parametrized;
+import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import bibliothek.gui.dock.common.MultipleCDockableLayout;
 import bibliothek.util.xml.XElement;
+import bibliothek.util.xml.XException;
 
 public class TreeLayout implements MultipleCDockableLayout {
   public static int SAND_ID = 1;
-  public static int ADT_ID = 2;
+  public static int ADT_ID  = 2;
 
   public TreeLayout(int id) {
     this.id = id;
     this.treeRoot = null;
     this.domains = new ArrayList<ValuationDomain>();
+    this.switchRole = false;
   }
 
   public TreeLayout(int id, Node treeRoot) {
     this.id = id;
     this.treeRoot = treeRoot;
     this.domains = new ArrayList<ValuationDomain>();
+    this.switchRole = false;
   }
 
   // public SandTreeLayout() {
@@ -33,11 +43,12 @@ public class TreeLayout implements MultipleCDockableLayout {
   // this.domains = new ArrayList<ValuationDomain>();
   // }
   public boolean isSand() {
-    if(this.treeRoot instanceof SandNode){
+    if (this.treeRoot instanceof SandNode) {
       return true;
     }
     return false;
   }
+
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
@@ -59,7 +70,7 @@ public class TreeLayout implements MultipleCDockableLayout {
   public void readStream(DataInputStream in) throws IOException {
     int type = in.readInt();
     this.id = in.readInt();
-    if(type == SAND_ID){
+    if (type == SAND_ID) {
       this.treeRoot = SandNode.readStream(in);
     }
     else {
@@ -68,15 +79,25 @@ public class TreeLayout implements MultipleCDockableLayout {
   }
 
   public void writeStream(DataOutputStream out) throws IOException {
-    if(this.treeRoot instanceof SandNode){
+    if (this.treeRoot instanceof SandNode) {
       out.writeInt(SAND_ID);
       out.writeInt(this.id);
-      ((SandNode)this.treeRoot).writeStream(out);
+      ((SandNode) this.treeRoot).writeStream(out);
     }
     else {
       out.writeInt(ADT_ID);
       out.writeInt(this.id);
-      ((ADTNode)this.treeRoot).writeStream(out);
+      ((ADTNode) this.treeRoot).writeStream(out);
+    }
+  }
+
+  public boolean getSwitchRole() {
+    return switchRole;
+  }
+
+  public void toggleRole() {
+    if (!isSand()) {
+      this.switchRole = !this.switchRole;
     }
   }
 
@@ -88,7 +109,7 @@ public class TreeLayout implements MultipleCDockableLayout {
     e = element.getElement("type");
     if (e == null) return;
     int type = e.getInt();
-    if(type == SAND_ID){
+    if (type == SAND_ID) {
       this.treeRoot = new SandNode();
       ((SandNode) this.treeRoot).fromXml(element.getElement("node"));
     }
@@ -106,13 +127,94 @@ public class TreeLayout implements MultipleCDockableLayout {
 
   public void writeXML(XElement element) {
     element.addElement("id").setInt(this.id);
-    if(this.treeRoot instanceof SandNode){
+    if (this.treeRoot instanceof SandNode) {
       element.addElement("type").setInt(SAND_ID);
-      element.addElement(((SandNode)this.treeRoot).toXml());
+      element.addElement(((SandNode) this.treeRoot).toXml());
     }
     else {
       element.addElement("type").setInt(ADT_ID);
-      element.addElement(((ADTNode)this.treeRoot).toXml());
+      element.addElement(((ADTNode) this.treeRoot).toXml());
+    }
+  }
+
+  public void importXml(XElement e, int treeId) throws IllegalArgumentException {
+    XElement root;
+    root = e.getElement("node");
+    HashMap<String, ValuationDomain> domainsHash = new HashMap<String, ValuationDomain>();
+    int i = 0;
+    if (e.getName().equals("sandtree")) {
+      for (XElement domain : e.getElements("domain")) {
+        i++;
+        String domainName = domain.getElement("class").getString();
+        SandDomain d = (SandDomain) DomainFactory.createFromString(domainName);
+        if (d == null) {
+          throw new IllegalArgumentException(Options.getMsg("exception.nodomain") + domainName);
+        }
+        String domainId = domain.getString("id");
+        if (domainId == null || domainsHash.containsKey(domainId)) {
+          throw new IllegalArgumentException(Options.getMsg("exception.wrongxml"));
+        }
+        domainsHash.put(domain.getString("id"), new ValuationDomain(treeId, i, d));
+      }
+      this.treeRoot = new SandNode();
+      ((SandNode) this.treeRoot).importXml(root, domainsHash);
+      this.switchRole = false;
+      this.domains = new ArrayList<ValuationDomain>(domainsHash.values());
+    }
+    else if (e.getName().equals("adtree")) {
+      for (XElement domain : e.getElements("domain")) {
+        i++;
+        String domainName = domain.getElement("class").getString();
+        AdtDomain d = (AdtDomain) DomainFactory.createFromString(domainName);
+        if (d == null) {
+          throw new IllegalArgumentException(Options.getMsg("exception.nodomain") + domainName);
+        }
+        if (d instanceof Parametrized) {
+          String range = domain.getElement("range").getString();
+          if (((Parametrized) d).getParameter() instanceof Integer) {
+            if (range.equals(Options.getMsg("inputdialog.infinity"))) {
+              ((Parametrized) d).setParameter(Integer.MAX_VALUE);
+            }
+            else {
+              ((Parametrized) d).setParameter(Integer.parseInt(range));
+            }
+          }
+        }
+        String domainId = domain.getString("id");
+        if (domainId == null || domainsHash.containsKey(domainId)) {
+          throw new IllegalArgumentException(Options.getMsg("exception.wrongxml"));
+        }
+        domainsHash.put(domain.getString("id"), new ValuationDomain(treeId, i, d));
+      }
+      this.treeRoot = new ADTNode();
+      this.treeRoot.setName(root.getElement("label").getString());
+      try {
+        this.switchRole = (root.getString("switchRole").toLowerCase().equals("yes")
+            || root.getString("switchRole").toLowerCase().equals("true"));
+      }
+      catch (XException exception) {
+        this.switchRole = false;
+      }
+      for (XElement parameter : root.getElements("parameter")) {
+        String category = parameter.getString("category");
+        if (category == null) {
+          throw new IllegalArgumentException(Options.getMsg("exception.wrongxml"));
+        }
+        if (category.equals("basic")) {
+          ValuationDomain d = domainsHash.get(parameter.getString("domainId"));
+          if (d != null) {
+            Ring r = d.getDomain().getDefaultValue(this.treeRoot);
+            r.updateFromString(parameter.getString());
+            d.setValue(this.treeRoot.getName(), r);
+          }
+        }
+      }
+      for (XElement child : root.getElements("node")) {
+        ADTNode ch = new ADTNode();
+        this.treeRoot.addChild(ch);
+        ch.importXml(child, domainsHash);
+      }
+      this.domains = new ArrayList<ValuationDomain>(domainsHash.values());
     }
   }
 
@@ -147,10 +249,10 @@ public class TreeLayout implements MultipleCDockableLayout {
   public void recalculateValues() {
     for (ValuationDomain values : domains) {
       if (treeRoot instanceof SandNode) {
-        values.valuesUpdated((SandNode)treeRoot);
+        values.valuesUpdated((SandNode) treeRoot);
       }
       else {
-        values.valuesUpdated((ADTNode)treeRoot);
+        values.valuesUpdated((ADTNode) treeRoot);
       }
     }
   }
@@ -158,10 +260,10 @@ public class TreeLayout implements MultipleCDockableLayout {
   public void refreshValues() {
     for (ValuationDomain values : domains) {
       if (treeRoot instanceof SandNode) {
-        values.treeChanged((SandNode)treeRoot);
+        values.treeChanged((SandNode) treeRoot);
       }
       else {
-        values.treeChanged((ADTNode)treeRoot);
+        values.treeChanged((ADTNode) treeRoot);
       }
     }
   }
@@ -210,4 +312,5 @@ public class TreeLayout implements MultipleCDockableLayout {
   private Node                       treeRoot;
   private int                        id;
   private ArrayList<ValuationDomain> domains;
+  private boolean                    switchRole;
 }

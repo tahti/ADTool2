@@ -1,3 +1,6 @@
 moveToSatoss
 target
 project/target
+.classpath
+.project
+.settings

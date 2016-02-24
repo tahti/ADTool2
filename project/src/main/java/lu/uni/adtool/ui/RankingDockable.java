@@ -72,8 +72,8 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     pane.removeAll();
     this.canvas = canvas;
     if (this.getCanvas() instanceof AbstractDomainCanvas) {
-      if (canvas.getTree() != null && (canvas.isSand()
-          || ((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain)) {
+      if (canvas.getTree() != null && (canvas.isSand() || (canvas instanceof AbstractDomainCanvas
+          && ((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain))) {
         JScrollPane scrollPane = new JScrollPane(this.createTable((AbstractDomainCanvas) canvas));
         pane.add(scrollPane);
         pane.revalidate();
@@ -94,8 +94,8 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
       setCanvas(canvas);
     }
     else {
-      if (canvas.isSand()
-          || ((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain) {
+      if (canvas.isSand() || (canvas instanceof AbstractDomainCanvas
+          && ((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain)) {
         Debug.log("Root used with name:" + root.getName());
         RankingTableModel model = ((RankingTableModel) this.table.getModel());
         if (model != null) {
@@ -109,7 +109,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         }
       }
       else {
-        //TODO - put message?
+        // TODO - put message?
       }
     }
   }

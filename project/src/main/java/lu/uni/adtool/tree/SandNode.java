@@ -76,41 +76,6 @@ public class SandNode extends GuiNode {
   }
 
   /**
-   * Import from XML using format used by the first version of ADTool
-   *
-   */
-  public ArrayList<ValuationDomain> importXml(XElement e, int treeId)
-      throws IllegalArgumentException {
-    XElement root;
-    root = e.getElement("node");
-    HashMap<String, ValuationDomain> domains = new HashMap<String, ValuationDomain>();
-    int i = 0;
-    for (XElement domain : e.getElements("domain")) {
-      i++;
-//       XElement etool = domain.getElement("tool");
-//       if (etool == null) {
-//         throw new IllegalArgumentException(Options.getMsg("exception.wrongtool"));
-//       }
-//       String tool = etool.getString();
-//       if (tool == null || (!tool.startsWith("ADTool"))) {
-//         throw new IllegalArgumentException(Options.getMsg("exception.wrongtool"));
-//       }
-      String domainName = domain.getElement("class").getString();
-      SandDomain d = (SandDomain)DomainFactory.createFromString(domainName);// TODO - handling of domains with parameters
-      if (d == null) {
-        throw new IllegalArgumentException(Options.getMsg("exception.nodomain") + domainName);
-      }
-      String domainId = domain.getString("id");
-      if (domainId == null || domains.containsKey(domainId)) {
-        throw new IllegalArgumentException(Options.getMsg("exception.wrongxml"));
-      }
-      domains.put(domain.getString("id"), new ValuationDomain(treeId, i, d));
-    }
-    this.importXml(root, domains);
-    return new ArrayList<ValuationDomain>(domains.values());
-  }
-
-  /**
    * Export to XML using format used by the first version of ADTool
    *
    */
@@ -239,7 +204,7 @@ public class SandNode extends GuiNode {
     }
   }
 
-  private void importXml(XElement e, HashMap<String, ValuationDomain> domains)
+  public void importXml(XElement e, HashMap<String, ValuationDomain> domains)
       throws IllegalArgumentException {
     setName(e.getElement("label").getString());
     this.type = xmlToType(e.getString("refinement"));

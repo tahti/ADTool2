@@ -81,7 +81,7 @@ public final class Options {
   public static Color        canv_rankRootMark         = new Color(150, 150, 0);
   public static Color        canv_rankNodeMark         = new Color(50, 170, 50);
   public static Color        canv_rankLeafMark         = new Color(150, 255, 150);
-  public static ADTNode.Role canv_Defender             = ADTNode.Role.OPPONENT;
+//   public static ADTNode.Role canv_Defender             = ADTNode.Role.OPPONENT; // moved to treeLayout
   /**
    * Arc size of round rectangle for node.
    */

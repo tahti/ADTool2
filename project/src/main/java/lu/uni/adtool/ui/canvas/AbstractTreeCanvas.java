@@ -610,7 +610,7 @@ public abstract class AbstractTreeCanvas extends JPanel
   public void createXml(FileOutputStream fileStream) {
     XmlConverter converter = new XmlConverter();
     try {
-      converter.exportTo(fileStream, tree.getRoot(true), tree.getLayout().getDomains());
+      converter.exportTo(fileStream, tree.getLayout());
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -864,7 +864,8 @@ public abstract class AbstractTreeCanvas extends JPanel
     fillCol = getFillColor(node);
     // ATTACKER type
     if (node instanceof ADTNode) {
-      if (((ADTNode) node).getRole() == Options.canv_Defender) {
+      ADTNode.Role defender = tree.getLayout().getSwitchRole()?ADTNode.Role.PROPONENT:ADTNode.Role.OPPONENT;
+      if (((ADTNode) node).getRole() == defender) {
         borderCol = Options.canv_BorderColorDef;
         textCol = Options.canv_TextColorDef;
         shape = Options.canv_ShapeDef;
@@ -1041,7 +1042,8 @@ public abstract class AbstractTreeCanvas extends JPanel
     // ATTACKER type
     Options.ShapeType shape = Options.canv_ShapeAtt;
     if (node instanceof ADTNode) {
-      if (((ADTNode) node).getRole() == Options.canv_Defender) {
+      ADTNode.Role defender = tree.getLayout().getSwitchRole()?ADTNode.Role.PROPONENT:ADTNode.Role.OPPONENT;
+      if (((ADTNode) node).getRole() == defender) {
         shape = Options.canv_ShapeDef;
       }
     }

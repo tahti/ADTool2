@@ -28,25 +28,27 @@ public class XmlConverter {
    *          stream to which we write - we assume stream is open and we close
    *          it.
    */
-  public void exportTo(FileOutputStream fileStream, Node root, ArrayList<ValuationDomain> domains)
+  public void exportTo(FileOutputStream fileStream, TreeLayout layout) //, ArrayList<ValuationDomain> domains)
       throws IOException {
-    if (root == null) return;
     XElement rootXML = null;
-    if (root instanceof SandNode) {
+    if (layout.isSand())  {
       rootXML = new XElement("sandtree");
-      rootXML.addElement(((SandNode) root).exportXml(domains));
-      Debug.log("Exporting domains:" + Options.main_saveDomains + " size:" + domains.size());
-      if (domains != null && Options.main_saveDomains) {
-        for (ValuationDomain d : domains) {
+      rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains()));
+      if (layout.getDomains() != null && Options.main_saveDomains) {
+        for (ValuationDomain d : layout.getDomains()) {
           d.exportXML(rootXML);
         }
       }
     }
     else {
       rootXML = new XElement("adtree");
-      rootXML.addElement(((ADTNode) root).exportXml(domains));
-      if (domains != null && Options.main_saveDomains) {
-        for (ValuationDomain d : domains) {
+      XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains());
+      if (layout.getSwitchRole())  {
+        rootNode.addString("switchRole", "yes");
+      }
+      rootXML.addElement(rootNode);
+      if (layout.getDomains() != null && Options.main_saveDomains) {
+        for (ValuationDomain d : layout.getDomains()) {
           d.exportXML(rootXML);
         }
       }
@@ -69,30 +71,11 @@ public class XmlConverter {
     TreeFactory treeFactory = controller.getFrame().getTreeFactory();
     int treeId = treeFactory.getNewUniqueId();
     TreeLayout treeLayout = new TreeLayout(treeId);
-    if (element.getName().equals("sandtree")) {
-      SandNode root = new SandNode();
-      try {
-        ArrayList<ValuationDomain> domains = root.importXml(element, treeId);
-        treeLayout.setRoot(root);
-        treeLayout.setDomains(domains);
-      }
-      catch (IllegalArgumentException e) {
-        controller.report(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
-      }
+    try {
+      treeLayout.importXml(element, treeId);
     }
-    else if (element.getName().equals("adtree")) {
-      ADTNode root = new ADTNode();
-      try {
-        ArrayList<ValuationDomain> domains = root.importXml(element, treeId);
-        treeLayout.setRoot(root);
-        treeLayout.setDomains(domains);
-      }
-      catch (IllegalArgumentException e) {
-        controller.report(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
-      }
-    }
-    else {
-      controller.report(Options.getMsg("error.xmlimport.nonode"));
+    catch (IllegalArgumentException e) {
+      controller.report(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
     }
     TreeDockable treeDockable = treeFactory.load(treeLayout);
     controller.addTreeDockable(treeDockable);

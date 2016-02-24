@@ -102,8 +102,9 @@ public final class MainController implements CControlListener, CFocusListener {
     }
     this.getFrame().getValuationsView().setCanvas(lastFocusedTree);
     this.getFrame().getDetailsView().assignCanvas(lastFocusedTree);
-    if(lastFocusedTree != null) {
-      this.getFrame().getRankingView().setFocus(lastFocusedTree, lastFocusedTree.getFocused(), false);
+    if (lastFocusedTree != null) {
+      this.getFrame().getRankingView().setFocus(lastFocusedTree, lastFocusedTree.getFocused(),
+          false);
     }
     else {
       this.getFrame().getRankingView().setFocus(lastFocusedTree, null, false);
@@ -236,14 +237,14 @@ public final class MainController implements CControlListener, CFocusListener {
       treeDockable.toFront();
     }
     DomainFactory factory = getFrame().getDomainFactory();
-    if(treeDockable.getLayout().getDomains() != null) {
-      for(ValuationDomain values:treeDockable.getLayout().getDomains()){
+    if (treeDockable.getLayout().getDomains() != null) {
+      for (ValuationDomain values : treeDockable.getLayout().getDomains()) {
         DomainDockable d = factory.read(values);
-          d.setWorkingArea(treeDockable.getWorkArea());
-          Debug.log("Adding domain to control with id:" + d.getUniqueId());
-          getControl().addDockable(d.getUniqueId(), d);
-          treeDockable.showDomain(d);
-          d.getCanvas().setTree(treeDockable.getCanvas().getTree());
+        d.setWorkingArea(treeDockable.getWorkArea());
+        Debug.log("Adding domain to control with id:" + d.getUniqueId());
+        getControl().addDockable(d.getUniqueId(), d);
+        treeDockable.showDomain(d);
+        d.getCanvas().setTree(treeDockable.getCanvas().getTree());
       }
     }
   }
@@ -306,11 +307,11 @@ public final class MainController implements CControlListener, CFocusListener {
     menuItem = fileMenu.add(fileNewADT);
     menuItem.addMouseListener(mouseHandler);
 
-
     ADAction fileExample = new ADAction(Options.getMsg("file.loadExample.txt")) {
       public void actionPerformed(final ActionEvent e) {
         loadExample();
       }
+
       private static final long serialVersionUID = -4300803966363076614L;
     };
     fileExample.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.loadExample.key")));
@@ -383,52 +384,6 @@ public final class MainController implements CControlListener, CFocusListener {
     final JMenu editMenu = new JMenu();
     editMenu.setText(Options.getMsg("edit.txt"));
     editMenu.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.key")).getKeyCode());
-    // menuItem = new JMenuItem(new DefaultEditorKit.CutAction());
-    // menuItem.setText("Cut");
-    // menuItem.setMnemonic(KeyEvent.VK_T);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-    // InputEvent.CTRL_MASK));
-    // editMenu.add(menuItem);
-    //
-    // menuItem = new JMenuItem(new DefaultEditorKit.CopyAction());
-    // menuItem.setText("Copy");
-    // menuItem.setMnemonic(KeyEvent.VK_C);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-    // InputEvent.CTRL_MASK));
-    // editMenu.add(menuItem);
-    //
-    // menuItem = new JMenuItem(new DefaultEditorKit.PasteAction());
-    // menuItem.setText("Paste");
-    // menuItem.setMnemonic(KeyEvent.VK_P);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
-    // InputEvent.CTRL_MASK));
-    // editMenu.add(menuItem);
-    // editMenu.addSeparator();
-    // menuItem = new JMenuItem("Switch Attacker/Defender Roles");
-    // menuItem.addActionListener(new ActionListener() {
-    // @SuppressWarnings("rawtypes")
-    // public void actionPerformed(ActionEvent e) {
-    // Options.canv_Defender = Options.canv_Defender ==
-    // ADTreeNode.Type.PROPONENT
-    // ? ADTreeNode.Type.OPPONENT : ADTreeNode.Type.PROPONENT;
-    // ((ADTreeView)
-    // views[0].getComponent()).getCanvas().getTree().updateAllSizes();
-    // //
-    // ((ADTreeView)views[0].getComponent()).getCanvas().getTree().notifyTreeChanged();
-    // ((ADTreeView) views[0].getComponent()).getCanvas().repaint();
-    // for (View v : dynamicViews.values()) {
-    // ((DomainView) v.getComponent()).getCanvas().getTree().updateAllSizes();
-    // ((DomainView) v.getComponent()).getCanvas().repaint();
-    // }
-    // status.report("Assigned a role of a defender to the "
-    // + (Options.canv_Defender == ADTreeNode.Type.PROPONENT ? "opponent." :
-    // "proponent."));
-    // }
-    // });
-    // menuItem.setMnemonic(KeyEvent.VK_S);
-    // menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W,
-    // InputEvent.CTRL_MASK));
-    // editMenu.add(menuItem);
     menuItem = new JMenuItem(Options.getMsg("edit.adddomain.txt"));
     menuItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -438,6 +393,37 @@ public final class MainController implements CControlListener, CFocusListener {
     menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.adddomain.key")).getKeyCode());
     menuItem.setEnabled(false);
     this.toDisableItems.add(menuItem);
+    menuItem = new JMenuItem(Options.getMsg("edit.switchRole.txt"));
+    menuItem
+        .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.switchRole.key")).getKeyCode());
+    menuItem.addActionListener(new ActionListener() {
+
+      // @SuppressWarnings("rawtypes")
+      public void actionPerformed(ActionEvent e) {
+        if (lastFocusedTree != null) {
+          lastFocusedTree.getTree().getLayout().toggleRole();
+          report(Options.getMsg("edit.switchRole.report",
+              (lastFocusedTree.getTree().getLayout().getSwitchRole()
+                  ? Options.getMsg("tablemodel.opponent").toLowerCase()
+                  : Options.getMsg("tablemodel.proponent").toLowerCase())));
+          lastFocusedTree.notifyAllTreeChanged();
+        }
+      }
+    });
+    menuItem.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.switchRole.acc")));
+    menuItem.setEnabled(false);
+    this.toDisableItems.add(menuItem);
+    editMenu.add(menuItem);
+    editMenu.add(menuItem);
+    editMenu.addSeparator();
+    menuItem = editMenu.add(editCut);
+    menuItem.addMouseListener(mouseHandler);
+    editMenu.add(menuItem);
+    menuItem = editMenu.add(editCopy);
+    menuItem.addMouseListener(mouseHandler);
+    editMenu.add(menuItem);
+    menuItem = editMenu.add(editPaste);
+    menuItem.addMouseListener(mouseHandler);
     editMenu.add(menuItem);
     return editMenu;
   }
@@ -592,7 +578,8 @@ public final class MainController implements CControlListener, CFocusListener {
     IconFactory iconFac = new IconFactory();
     fileNewSand = new ADAction(Options.getMsg("file.newSand.txt")) {
       public void actionPerformed(final ActionEvent e) {
-        final TreeLayout layout = new TreeLayout(frame.getTreeFactory().getNewUniqueId(), new SandNode());
+        final TreeLayout layout =
+            new TreeLayout(frame.getTreeFactory().getNewUniqueId(), new SandNode());
         final TreeDockable treeDockable = new TreeDockable(frame.getTreeFactory(), layout, false);
         addTreeDockable(treeDockable);
         report(Options.getMsg("status.newSandTree"));
@@ -722,6 +709,31 @@ public final class MainController implements CControlListener, CFocusListener {
     fileExit.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.exit.acc")));
     fileExit.setSmallIcon(iconFac.createImageIcon("/icons/exit.png"));
 
+    editCut = new ADAction(Options.getMsg("edit.cut.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        // cut
+      }
+    };
+    editCut.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.cut.key")));
+    editCut.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.cut.acc")));
+    editCut.setSmallIcon(iconFac.createImageIcon("/icons/cut.png"));
+    editPaste = new ADAction(Options.getMsg("edit.paste.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        // paste
+      }
+    };
+    editPaste.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.paste.key")));
+    editPaste.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.paste.acc")));
+    editPaste.setSmallIcon(iconFac.createImageIcon("/icons/paste.png"));
+    editCopy = new ADAction(Options.getMsg("edit.copy.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        // copy
+      }
+    };
+    editCopy.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.copy.key")));
+    editCopy.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.copy.acc")));
+    editCopy.setSmallIcon(iconFac.createImageIcon("/icons/copy.png"));
+
   }
 
   private void removeDomain(DomainDockable dockable) {
@@ -760,7 +772,7 @@ public final class MainController implements CControlListener, CFocusListener {
       }
       else {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(false);
-        Debug.log(" domains size:"+domains.size());
+        Debug.log(" domains size:" + domains.size());
         AddAdtDomainDialog addDialog = new AddAdtDomainDialog(this.frame);
         AdtDomain<?> d = addDialog.showDomainDialog(domains);
         if (d == null) {
@@ -886,6 +898,9 @@ public final class MainController implements CControlListener, CFocusListener {
   private static ADAction      filePrintPreview;
   private static ADAction      fileExit;
   private static ADAction      fileImportFromXml;
+  private static ADAction      editCopy;
+  private static ADAction      editCut;
+  private static ADAction      editPaste;
 
   private AbstractTreeCanvas   lastFocusedTree;
 
