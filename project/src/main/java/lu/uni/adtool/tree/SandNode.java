@@ -229,6 +229,20 @@ public class SandNode extends GuiNode {
     }
   }
 
+  public SandNode deepCopy() {
+    SandNode result = new SandNode();
+    result.setName(getName());
+    result.setType(getType());
+    result.setLeftSibling(null);
+    result.setRightSibling(null);
+    if (getChildren() != null) {
+      for (Node child : getChildren()) {
+        result.addChild(((SandNode) child).deepCopy());
+      }
+    }
+    return result;
+  }
+
   private Type stringToType(String typeStr) {
     if (typeStr.equals("AND")) {
       return Type.AND;

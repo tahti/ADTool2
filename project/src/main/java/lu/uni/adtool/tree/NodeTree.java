@@ -169,6 +169,25 @@ public class NodeTree {
     }
   }
 
+  public void addSubtree(Node parent, Node subtree) {
+    if(parent instanceof SandNode){
+      parent.addChild(subtree);
+    }
+    else {
+      if (((ADTNode) parent).getRole() != ((ADTNode)subtree).getRole()) {
+        if (!((ADTNode) parent).isCountered()) {
+          ((ADTNode)parent).addCounter((ADTNode)subtree);
+        }
+      }
+      else {
+        parent.addChild(subtree);
+      }
+    }
+    recalculateSiblings();
+    this.sharedExtentProvider.updateTreeSize(parent);
+    this.layout.refreshValues();
+  }
+
   public void addCounter(ADTNode parentNode, ADTNode node) {
     boolean refresh = parentNode.hasDefault();
     // checkArg(hasNode(parentNode), "parentNode is not in the tree");

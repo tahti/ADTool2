@@ -218,9 +218,21 @@ public class ADTNode extends GuiNode {
       return Role.PROPONENT;
     }
   }
+
   public ADTNode deepCopy() {
-    return null;
+    ADTNode result = new ADTNode();
+    result.setName(getName());
+    result.setType(getType());
+    result.setLeftSibling(null);
+    result.setRightSibling(null);
+    if (getChildren() != null) {
+      for (Node child : getChildren()) {
+        result.addCounter(((ADTNode) child).deepCopy());
+      }
+    }
+    return result;
   }
+
   public String toString() {
     return "not implemented";
   }
@@ -329,7 +341,7 @@ public class ADTNode extends GuiNode {
     catch (XException exception) {
       switchRole = false;
     }
-    Debug.log("Switch role:" + switchRole+ " node:"+getName());
+    Debug.log("Switch role:" + switchRole + " node:" + getName());
     if (getParent() == null) {
       this.type = xmlToType(e.getString("refinement"), Role.PROPONENT);
     }
@@ -339,7 +351,7 @@ public class ADTNode extends GuiNode {
     if (switchRole) {
       this.toggleRole();
     }
-    Debug.log("type:" + this.type+ " node:"+getName());
+    Debug.log("type:" + this.type + " node:" + getName());
     for (XElement parameter : e.getElements("parameter")) {
       String category = parameter.getString("category");
       if (category == null) {

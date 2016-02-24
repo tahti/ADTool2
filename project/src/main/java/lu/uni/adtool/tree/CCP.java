@@ -7,6 +7,7 @@ import lu.uni.adtool.ui.TreeDockable;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
+import lu.uni.adtool.ui.canvas.SandTreeCanvas;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -66,12 +67,12 @@ public class CCP {
           if (canv instanceof AbstractDomainCanvas) {
           }
           else if (canv.isSand() && contents.isDataFlavorSupported(NodeSelection.sandFlavor)) {
-            // Debug.log(((ADTNode)
-            // contents.getTransferData(NodeSelection.adtFlavor)).toTerms());
+            SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.adtFlavor));
+            ((SandTreeCanvas) canv).paste(copy);
           }
           else if (!canv.isSand() && contents.isDataFlavorSupported(NodeSelection.adtFlavor)) {
-            ((ADTreeCanvas) canv)
-                .paste((ADTNode) contents.getTransferData(NodeSelection.adtFlavor));
+            ADTNode copy = ((ADTNode) contents.getTransferData(NodeSelection.adtFlavor));
+            ((ADTreeCanvas) canv).paste(copy);
           }
         }
       }
@@ -92,8 +93,10 @@ public class CCP {
         if (canv instanceof AbstractDomainCanvas) {
         }
         else {
-          cb.setContents(new NodeSelection(canv.getFocused()), null);
-          return true;
+          if(canv.getFocused() instanceof ADTNode) {
+            cb.setContents(new NodeSelection(((ADTNode)canv.getFocused()).deepCopy()), null);
+            return true;
+          }
         }
       }
     }

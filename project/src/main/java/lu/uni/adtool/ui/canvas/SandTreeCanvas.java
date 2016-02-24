@@ -37,6 +37,15 @@ public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
     }
   }
 
+  public void paste(Node node) {
+    if (this.focused != null && node instanceof SandNode) {
+      SandNode n = ((SandNode) node).deepCopy();
+      tree.addSubtree(this.focused, n);
+      this.notifyAllTreeChanged();
+      terms.updateTerms();
+    }
+  }
+
   /**
    * Adds a child or a counter to the node.
    *

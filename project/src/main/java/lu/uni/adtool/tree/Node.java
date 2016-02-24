@@ -1,8 +1,9 @@
 package lu.uni.adtool.tree;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class Node {
+public abstract class Node implements Serializable{
   public Node() {
     this.name = "root";
   }

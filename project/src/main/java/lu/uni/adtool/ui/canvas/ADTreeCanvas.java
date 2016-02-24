@@ -37,19 +37,9 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
   }
 
   public void paste(Node node) {
-    if (this.lastFocused != null && node instanceof ADTNode) {
-      ADTNode n = (ADTNode) node;
-      if (((ADTNode) this.lastFocused).getRole() != n.getRole()) {
-        if (!((ADTNode) this.lastFocused).isCountered()) {
-          tree.addCounter((ADTNode) lastFocused, n);
-        }
-        else {
-          return;
-        }
-      }
-      else {
-        tree.addChild(lastFocused, n);
-      }
+    if (this.focused != null && node instanceof ADTNode) {
+      ADTNode n = ((ADTNode) node).deepCopy();
+      tree.addSubtree(this.focused, n);
       this.notifyAllTreeChanged();
       terms.updateTerms();
     }
@@ -70,15 +60,12 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
 
   public void addCounter(Node node) {
     if (((ADTNode) node).isCountered()) {
-      Debug.log("Not added counter to node " + node.getName());
       return;
     }
-    Debug.log("Adding counter to node " + node.getName());
     Node child = new ADTNode(((ADTNode) node).getType());
     ((ADTNode) child).toggleRole();
     child.setName(this.getNewLabel());
     tree.addCounter((ADTNode) node, (ADTNode) child);
-    Debug.log("tree " + tree);
     this.notifyAllTreeChanged();
     terms.updateTerms();
   }

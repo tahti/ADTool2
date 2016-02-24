@@ -86,6 +86,7 @@ public class SharedExtentProvider extends AbstractExtentProvider {
   }
 
   public void updateTreeSize(final Node node) {
+    Debug.log("nn name:"+node.getName());
     this.updateNodeSize(node);
     if (node.getChildren() != null) {
       for (Node child : node.getChildren()) {
