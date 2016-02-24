@@ -75,6 +75,13 @@ public class TreeLayout implements MultipleCDockableLayout {
     }
     else {
       this.treeRoot = ADTNode.readStream(in);
+      int sR= in.readInt();
+      if (sR == 0 ) {
+        this.switchRole = false;
+      }
+      else {
+        this.switchRole = true;
+      }
     }
   }
 
@@ -88,6 +95,12 @@ public class TreeLayout implements MultipleCDockableLayout {
       out.writeInt(ADT_ID);
       out.writeInt(this.id);
       ((ADTNode) this.treeRoot).writeStream(out);
+      if(this.switchRole){
+        out.writeInt(1);
+      }
+      else {
+        out.writeInt(0);
+      }
     }
   }
 
@@ -115,12 +128,20 @@ public class TreeLayout implements MultipleCDockableLayout {
     }
     else {
       this.treeRoot = new ADTNode();
+      XElement rootNode = element.getElement("node");
       try {
-        ((ADTNode) this.treeRoot).fromXml(element.getElement("node"));
+        ((ADTNode) this.treeRoot).fromXml(rootNode);
       }
       catch (IOException ex) {
         this.treeRoot = null;
         ex.printStackTrace();
+      }
+      try {
+        this.switchRole = (rootNode.getString("switchRole").toLowerCase().equals("yes")
+            || rootNode.getString("switchRole").toLowerCase().equals("true"));
+      }
+      catch (XException exception) {
+        this.switchRole = false;
       }
     }
   }
@@ -133,7 +154,11 @@ public class TreeLayout implements MultipleCDockableLayout {
     }
     else {
       element.addElement("type").setInt(ADT_ID);
-      element.addElement(((ADTNode) this.treeRoot).toXml());
+      XElement root = ((ADTNode) this.treeRoot).toXml();
+      if (this.getSwitchRole())  {
+        root.addString("switchRole", "yes");
+      }
+      element.addElement(root);
     }
   }
 

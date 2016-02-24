@@ -393,6 +393,7 @@ public final class MainController implements CControlListener, CFocusListener {
     menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.adddomain.key")).getKeyCode());
     menuItem.setEnabled(false);
     this.toDisableItems.add(menuItem);
+    editMenu.add(menuItem);
     menuItem = new JMenuItem(Options.getMsg("edit.switchRole.txt"));
     menuItem
         .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.switchRole.key")).getKeyCode());
@@ -413,7 +414,6 @@ public final class MainController implements CControlListener, CFocusListener {
     menuItem.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.switchRole.acc")));
     menuItem.setEnabled(false);
     this.toDisableItems.add(menuItem);
-    editMenu.add(menuItem);
     editMenu.add(menuItem);
     editMenu.addSeparator();
     menuItem = editMenu.add(editCut);
