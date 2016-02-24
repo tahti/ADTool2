@@ -499,6 +499,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     return this.focused;
   }
 
+
   /**
    * Gets the lastFocused for this instance.
    *

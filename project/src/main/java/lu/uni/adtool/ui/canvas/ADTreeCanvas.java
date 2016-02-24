@@ -36,6 +36,25 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     }
   }
 
+  public void paste(Node node) {
+    if (this.lastFocused != null && node instanceof ADTNode) {
+      ADTNode n = (ADTNode) node;
+      if (((ADTNode) this.lastFocused).getRole() != n.getRole()) {
+        if (!((ADTNode) this.lastFocused).isCountered()) {
+          tree.addCounter((ADTNode) lastFocused, n);
+        }
+        else {
+          return;
+        }
+      }
+      else {
+        tree.addChild(lastFocused, n);
+      }
+      this.notifyAllTreeChanged();
+      terms.updateTerms();
+    }
+  }
+
   /**
    * Adds a child or a counter to the node.
    *
@@ -187,10 +206,10 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     if (node.getParent() != null) {
       GuiNode newPos = null;
       if (onLeft) {
-        newPos = ((GuiNode)node).getLeftSibling();
+        newPos = ((GuiNode) node).getLeftSibling();
       }
       else {
-        newPos = ((GuiNode)node).getRightSibling();
+        newPos = ((GuiNode) node).getRightSibling();
       }
       if (newPos != null && newPos.getParent() != null) {
         tree.switchSibling(node, newPos);

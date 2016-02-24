@@ -218,7 +218,9 @@ public class ADTNode extends GuiNode {
       return Role.PROPONENT;
     }
   }
-
+  public ADTNode deepCopy() {
+    return null;
+  }
   public String toString() {
     return "not implemented";
   }
@@ -348,7 +350,7 @@ public class ADTNode extends GuiNode {
         if (d != null) {
           Ring r = d.getDomain().getDefaultValue(this);
           r.updateFromString(parameter.getString());
-          d.setValue(getName(), r);
+          d.setValue(this.getRole() == ADTNode.Role.PROPONENT, getName(), r);
         }
       }
     }

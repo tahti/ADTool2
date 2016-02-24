@@ -134,7 +134,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
         }
         if (value != null) {
           String key = node.getName();
-          putNewValue(key, value);
+          this.values.setValue(true, key, value);
           this.valuesUpdated();
         }
       }
@@ -177,7 +177,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
         }
         if (value != null) {
           String key = node.getName();
-          putNewValue(key, value);
+          this.values.setValue(node.getRole() == ADTNode.Role.PROPONENT, key, value);
           this.valuesUpdated();
         }
       }
@@ -200,14 +200,14 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     marked.put(node, color);
   }
 
-  /**
-   * Assigns a new value to a node.
-   *
-   * @param key
-   */
-  public void putNewValue(String key, Ring value) {
-    this.values.setValue(key, value);
-  }
+//   /**
+//    * Assigns a new value to a node.
+//    *
+//    * @param key
+//    */
+//   public void putNewValue(String key, Ring value) {
+//     this.values.setValue(key, value);
+//   }
 
   /**
    * Determines if this instance is markEditable.

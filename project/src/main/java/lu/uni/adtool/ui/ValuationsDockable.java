@@ -90,10 +90,10 @@ public class ValuationsDockable extends PermaDockable
   public void keyTyped(KeyEvent e) {
   }
 
-  public Ring editValue(String key) {
+  public Ring editValue(boolean proponent, String key) {
     Ring value;
     InputDialog dialog;
-    value = ((AbstractDomainCanvas) getCanvas()).getValues().get(key);
+    value = ((AbstractDomainCanvas) getCanvas()).getValues().get(proponent, key);
 
     if (value instanceof Bool) {
       value = (Ring) Bool.not((Bool) value);
@@ -139,19 +139,38 @@ public class ValuationsDockable extends PermaDockable
         if (!isCellSelected(row, column)) {
           return false;
         }
-        ;
-        String key = (String) getValueAt(row, 0);
+        if (getCanvas().isSand()) {
+          String key = (String) getValueAt(row, 0);
 
-        int[] selection = table.getSelectedRows();
-        if (selection.length > 0) {
-          Ring value = editValue(key);
-          if (value != null) {
-            selection = table.getSelectedRows();
-            for (int i = 0; i < selection.length; i++) {
-              key = (String) getValueAt(selection[i], 0);
-              ((AbstractDomainCanvas) getCanvas()).putNewValue(key, value);
+          int[] selection = table.getSelectedRows();
+          if (selection.length > 0) {
+            Ring value = editValue(true, key);
+            if (value != null) {
+              selection = table.getSelectedRows();
+              for (int i = 0; i < selection.length; i++) {
+                key = (String) getValueAt(selection[i], 0);
+                ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, value);
+              }
+              ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
             }
-            ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+          }
+        }
+        else {
+          String key = (String) getValueAt(row, 1);
+          boolean proponent = getValueAt(row, 0).equals(Options.getMsg("tablemodel.proponent"));
+
+          int[] selection = table.getSelectedRows();
+          if (selection.length > 0) {
+            Ring value = editValue(proponent, key);
+            if (value != null) {
+              selection = table.getSelectedRows();
+              for (int i = 0; i < selection.length; i++) {
+                key = (String) getValueAt(selection[i], 0);
+                proponent = getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
+                ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, value);
+              }
+              ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+            }
           }
         }
         SwingUtilities.invokeLater(new Runnable() {
@@ -267,7 +286,7 @@ public class ValuationsDockable extends PermaDockable
         for (String key : keys) {
           Vector<Comparable> v = new Vector<Comparable>();
           v.add(key);
-          v.add(canvas.getValues().get(key));
+          v.add(canvas.getValues().get(true, key));
           addRow(v);
         }
       }
@@ -278,7 +297,7 @@ public class ValuationsDockable extends PermaDockable
           Vector<Comparable> v = new Vector<Comparable>();
           v.add(Options.getMsg("tablemodel.proponent"));
           v.add(key);
-          v.add(canvas.getValues().get(key));
+          v.add(canvas.getValues().get(true, key));
           addRow(v);
         }
         keys = canvas.getValues().oppKeySet();
@@ -286,7 +305,7 @@ public class ValuationsDockable extends PermaDockable
           Vector<Comparable> v = new Vector<Comparable>();
           v.add(Options.getMsg("tablemodel.opponent"));
           v.add(key);
-          v.add(canvas.getValues().getOpp(key));
+          v.add(canvas.getValues().get(false, key));
           addRow(v);
         }
       }

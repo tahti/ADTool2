@@ -230,7 +230,7 @@ public class TreeLayout implements MultipleCDockableLayout {
           if (d != null) {
             Ring r = d.getDomain().getDefaultValue(this.treeRoot);
             r.updateFromString(parameter.getString());
-            d.setValue(this.treeRoot.getName(), r);
+            d.setValue(true, this.treeRoot.getName(), r);
           }
         }
       }

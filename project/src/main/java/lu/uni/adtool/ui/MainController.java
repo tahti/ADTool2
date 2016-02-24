@@ -9,6 +9,7 @@ import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.CCP;
 import lu.uni.adtool.tree.DomainFactory;
 import lu.uni.adtool.tree.GuiNode;
 import lu.uni.adtool.tree.SandNode;
@@ -55,34 +56,14 @@ public final class MainController implements CControlListener, CFocusListener {
     menu = null; // create it later
     lastFocusedTree = null;
     fh = new FileHandler(this);
+    copyHandler = new CCP(control);
   }
 
   public void focusGained(CDockable dockable) {
-    if (dockable instanceof TreeDockable) {
-      setLastFocused(((TreeDockable) dockable).getCanvas());
-    }
-    if (dockable instanceof PermaDockable) {
-      // LogView/ValuationsView - ignore
-    }
-    else if (dockable instanceof DomainDockable) {
-      setLastFocused(((DomainDockable) dockable).getCanvas());
-    }
-    else if (dockable instanceof DefaultSingleCDockable) {
-      String id = ((DefaultSingleCDockable) dockable).getUniqueId();
-      if (id.endsWith(TreeDockable.TREEVIEW_ID)) {
-        TreeDockable d =
-            (TreeDockable) control.getMultipleDockable(id.substring(0, id.indexOf('_')));
-        if (d == null) {
-          System.err.println(
-              "MainController:Could not find dockable with id:" + id.substring(0, id.indexOf('_')));
-        }
-        else {
-          setLastFocused(d.getCanvas());
-        }
-        // AbstractTreeCanvas
-      }
-      else {
-      }
+    copyHandler.setFocus(dockable);
+    AbstractTreeCanvas lf = CCP.getCanvas(dockable, this.control);
+    if (lf != null) {
+      setLastFocused(lf);
     }
   }
 
@@ -399,7 +380,6 @@ public final class MainController implements CControlListener, CFocusListener {
         .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.switchRole.key")).getKeyCode());
     menuItem.addActionListener(new ActionListener() {
 
-      // @SuppressWarnings("rawtypes")
       public void actionPerformed(ActionEvent e) {
         if (lastFocusedTree != null) {
           lastFocusedTree.getTree().getLayout().toggleRole();
@@ -711,7 +691,7 @@ public final class MainController implements CControlListener, CFocusListener {
 
     editCut = new ADAction(Options.getMsg("edit.cut.txt")) {
       public void actionPerformed(final ActionEvent e) {
-        // cut
+        copyHandler.cut();
       }
     };
     editCut.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.cut.key")));
@@ -719,7 +699,7 @@ public final class MainController implements CControlListener, CFocusListener {
     editCut.setSmallIcon(iconFac.createImageIcon("/icons/cut.png"));
     editPaste = new ADAction(Options.getMsg("edit.paste.txt")) {
       public void actionPerformed(final ActionEvent e) {
-        // paste
+        copyHandler.paste();
       }
     };
     editPaste.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.paste.key")));
@@ -727,7 +707,7 @@ public final class MainController implements CControlListener, CFocusListener {
     editPaste.setSmallIcon(iconFac.createImageIcon("/icons/paste.png"));
     editCopy = new ADAction(Options.getMsg("edit.copy.txt")) {
       public void actionPerformed(final ActionEvent e) {
-        // copy
+        copyHandler.copy();
       }
     };
     editCopy.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.copy.key")));
@@ -910,4 +890,5 @@ public final class MainController implements CControlListener, CFocusListener {
   private FileHandler          fh;
 
   private CControl             control;
+  private CCP                  copyHandler;
 }

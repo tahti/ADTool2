@@ -79,7 +79,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
         String value = in.readUTF();
         Ring v = domain.getDefaultValue(node);
         v.updateFromString(value);
-        this.setValue(name, v);
+        this.setValue(true, name, v);
       }
       if (domain instanceof AdtDomain) {
         counter = in.readInt();
@@ -126,7 +126,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
         String value = v.getElement(i + 1).getString();
         Ring r = domain.getDefaultValue(node);
         r.updateFromString(value);
-        this.setValue(key, r);
+        this.setValue(true, key, r);
       }
     }
     if (domain instanceof AdtDomain) {
@@ -219,12 +219,8 @@ public class ValuationDomain implements MultipleCDockableLayout {
     return valueAssPro.get(key);
   }
 
-  public Ring get(String key) {
+  public Ring get(boolean proponent, String key) {
     return (Ring) valueAssPro.get(key);
-  }
-
-  public Ring getOpp(String key) {
-    return (Ring) valueAssOpp.get(key);
   }
 
   public Set<String> sandKeySet() {
@@ -279,9 +275,6 @@ public class ValuationDomain implements MultipleCDockableLayout {
     valueAssPro.put(node.getName(), value);
   }
 
-  public void setValue(String key, Ring value) {
-    valueAssPro.put(key, value);
-  }
 
   public boolean hasEvaluator() {
     return evaluator != null;

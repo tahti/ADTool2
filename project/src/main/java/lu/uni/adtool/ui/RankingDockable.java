@@ -130,41 +130,41 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
   public void keyTyped(KeyEvent e) {
   }
 
-  public Ring editValue(String key) {
-    Ring value;
-    InputDialog dialog;
-    value = ((AbstractDomainCanvas) getCanvas()).getValues().get(key);
-
-    if (value instanceof Bool) {
-      value = (Ring) Bool.not((Bool) value);
-    }
-    else if (value instanceof RealG0) {
-      dialog = new RealG0Dialog(getCanvas().getFrame());
-      value = (Ring) (dialog.showInputDialog(value));
-    }
-    else if (value instanceof RealZeroOne) {
-      dialog = new RealZeroOneDialog(getCanvas().getFrame());
-      value = (Ring) (dialog.showInputDialog(value));
-    }
-    else if (value instanceof LMHValue) {
-      dialog = new LMHDialog(getCanvas().getFrame());
-      value = (Ring) (dialog.showInputDialog(value));
-    }
-    else if (value instanceof LMHEValue) {
-      dialog = new LMHEDialog(getCanvas().getFrame());
-      value = (Ring) (dialog.showInputDialog(value));
-    }
-    else if (value instanceof BoundedInteger) {
-      // if(getDomain() instanceof MinSkill){
-      // dialog = new BoundedIntegerInfDialog(getMainWindow());
-      // }
-      // else{
-      dialog = new BoundedIntegerDialog(getCanvas().getFrame());
-      // }
-      value = (Ring) (dialog.showInputDialog(value));
-    }
-    return value;
-  }
+//   public Ring editValue(String key) {
+//     Ring value;
+//     InputDialog dialog;
+//     value = ((AbstractDomainCanvas) getCanvas()).getValues().get(key);
+// 
+//     if (value instanceof Bool) {
+//       value = (Ring) Bool.not((Bool) value);
+//     }
+//     else if (value instanceof RealG0) {
+//       dialog = new RealG0Dialog(getCanvas().getFrame());
+//       value = (Ring) (dialog.showInputDialog(value));
+//     }
+//     else if (value instanceof RealZeroOne) {
+//       dialog = new RealZeroOneDialog(getCanvas().getFrame());
+//       value = (Ring) (dialog.showInputDialog(value));
+//     }
+//     else if (value instanceof LMHValue) {
+//       dialog = new LMHDialog(getCanvas().getFrame());
+//       value = (Ring) (dialog.showInputDialog(value));
+//     }
+//     else if (value instanceof LMHEValue) {
+//       dialog = new LMHEDialog(getCanvas().getFrame());
+//       value = (Ring) (dialog.showInputDialog(value));
+//     }
+//     else if (value instanceof BoundedInteger) {
+//       // if(getDomain() instanceof MinSkill){
+//       // dialog = new BoundedIntegerInfDialog(getMainWindow());
+//       // }
+//       // else{
+//       dialog = new BoundedIntegerDialog(getCanvas().getFrame());
+//       // }
+//       value = (Ring) (dialog.showInputDialog(value));
+//     }
+//     return value;
+//   }
 
   public static final String ID_RANKINGVIEW = "rank_view";
 

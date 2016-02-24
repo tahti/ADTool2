@@ -218,7 +218,7 @@ public class SandNode extends GuiNode {
         if (d != null) {
           Ring r = d.getDomain().getDefaultValue(this);
           r.updateFromString(parameter.getString());
-          d.setValue(getName(), r);
+          d.setValue(true, getName(), r);
         }
       }
     }
