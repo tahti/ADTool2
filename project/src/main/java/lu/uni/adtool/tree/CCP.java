@@ -67,11 +67,13 @@ public class CCP {
           if (canv instanceof AbstractDomainCanvas) {
           }
           else if (canv.isSand() && contents.isDataFlavorSupported(NodeSelection.sandFlavor)) {
-            SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.adtFlavor));
+            SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.sandFlavor));
+            Debug.log("paste sand");
             ((SandTreeCanvas) canv).paste(copy);
           }
           else if (!canv.isSand() && contents.isDataFlavorSupported(NodeSelection.adtFlavor)) {
             ADTNode copy = ((ADTNode) contents.getTransferData(NodeSelection.adtFlavor));
+            Debug.log("paste adt");
             ((ADTreeCanvas) canv).paste(copy);
           }
         }
@@ -87,6 +89,7 @@ public class CCP {
 
   public boolean copy() {
     if (lastFocused != null) {
+      Debug.log("copy");
       Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
       AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
       if (canv != null && canv.getFocused() != null) {
@@ -97,6 +100,10 @@ public class CCP {
             cb.setContents(new NodeSelection(((ADTNode)canv.getFocused()).deepCopy()), null);
             return true;
           }
+          else if(canv.getFocused() instanceof SandNode) {
+            cb.setContents(new NodeSelection(((SandNode)canv.getFocused()).deepCopy()), null);
+            return true;
+          }
         }
       }
     }
@@ -104,6 +111,25 @@ public class CCP {
   }
 
   public void cut() {
+    if (lastFocused != null) {
+      Debug.log("cut");
+      Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+      AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
+      if (canv != null && canv.getFocused() != null) {
+        if (canv instanceof AbstractDomainCanvas) {
+        }
+        else {
+          if(canv.getFocused() instanceof ADTNode) {
+            cb.setContents(new NodeSelection(((ADTNode)canv.getFocused()).deepCopy()), null);
+            ((ADTreeCanvas) canv).removeTree((ADTNode)canv.getFocused());
+          }
+          else if(canv.getFocused() instanceof SandNode) {
+            cb.setContents(new NodeSelection(((SandNode)canv.getFocused()).deepCopy()), null);
+            ((SandTreeCanvas) canv).removeTree((SandNode)canv.getFocused());
+          }
+        }
+      }
+    }
   }
 
   static class NodeSelection implements Transferable {
@@ -115,11 +141,21 @@ public class CCP {
     public Object getTransferData(DataFlavor df) throws UnsupportedFlavorException, IOException {
       // If text/rtf flavor is requested
       if (adtFlavor.equals(df)) {
+        if (node instanceof ADTNode) {
         // Return text/rtf data
-        return node;
+          return ((ADTNode)node).deepCopy();
+        }
+        else {
+          return ((SandNode)node).adtCopy();
+        }
       }
       else if (sandFlavor.equals(df)) {
-        return node;
+        if (node instanceof SandNode) {
+          return ((SandNode)node).deepCopy();
+        }
+        else {
+          return ((ADTNode)node).sandCopy();
+        }
         // If plain flavor is requested
       }
       else if (DataFlavor.stringFlavor.equals(df)) {

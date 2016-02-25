@@ -229,6 +229,25 @@ public class SandNode extends GuiNode {
     }
   }
 
+  public ADTNode adtCopy() {
+    ADTNode result = new ADTNode();
+    result.setName(getName());
+    if (type == Type.OR) {
+      result.setType(ADTNode.Type.OR_PRO);
+    }
+    else {
+      result.setType(ADTNode.Type.AND_PRO);
+    }
+    result.setLeftSibling(null);
+    result.setRightSibling(null);
+    if (getChildren() != null) {
+      for (Node child : getChildren()) {
+        result.addChild(((SandNode) child).adtCopy());
+      }
+    }
+    return result;
+  }
+
   public SandNode deepCopy() {
     SandNode result = new SandNode();
     result.setName(getName());
