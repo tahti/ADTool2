@@ -1,10 +1,12 @@
 package lu.uni.adtool.ui;
 
 import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.tools.Options;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -27,7 +29,9 @@ import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 
 class AboutDialog extends JDialog {
-  public AboutDialog() {
+  public AboutDialog(Frame frame) {
+    super(frame, Options.getMsg("help.about.title"), true);
+    setLocationRelativeTo(frame);
     initCloseListener();
     initUI();
   }
@@ -65,10 +69,7 @@ class AboutDialog extends JDialog {
     mainPane.add(label);
     mainPane.add(Box.createRigidArea(new Dimension(0, 10)));
     // "Supported by" text
-    name = new JLabel("<html>" + "Supported by the Fonds National de la Recherche, Luxembourg<br>"
-        + "under grants C08/IS/26 and PHD-09-167 and the European<br>"
-        + "Commission\'s Seventh Framework Programme (FP7/2007-2013)<br>"
-        + "under grant 318003 (TREsPASS)</html>");
+    name = new JLabel(Options.getMsg("help.about.grant"));
     name.setFont(new Font("Serif", Font.PLAIN, 13));
     name.setAlignmentX(0.5f);
     mainPane.add(name);
@@ -89,7 +90,7 @@ class AboutDialog extends JDialog {
     mainPane.add(p);
     mainPane.add(Box.createRigidArea(new Dimension(0, 10)));
 
-    JButton close = new JButton("Close");
+    JButton close = new JButton(Options.getMsg("toolbar.close"));
     close.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent event) {
         dispose();
@@ -100,9 +101,7 @@ class AboutDialog extends JDialog {
     add(mainPane);
     setModalityType(ModalityType.APPLICATION_MODAL);
 
-    setTitle("About ADTool");
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-    setLocationRelativeTo(null);
     pack();
   }
 
@@ -135,7 +134,8 @@ class AboutDialog extends JDialog {
       Manifest manifest = new Manifest(new URL(manifestPath).openStream());
       Attributes mainAttribs = manifest.getMainAttributes();
       result += mainAttribs.getValue("Implementation-Version") + " (";
-      result += mainAttribs.getValue("Date-Build") + ")";
+      result += mainAttribs.getValue("Date-Build") + " - ";
+      result += mainAttribs.getValue("Implementation-Build").substring(0,6) + ")";
     }
     catch (IOException e1) {
     }

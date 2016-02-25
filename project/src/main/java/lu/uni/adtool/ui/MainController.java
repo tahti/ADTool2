@@ -463,7 +463,7 @@ public final class MainController implements CControlListener, CFocusListener {
     menuItem = new JMenuItem(Options.getMsg("help.about.txt"));
     menuItem.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        AboutDialog ad = new AboutDialog();
+        AboutDialog ad = new AboutDialog(getFrame());
         ad.setVisible(true);
       }
     });

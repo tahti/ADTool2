@@ -4,7 +4,7 @@
   
   <groupId>lu.uni.adtool</groupId>
   <artifactId>ADTool</artifactId>
-  <version>2.0</version>
+  <version>2.0.0</version>
   
   <packaging>jar</packaging>
   
@@ -30,8 +30,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <scm>
-    <connection>scm:svn:svn+ssh://pkordy@svn.gforge.uni.lu/svn/piotrkordy/projects/ADTool2/project</connection>
-    <url>scm:svn:svn+ssh://pkordy@svn.gforge.uni.lu/svn/piotrkordy/projects/ADTool2/project</url>
+    <connection>scm:git:git://github.com/tahti/ADTool2.git</connection>
   </scm>
   <repositories>
     <repository>
@@ -143,10 +142,10 @@
             -->
             <!--<timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat>-->
             <timestampFormat>{0, date, MMMMMMMM dd, yyyy}</timestampFormat>
-            <format>{0}</format>
-            <items>
-              <item>scmVersion</item>
-            </items>
+<!--             <format>{0}</format> -->
+<!--             <items> -->
+<!--               <item>gitVersion</item> -->
+<!--             </items> -->
           <!--</revisiononscmfailure>-->
         </configuration>
       </plugin>

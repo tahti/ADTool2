@@ -1,5 +1,6 @@
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.PermaDockable;
@@ -96,12 +97,12 @@ public class CCP {
         if (canv instanceof AbstractDomainCanvas) {
         }
         else {
-          if(canv.getFocused() instanceof ADTNode) {
-            cb.setContents(new NodeSelection(((ADTNode)canv.getFocused()).deepCopy()), null);
+          if (canv.getFocused() instanceof ADTNode) {
+            cb.setContents(new NodeSelection(((ADTNode) canv.getFocused()).deepCopy()), null);
             return true;
           }
-          else if(canv.getFocused() instanceof SandNode) {
-            cb.setContents(new NodeSelection(((SandNode)canv.getFocused()).deepCopy()), null);
+          else if (canv.getFocused() instanceof SandNode) {
+            cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
             return true;
           }
         }
@@ -119,13 +120,13 @@ public class CCP {
         if (canv instanceof AbstractDomainCanvas) {
         }
         else {
-          if(canv.getFocused() instanceof ADTNode) {
-            cb.setContents(new NodeSelection(((ADTNode)canv.getFocused()).deepCopy()), null);
-            ((ADTreeCanvas) canv).removeTree((ADTNode)canv.getFocused());
+          if (canv.getFocused() instanceof ADTNode) {
+            cb.setContents(new NodeSelection(((ADTNode) canv.getFocused()).deepCopy()), null);
+            ((ADTreeCanvas) canv).removeTree((ADTNode) canv.getFocused());
           }
-          else if(canv.getFocused() instanceof SandNode) {
-            cb.setContents(new NodeSelection(((SandNode)canv.getFocused()).deepCopy()), null);
-            ((SandTreeCanvas) canv).removeTree((SandNode)canv.getFocused());
+          else if (canv.getFocused() instanceof SandNode) {
+            cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
+            ((SandTreeCanvas) canv).removeTree((SandNode) canv.getFocused());
           }
         }
       }
@@ -142,19 +143,19 @@ public class CCP {
       // If text/rtf flavor is requested
       if (adtFlavor.equals(df)) {
         if (node instanceof ADTNode) {
-        // Return text/rtf data
-          return ((ADTNode)node).deepCopy();
+          // Return text/rtf data
+          return ((ADTNode) node).deepCopy();
         }
         else {
-          return ((SandNode)node).adtCopy();
+          return ((SandNode) node).adtCopy();
         }
       }
       else if (sandFlavor.equals(df)) {
         if (node instanceof SandNode) {
-          return ((SandNode)node).deepCopy();
+          return ((SandNode) node).deepCopy();
         }
         else {
-          return ((ADTNode)node).sandCopy();
+          return ((ADTNode) node).sandCopy();
         }
         // If plain flavor is requested
       }
@@ -199,6 +200,54 @@ public class CCP {
       finally {
         adtFlavor = d1;
         sandFlavor = d2;
+      }
+    }
+  }
+
+  static class ValueSelection implements Transferable {
+    // Transferable class constructor
+    public ValueSelection(Ring value) {
+      this.value = value;
+    }
+
+    public Object getTransferData(DataFlavor df) throws UnsupportedFlavorException, IOException {
+      // If text/rtf flavor is requested
+      if (valueFlavor.equals(df)) {
+        return this.value;
+      }
+      else {
+        throw new UnsupportedFlavorException(df);
+      }
+    }
+
+    public boolean isDataFlavorSupported(DataFlavor df) {
+      // If the flavor is text/rtf or tet/plain return true
+      if (valueFlavor.equals(df)) {
+        return true;
+      }
+      return false;
+    }
+
+    public DataFlavor[] getTransferDataFlavors() {
+      // Return array of flavors
+      return new DataFlavor[] {valueFlavor};
+    }
+
+    // ADTNode
+    private Ring                   value;
+
+    public static final DataFlavor valueFlavor;
+
+    static {
+      DataFlavor d1 = null;
+      try {
+        d1 = new DataFlavor(
+            DataFlavor.javaJVMLocalObjectMimeType + ";class=lu.uni.adtool.domains.rings.Ring");
+      }
+      catch (ClassNotFoundException e) {
+      }
+      finally {
+        valueFlavor = d1;
       }
     }
   }

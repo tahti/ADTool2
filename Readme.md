@@ -27,3 +27,7 @@ and installed maven tool:
 - after successful compilation there should be new directory `target` with ADTool-2.0-full.jar among other files
 - run the tool using command `java -jar target/ADTool-2.0-full.jar`
 
+The latest compiled jar file can be downloaded from
+[here](http://satoss.uni.lu/members/piotr/adtool/) - look in Development
+Version section.
+
