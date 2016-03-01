@@ -281,7 +281,7 @@ public class SandNode extends GuiNode {
     case OR:
       return "OR";
     case SAND:
-      return "SANd";
+      return "SAND";
     }
     return "";
   }

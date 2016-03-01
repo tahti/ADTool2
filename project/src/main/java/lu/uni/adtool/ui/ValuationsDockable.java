@@ -165,7 +165,7 @@ public class ValuationsDockable extends PermaDockable
             if (value != null) {
               selection = table.getSelectedRows();
               for (int i = 0; i < selection.length; i++) {
-                key = (String) getValueAt(selection[i], 0);
+                key = (String) getValueAt(selection[i], 1);
                 proponent = getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
                 ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, value);
               }

@@ -220,7 +220,12 @@ public class ValuationDomain implements MultipleCDockableLayout {
   }
 
   public Ring get(boolean proponent, String key) {
-    return (Ring) valueAssPro.get(key);
+    if (proponent) {
+      return (Ring) valueAssPro.get(key);
+    }
+    else {
+      return (Ring) valueAssOpp.get(key);
+    }
   }
 
   public Set<String> sandKeySet() {

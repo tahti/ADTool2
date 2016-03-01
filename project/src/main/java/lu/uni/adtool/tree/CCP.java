@@ -98,7 +98,11 @@ public class CCP {
         }
         else {
           if (canv.getFocused() instanceof ADTNode) {
-            cb.setContents(new NodeSelection(((ADTNode) canv.getFocused()).deepCopy()), null);
+            ADTNode copy = ((ADTNode) canv.getFocused()).deepCopy();
+            if (canv.getTree().getLayout().getSwitchRole()) {
+              copy.toggleRoleRecursive();
+            }
+            cb.setContents(new NodeSelection(copy), null);
             return true;
           }
           else if (canv.getFocused() instanceof SandNode) {

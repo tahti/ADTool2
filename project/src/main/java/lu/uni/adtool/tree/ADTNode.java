@@ -209,6 +209,15 @@ public class ADTNode extends GuiNode {
     }
   }
 
+  public void toggleRoleRecursive() {
+    this.toggleRole();
+    if (getChildren() != null) {
+      for (Node node : this.getNotNullChildren()) {
+        ((ADTNode) node).toggleRoleRecursive();
+      }
+    }
+  }
+
   public Role getRole() {
     switch (type) {
     case AND_OPP:

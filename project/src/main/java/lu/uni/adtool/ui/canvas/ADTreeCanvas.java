@@ -39,6 +39,9 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
   public void paste(Node node) {
     if (this.focused != null && node instanceof ADTNode) {
       ADTNode n = (ADTNode) node;
+      if (tree.getLayout().getSwitchRole()) {
+        n.toggleRoleRecursive();
+      }
       tree.addSubtree(this.focused, n);
       this.notifyAllTreeChanged();
       terms.updateTerms();
