@@ -106,7 +106,7 @@ public final class ADToolMain extends JFrame {
     this.rankingView.doClose();
     this.detailsView.doClose();
     super.setJMenuBar(this.controller.getMenu());
-    Options.tryLoadLayout(control);
+    Options.tryLoadLayout(control, this);
     this.pack();
     this.setVisible(true);
 //     this.setExtendedState(getExtendedState() |JFrame.MAXIMIZED_BOTH);

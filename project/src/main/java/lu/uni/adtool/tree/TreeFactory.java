@@ -51,6 +51,9 @@ public class TreeFactory implements MultipleCDockableFactory<TreeDockable, TreeL
       for (int i = 0; i < size; i++) {
         DomainDockable domain = domains.get(i);
         domain.getCanvas().setTree(dockable.getCanvas().getTree());
+        if (dockable.getCanvas().isSand()) {
+          domain.hideShowAll();
+        }
         dockable.getLayout().addDomain(domain.getCanvas().getValues());
         Debug.log("Connecting domain domainId:" + domain.getValues().getDomainId());
       }

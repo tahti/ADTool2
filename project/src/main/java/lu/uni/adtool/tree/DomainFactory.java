@@ -84,6 +84,9 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
         .getMultipleDockable(TreeDockable.getUniqueId(treeId.intValue()));
     if (treeDockable != null) {
       dockable.getCanvas().setTree(treeDockable.getCanvas().getTree());
+      if (treeDockable.getCanvas().isSand()) {
+        dockable.hideShowAll();
+      }
       if (treeDockable.getLayout().getDomains().indexOf(values) == -1) {
         treeDockable.getLayout().addDomain(values);
       }

@@ -346,7 +346,13 @@ public class ValuationsDockable extends PermaDockable
       for (int i = minIndex; i <= maxIndex; i++) {
         if (lsm.isSelectedIndex(i)) {
           int j = table.convertRowIndexToModel(i);
-          String key = (String) (table.getModel().getValueAt(j, 0));
+          String key = "";
+          if(getCanvas().isSand()){
+            key = (String) (table.getModel().getValueAt(j, 0));
+          }
+          else {
+            key = (String) (table.getModel().getValueAt(j, 1));
+          }
           ((AbstractDomainCanvas) getCanvas()).markLabel(key);
         }
       }

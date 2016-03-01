@@ -1,6 +1,7 @@
 package lu.uni.adtool.tools;
 
-import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.ui.OptionPane;
 import lu.uni.adtool.ui.TreeDockable;
 
 import java.awt.Color;
@@ -11,6 +12,8 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
+
+import javax.swing.JOptionPane;
 
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -81,7 +84,8 @@ public final class Options {
   public static Color        canv_rankRootMark         = new Color(150, 150, 0);
   public static Color        canv_rankNodeMark         = new Color(50, 170, 50);
   public static Color        canv_rankLeafMark         = new Color(150, 255, 150);
-//   public static ADTNode.Role canv_Defender             = ADTNode.Role.OPPONENT; // moved to treeLayout
+  // public static ADTNode.Role canv_Defender = ADTNode.Role.OPPONENT; // moved
+  // to treeLayout
   /**
    * Arc size of round rectangle for node.
    */
@@ -157,7 +161,7 @@ public final class Options {
 
   }
 
-  public static boolean tryLoadLayout(CControl control) {
+  public static boolean tryLoadLayout(CControl control, ADToolMain frame) {
     File dir = new File(pref_path);
     if (!dir.exists()) {
       return false;
@@ -168,12 +172,19 @@ public final class Options {
       return false;
     }
     try {
-      control.readXML(layout);
-      // control.read(layout);
-      DefaultSingleCDockable dock = (DefaultSingleCDockable) control
-          .getSingleDockable(TreeDockable.getUniqueId(1) + TreeDockable.TREEVIEW_ID);
-      if (dock != null) {
-        dock.toFront();
+      Preferences prefs = Preferences.userRoot().node(PREF_PATH);
+      pref_layoutfile = prefs.get("layoutfile", def_layoutfile);
+      boolean success = prefs.getBoolean("loadedLayout", true);
+      if (success ||OptionPane.showYNDialog(frame, Options.getMsg("reloaddialog.txt"),  Options.getMsg("reloaddialog.title")) == JOptionPane.YES_OPTION) {
+        prefs.putBoolean("loadedLayout", false);
+        control.readXML(layout);
+        // control.read(layout);
+        DefaultSingleCDockable dock = (DefaultSingleCDockable) control
+            .getSingleDockable(TreeDockable.getUniqueId(1) + TreeDockable.TREEVIEW_ID);
+        if (dock != null) {
+          dock.toFront();
+        }
+        prefs.putBoolean("loadedLayout", true);
       }
     }
     catch (IOException e) {

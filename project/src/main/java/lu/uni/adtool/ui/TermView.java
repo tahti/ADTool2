@@ -1,6 +1,6 @@
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.ADTParser;
 import lu.uni.adtool.tree.Node;
@@ -38,13 +38,13 @@ import javax.swing.text.DefaultHighlighter;
 
 public class TermView extends JPanel {
 
-  public TermView(SandTreeCanvas canvas) {
+  public TermView(SandTreeCanvas<?> canvas) {
     super(new BorderLayout());
     this.canvas = canvas;
     initLayout(canvas.getTermsString());
   }
 
-  public TermView(ADTreeCanvas canvas) {
+  public TermView(ADTreeCanvas<?> canvas) {
     super(new BorderLayout());
     this.canvas = canvas;
     initLayout(canvas.getTermsString());
@@ -71,14 +71,17 @@ public class TermView extends JPanel {
     editTerms.getDocument().addDocumentListener(new DocumentListener() {
       public void changedUpdate(DocumentEvent e) {
         editTerms.getHighlighter().removeAllHighlights();
+        validate.setEnabled(editTerms.getText().length() > 0);
       }
 
       public void removeUpdate(DocumentEvent e) {
         editTerms.getHighlighter().removeAllHighlights();
+        validate.setEnabled(editTerms.getText().length() > 0);
       }
 
       public void insertUpdate(DocumentEvent e) {
         editTerms.getHighlighter().removeAllHighlights();
+        validate.setEnabled(editTerms.getText().length() > 0);
       }
     });
     errorOutput = new JTextArea();
@@ -98,6 +101,7 @@ public class TermView extends JPanel {
       public void actionPerformed(ActionEvent arg0) {
         parse();
       }
+      private static final long serialVersionUID = -4345934200261947700L;
 
     };
     getActionMap().put("doValidate", pressedAction);
@@ -110,25 +114,25 @@ public class TermView extends JPanel {
    */
   private JPanel createButtonPane() {
     JPanel buttonPane = new JPanel();
-    JButton validate = new JButton("Validate");
-    revert = new JButton("Revert");
+    this.validate = new JButton(Options.getMsg("window.termView.validate"));
+    this.revert = new JButton(Options.getMsg("window.termView.revert"));
     buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
     buttonPane.add(validate);
     buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
     buttonPane.add(revert);
-    revert.addActionListener(new ActionListener() {
+    this.revert.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         // Execute when button is pressed
         revert();
       }
     });
-    validate.addActionListener(new ActionListener() {
+    this.validate.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         // Execute when button is pressed
         parse();
       }
     });
-    revert.setEnabled(false);
+    this.revert.setEnabled(false);
     return buttonPane;
   }
 
@@ -162,13 +166,13 @@ public class TermView extends JPanel {
         errorOutput.setText("");
         if (newRoot instanceof SandNode) {
           SandEulerTree et = new SandEulerTree();
-          et.transferLabels((SandNode)newRoot, ((SandTreeCanvas) canvas).getRoot());
-          ((SandTreeCanvas) canvas).setRoot((SandNode)newRoot);
+          et.transferLabels((SandNode)newRoot, ((SandTreeCanvas<?>) canvas).getRoot());
+          ((SandTreeCanvas<?>) canvas).setRoot((SandNode)newRoot);
         }
         else {
           ADEulerTree et = new ADEulerTree();
-          et.transferLabels((ADTNode)newRoot, ((ADTreeCanvas) canvas).getRoot());
-          ((ADTreeCanvas) canvas).setRoot((ADTNode)newRoot);
+          et.transferLabels((ADTNode)newRoot, ((ADTreeCanvas<?>) canvas).getRoot());
+          ((ADTreeCanvas<?>) canvas).setRoot((ADTNode)newRoot);
         }
         // canvas.getMainWindow().getStatusBar().report("Validation of terms was
         // successful");
@@ -178,7 +182,6 @@ public class TermView extends JPanel {
 
   private void handleError(Parser parser) {
     errorOutput.setText(parser.getErrorMessage());
-    Debug.log("Parser error:"+parser.getErrorMessage());
     // canvas.getMainWindow().getStatusBar().reportError("Validation of terms
     // was not possible: " + m);
     splitPane.setDividerLocation(Math.max(1 / 2,
@@ -217,4 +220,5 @@ public class TermView extends JPanel {
   private JTextArea          editTerms;
   private AbstractTreeCanvas canvas;
   private JButton            revert;
+  private JButton validate;
 }

@@ -1,6 +1,14 @@
 # Change Log
 All notable changes to the ADTool will be documented in this file.
-
+## Unreleased
+- fixed bug with wrong Sand Tree terms
+- changed copy/paste behaviour to take into account Attacker/defender role so
+  that visual colour stays the same
+- fixed Valuations View for Attack Defense Trees
+- added marking when highlighting values in Valuations View
+- added disabling "Validate" button when terms text is empty
+- added option to show computed values in countered nodes with no children
+- added option not to load saved layout when loading failed last time
 ## [2.0.0] - 2015-12-03
 Initial release of the second rewrite of ADTool. Among others there are new features:
 - support opening multiple trees

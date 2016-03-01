@@ -200,14 +200,14 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     marked.put(node, color);
   }
 
-//   /**
-//    * Assigns a new value to a node.
-//    *
-//    * @param key
-//    */
-//   public void putNewValue(String key, Ring value) {
-//     this.values.setValue(key, value);
-//   }
+  // /**
+  // * Assigns a new value to a node.
+  // *
+  // * @param key
+  // */
+  // public void putNewValue(String key, Ring value) {
+  // this.values.setValue(key, value);
+  // }
 
   /**
    * Determines if this instance is markEditable.
@@ -229,10 +229,10 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     repaint();
   }
 
-//   public boolean isMarked(Node node) {
-//     // return marked.contains(node.getName());
-//     return false;
-//   }
+  // public boolean isMarked(Node node) {
+  // // return marked.contains(node.getName());
+  // return false;
+  // }
 
   protected Color getFillColor(Node node) {
     Color c = marked.get(node);
@@ -240,13 +240,13 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
       return c;
     }
     if (markEditable) {
-      if (this.isSand()){
+      if (this.isSand()) {
         if (((SandNode) node).isEditable()) {
           return Options.canv_EditableColor;
         }
       }
       else {
-        if (((ADTNode) node).isEditable((AdtDomain)values.getDomain())) {
+        if (((ADTNode) node).isEditable((AdtDomain) values.getDomain())) {
           return Options.canv_EditableColor;
         }
       }
@@ -275,11 +275,22 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     if (this.values.hasEvaluator()) {
       if (this.isSand()) {
         value = this.values.getTermValue((SandNode) n);
+        result += value.toUnicode();
       }
       else {
-        value = this.values.getTermValue((ADTNode) n);
+        if (((ADTNode)n).hasDefault() && ((ADTNode)n).isCountered()) {
+          if (values.isShowAllLabels()) {
+            value = this.values.getTermValue((ADTNode) n);
+            result +=  value.toUnicode() + "\n" ;
+          }
+          value = values.getValue((ADTNode)n);
+          result +=  value.toUnicode();
+        }
+        else {
+          value = this.values.getTermValue((ADTNode) n);
+          result +=  value.toUnicode();
+        }
       }
-      result += value.toUnicode();
     }
     return result;
   }
@@ -302,13 +313,8 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     }
     RankingDockable rank = controller.getFrame().getRankingView();
     if (rank != null && rank.getCanvas() == this) {
-      Debug.log("updating rank");
       rank.setFocus(this, this.getFocused(), true);
     }
-    else{
-      Debug.log("NOT updating rank");
-    }
-    Debug.log("before updateTreeSize");
     tree.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
     if (!this.localExtentProvider) {
       tree.getSharedExtentProvider().notifyTreeChanged();
@@ -329,17 +335,18 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
         this.treeChanged();
       }
       else {
-        Debug.log("before updateTreeSize");
         getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
         tree.getSharedExtentProvider().notifyTreeChanged();
       }
     }
   }
 
-  // public void setShowAllLabels(boolean showAllLabels) {
-  // values.setShowAllLabels(showAllLabels);
-  // tree.notifyTreeChanged(TreeChangeListener.Change.LABEL_CHANGE);
-  // }
+  public void setShowAllLabels(boolean showAllLabels) {
+    values.setShowAllLabels(showAllLabels);
+    if (tree != null) {
+      tree.getSharedExtentProvider().notifyTreeChanged();
+    }
+  }
 
   public void repaintAll() {
     DomainFactory factory = getController().getFrame().getDomainFactory();
@@ -388,12 +395,12 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
   private void markLabel(Node node, String label) {
     boolean doMark = false;
     if (node instanceof SandNode) {
-      if (node.getName().equals(label) && ((SandNode)node).isLeaf()) {
+      if (node.getName().equals(label) && ((SandNode) node).isLeaf()) {
         doMark = true;
       }
     }
     else {
-      if (node.getName().equals(label) && ((ADTNode)node).hasDefault()) {
+      if (node.getName().equals(label) && ((ADTNode) node).hasDefault()) {
         doMark = true;
       }
     }

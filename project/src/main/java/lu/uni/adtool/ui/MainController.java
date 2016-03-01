@@ -733,9 +733,6 @@ public final class MainController implements CControlListener, CFocusListener {
 
   private void chooseDomain() {
     if (lastFocusedTree != null) {
-      // int pos = lastFocusedTree.getUniqueId().indexOf("_");
-      // if (pos < 5) return;
-      // String id = lastFocusedTree.getUniqueId().substring(0, pos);
       if (lastFocusedTree.isSand()) {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(true);
         AddSandDomainDialog addDialog = new AddSandDomainDialog(this.frame);
