@@ -1,6 +1,6 @@
 # Change Log
 All notable changes to the ADTool will be documented in this file.
-## Unreleased
+## [2.0.1] - 2016-03-01
 - fixed bug with wrong Sand Tree terms
 - changed copy/paste behaviour to take into account Attacker/defender role so
   that visual colour stays the same
@@ -9,7 +9,7 @@ All notable changes to the ADTool will be documented in this file.
 - added disabling "Validate" button when terms text is empty
 - added option to show computed values in countered nodes with no children
 - added option not to load saved layout when loading failed last time
-## [2.0.0] - 2015-12-03
+## [2.0.0] - 2016-02-25
 Initial release of the second rewrite of ADTool. Among others there are new features:
 - support opening multiple trees
 - support for Sand Attack Trees
