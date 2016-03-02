@@ -1,5 +1,8 @@
 # Change Log
 All notable changes to the ADTool will be documented in this file.
+## Unreleased
+- added copy/paste of values to Domain View
+- fixed not updating node size after checking "Computed Values" checkbox
 
 ## [2.0.1] - 2016-03-01
 - fixed bug with wrong Sand Tree terms

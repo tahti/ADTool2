@@ -32,15 +32,14 @@ public class Ranker<Type extends Ring> {
    * @return true if evaluation was successful.
    */
   public final ArrayList<RankNode<Type>> rank(final ADTNode root,
-      final ValueAssignement<Type> newProMap, final ValueAssignement<Type> newOppMap,
-      int maxItems) {
+      final ValueAssignement<Type> valuesMap, int maxItems) {
     this.lastNode = root;
-    if (newProMap == null || root == null || newOppMap == null || this.atdDomain == null
+    if (valuesMap == null || root == null || this.atdDomain == null
         || !(this.atdDomain instanceof RankingDomain)) {
       Debug.log("NULL result");
       return null;
     }
-    this.lastResult = rankRecursive(root, newProMap, newOppMap, maxItems);
+    this.lastResult = rankRecursive(root, valuesMap , maxItems);
     return this.lastResult;
 
     // return rankRecursive(root, newProMap, newOppMap, maxItems);
@@ -57,8 +56,7 @@ public class Ranker<Type extends Ring> {
     return this.lastResult;
   }
 
-  private ArrayList<RankNode<Type>> rankRecursive(final ADTNode root, ValueAssignement<Type> mapPro,
-      ValueAssignement<Type> mapOpp, int maxItems) {
+  private ArrayList<RankNode<Type>> rankRecursive(final ADTNode root, ValueAssignement<Type> valuesMap, int maxItems){
     ArrayList<RankNode<Type>> result = new ArrayList<RankNode<Type>>();
     int c = 0;
     if (root.isCountered()) {
@@ -66,12 +64,7 @@ public class Ranker<Type extends Ring> {
     }
     if (root.hasDefault()) {
       Type value;
-      if (root.getRole() == ADTNode.Role.PROPONENT) {
-        value = mapPro.get(root.getName());
-      }
-      else {
-        value = mapOpp.get(root.getName());
-      }
+      value = valuesMap.get(root.getRole() == ADTNode.Role.PROPONENT, root.getName());
       if (value == null) {
         value = atdDomain.getDefaultValue(root);
       }
@@ -81,7 +74,7 @@ public class Ranker<Type extends Ring> {
       ArrayList<ArrayList<RankNode<Type>>> list = new ArrayList<ArrayList<RankNode<Type>>>();
       list.ensureCapacity(root.getChildren().size() - c);
       for (int i = 0; i < (root.getChildren().size() - c); i++) {
-        list.add(rankRecursive((ADTNode) root.getChildren().get(i), mapPro, mapOpp, maxItems));
+        list.add(rankRecursive((ADTNode) root.getChildren().get(i), valuesMap, maxItems));
       }
       if (((RankingDomain<Type>) this.atdDomain).isOrType(root.getType())) {
         result = ((RankingDomain<Type>) this.atdDomain).minOp(list, maxItems, root.getType());
@@ -96,7 +89,7 @@ public class Ranker<Type extends Ring> {
       list.ensureCapacity(2);
       list.add(result);
       list.add(rankRecursive((ADTNode) root.getChildren().get(root.getChildren().size() - 1),
-          mapPro, mapOpp, maxItems));
+          valuesMap, maxItems));
       if (root.getRole() == ADTNode.Role.OPPONENT) {
         // assuming AND_OPP == CO
         if (((RankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
@@ -127,7 +120,7 @@ public class Ranker<Type extends Ring> {
       int maxItems) {
     ArrayList<RankNode<Type>> result = new ArrayList<RankNode<Type>>();
     if (root.isLeaf()) {
-      Type value = map.get(root.getName());
+      Type value = map.get(true, root.getName());
       if (value == null) {
         value = sandDomain.getDefaultValue(root);
       }

@@ -21,8 +21,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
     this.domainId = -1;
     this.domain = null;
     this.evaluator = null;
-    this.valueAssPro = new ValueAssignement<Ring>();
-    this.valueAssOpp = null;
+    this.valuesMap = new ValueAssignement<Ring>();
     this.showAllLabels = true;
   }
 
@@ -31,8 +30,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
     this.treeId = treeId;
     this.domain = domain;
     this.evaluator = new Evaluator<Ring>(domain);
-    this.valueAssPro = new ValueAssignement<Ring>();
-    this.valueAssOpp = new ValueAssignement<Ring>();
+    this.valuesMap = new ValueAssignement<Ring>();
     this.showAllLabels = true;
   }
 
@@ -41,8 +39,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
     this.treeId = treeId;
     this.domain = domain;
     this.evaluator = new Evaluator<Ring>(domain);
-    this.valueAssPro = new ValueAssignement<Ring>();
-    this.valueAssOpp = null;
+    this.valuesMap = new ValueAssignement<Ring>();
   }
 
   public boolean equals(Object obj) {
@@ -60,12 +57,10 @@ public class ValuationDomain implements MultipleCDockableLayout {
       throw new IOException("No domain with name:" + domainName);
     }
     if (DomainFactory.isSandDomain(domainName)) {
-      valueAssOpp = null;
       node = new SandNode();
     }
     else {
       node = new ADTNode();
-      this.valueAssOpp = new ValueAssignement<Ring>();
     }
     this.treeId = in.readInt();
     this.domainId = in.readInt();
@@ -73,7 +68,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
         .log("Read domain " + domainName + " treeId:" + this.treeId + " domainId:" + this.domainId);
     if (node != null) {
       int counter = in.readInt();
-      this.valueAssPro.clear();
+      this.valuesMap.clear();
       for (int i = 0; i < counter; i++) {
         String name = in.readUTF();
         String value = in.readUTF();
@@ -83,7 +78,6 @@ public class ValuationDomain implements MultipleCDockableLayout {
       }
       if (domain instanceof AdtDomain) {
         counter = in.readInt();
-        this.valueAssOpp.clear();
         for (int i = 0; i < counter; i++) {
           String name = in.readUTF();
           String value = in.readUTF();
@@ -107,19 +101,17 @@ public class ValuationDomain implements MultipleCDockableLayout {
     Node node = null;
     domain = DomainFactory.createFromString(domainName);
     if (DomainFactory.isSandDomain(domainName)) {
-      valueAssOpp = null;
       node = new SandNode();
     }
     else {
       node = new ADTNode();
-      this.valueAssOpp = new ValueAssignement<Ring>();
     }
     this.treeId = element.getElement("treeId").getInt();
     this.domainId = element.getElement("domainId").getInt();
     Debug.log(" layout with treeId " + treeId + " domainId:" + domainId);
     XElement v = element.getElement("values");
     if (node != null && v != null) {
-      this.valueAssPro.clear();
+      this.valuesMap.clear();
       int size = v.getElementCount();
       for (int i = 0; i < size; i = i + 2) {
         String key = v.getElement(i).getString();
@@ -130,7 +122,6 @@ public class ValuationDomain implements MultipleCDockableLayout {
       }
     }
     if (domain instanceof AdtDomain) {
-      this.valueAssOpp.clear();
       int size = v.getElementCount();
       for (int i = 0; i < size; i = i + 2) {
         String key = v.getElement(i).getString();
@@ -153,18 +144,18 @@ public class ValuationDomain implements MultipleCDockableLayout {
     out.writeUTF(this.domain.getClass().getSimpleName());
     out.writeInt(this.treeId);
     out.writeInt(this.domainId);
-    Set<String> keys = valueAssPro.keySet();
+    Set<String> keys = valuesMap.keySet(true);
     out.writeInt(keys.size());
     for (String key : keys) {
       out.writeUTF(key);
-      out.writeUTF(valueAssPro.get(key).toString());
+      out.writeUTF(valuesMap.get(true, key).toString());
     }
     if (domain instanceof AdtDomain) {
-      keys = valueAssOpp.keySet();
+      keys = valuesMap.keySet(false);
       out.writeInt(keys.size());
       for (String key : keys) {
         out.writeUTF(key);
-        out.writeUTF(valueAssOpp.get(key).toString());
+        out.writeUTF(valuesMap.get(false, key).toString());
       }
     }
   }
@@ -185,61 +176,47 @@ public class ValuationDomain implements MultipleCDockableLayout {
     element.addElement("treeId").setInt(this.treeId);
     element.addElement("domainId").setInt(this.domainId);
     XElement v = new XElement("values");
-    Set<String> keys = valueAssPro.keySet();
+    Set<String> keys = valuesMap.keySet(true);
     for (String key : keys) {
       v.addElement("label").setString(key);
-      v.addElement("value").setString(valueAssPro.get(key).toString());
+      v.addElement("value").setString(valuesMap.get(true, key).toString());
     }
     element.addElement(v);
     if (domain instanceof AdtDomain) {
       v = new XElement("valuesOpp");
-      keys = valueAssOpp.keySet();
+      keys = valuesMap.keySet(true);
       for (String key : keys) {
         v.addElement("label").setString(key);
-        v.addElement("value").setString(valueAssOpp.get(key).toString());
+        v.addElement("value").setString(valuesMap.get(true, key).toString());
       }
       element.addElement(v);
     }
   }
 
   public Ring getValue(ADTNode node) {
-    Ring result = null;
-    String key = node.getName();
-    if (node.getRole() == ADTNode.Role.PROPONENT) {
-      result = valueAssPro.get(key);
-    }
-    else {
-      result = valueAssOpp.get(key);
-    }
-    return result;
+    return valuesMap.get(node.getRole() == ADTNode.Role.PROPONENT, node.getName());
   }
 
   public Ring getValue(SandNode node) {
-    String key = node.getName();
-    return valueAssPro.get(key);
+    return valuesMap.get(true, node.getName());
   }
 
   public Ring get(boolean proponent, String key) {
-    if (proponent) {
-      return (Ring) valueAssPro.get(key);
-    }
-    else {
-      return (Ring) valueAssOpp.get(key);
-    }
+    return valuesMap.get(proponent, key);
   }
 
   public Set<String> sandKeySet() {
-    return valueAssPro.keySet();
+    return valuesMap.keySet(true);
   }
 
   public Set<String> oppKeySet() {
-    return valueAssOpp.keySet();
+    return valuesMap.keySet(false);
   }
 
   public final Ring getTermValue(final ADTNode node) {
     Ring value = (Ring) evaluator.getValue(node);
     if (value == null) {
-      return (Ring) evaluator.reevaluate(node, valueAssPro, valueAssOpp);
+      return (Ring) evaluator.reevaluate(node, valuesMap);
     }
     else {
       return value;
@@ -249,7 +226,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
   public final Ring getTermValue(final SandNode node) {
     Ring value = (Ring) evaluator.getValue(node);
     if (value == null) {
-      return (Ring) evaluator.reevaluate(node, valueAssPro);
+      return (Ring) evaluator.reevaluate(node, valuesMap);
     }
     else {
       return value;
@@ -257,29 +234,30 @@ public class ValuationDomain implements MultipleCDockableLayout {
   }
 
   public void setValue(boolean proponent, String key, Ring value) {
-    if (proponent) {
-      valueAssPro.put(key, value);
-    }
-    else {
-      valueAssOpp.put(key, value);
+    valuesMap.put(proponent, key, value);
+  }
+
+  public void setValue(Node node, Ring value) {
+    Ring v = getDomain().getDefaultValue(node);
+    if (v.updateFromString(value.toString())) {
+      if (node instanceof ADTNode) {
+        valuesMap.put(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, node.getName(), v);
+      }
+      else {
+        valuesMap.put(true, node.getName(), value);
+      }
     }
   }
 
   public void setDefaultValue(ADTNode node) {
     Ring value = getDomain().getDefaultValue(node);
-    if (node.getRole() == ADTNode.Role.PROPONENT) {
-      valueAssPro.put(node.getName(), value);
-    }
-    else {
-      valueAssOpp.put(node.getName(), value);
-    }
+    valuesMap.put(node.getRole() == ADTNode.Role.PROPONENT, node.getName(), value);
   }
 
   public void setDefaultValue(SandNode node) {
     Ring value = getDomain().getDefaultValue(node);
-    valueAssPro.put(node.getName(), value);
+    valuesMap.put(true, node.getName(), value);
   }
-
 
   public boolean hasEvaluator() {
     return evaluator != null;
@@ -288,60 +266,49 @@ public class ValuationDomain implements MultipleCDockableLayout {
   public void rename(Node node, String name) {
     Ring value = null;
     if (node instanceof SandNode) {
-      value = valueAssPro.get(node.getName());
+      value = valuesMap.get(true, node.getName());
       if (value == null) {
         value = getDomain().getDefaultValue(node);
       }
-      valueAssPro.put(name, value);
+      valuesMap.put(true, name, value);
     }
     else {
-      if (((ADTNode) node).getRole() == ADTNode.Role.PROPONENT) {
-        value = valueAssPro.get(node.getName());
-        if (value == null) {
-          value = getDomain().getDefaultValue(node);
-        }
-        valueAssPro.put(name, value);
+      value =
+          this.valuesMap.get(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, node.getName());
+      if (value == null) {
+        value = getDomain().getDefaultValue(node);
       }
-      else {
-        value = valueAssOpp.get(node.getName());
-        if (value == null) {
-          value = getDomain().getDefaultValue(node);
-        }
-        valueAssOpp.put(name, value);
-      }
+      valuesMap.put(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, name, value);
     }
   }
 
   public void refreshAllValues(ADTNode root) {
-    ValueAssignement<Ring> proNew = new ValueAssignement<Ring>();
-    ValueAssignement<Ring> oppNew = new ValueAssignement<Ring>();
-    refreshAllValues(root, proNew, oppNew);
-    valueAssPro = proNew;
-    valueAssOpp = oppNew;
+    ValueAssignement<Ring> vm = new ValueAssignement<Ring>();
+    this.refreshAllValues(root, vm);
+    this.valuesMap = vm;
   }
 
   public void refreshAllValues(SandNode root) {
-    ValueAssignement<Ring> proNew = new ValueAssignement<Ring>();
-    refreshAllValues(root, proNew);
-    valueAssPro = proNew;
-    valueAssOpp = null;
+    ValueAssignement<Ring> vm = new ValueAssignement<Ring>();
+    this.refreshAllValues(root, vm);
+    this.valuesMap = vm;
   }
 
   public void valuesUpdated(ADTNode root) {
-    evaluator.reevaluate(root, valueAssPro, valueAssOpp);
+    evaluator.reevaluate(root, valuesMap);
   }
 
   public void valuesUpdated(SandNode root) {
-    evaluator.reevaluate(root, valueAssPro);
+    evaluator.reevaluate(root, this.valuesMap);
   }
 
   public void treeChanged(ADTNode root) {
-    this.evaluator.reevaluate(root, valueAssPro, valueAssOpp);
+    this.evaluator.reevaluate(root, this.valuesMap);
     this.refreshAllValues(root);
   }
 
   public void treeChanged(SandNode root) {
-    this.evaluator.reevaluate(root, valueAssPro);
+    this.evaluator.reevaluate(root, this.valuesMap);
     this.refreshAllValues(root);
   }
 
@@ -360,20 +327,9 @@ public class ValuationDomain implements MultipleCDockableLayout {
    * @param newValueAssPro
    *          new value assignement.
    */
-  public void setValueAssPro(ValueAssignement<Ring> newValueAss, ADTNode root) {
-    this.valueAssPro = newValueAss;
-    evaluator.reevaluate(root, valueAssPro, valueAssOpp);
-  }
-
-  /**
-   * Sets the valueAssOpp for this instance.
-   *
-   * @param newValueAssOpp
-   *          new value assignement.
-   */
-  public void setValueAssOpp(ValueAssignement<Ring> newValueAss, ADTNode root) {
-    this.valueAssOpp = newValueAss;
-    evaluator.reevaluate(root, valueAssPro, valueAssOpp);
+  public void setValueMap(ValueAssignement<Ring> newValueAss, ADTNode root) {
+    this.valuesMap = newValueAss;
+    evaluator.reevaluate(root, this.valuesMap);
   }
 
   /**
@@ -381,17 +337,8 @@ public class ValuationDomain implements MultipleCDockableLayout {
    *
    * @return The valueAssPro.
    */
-  public ValueAssignement<Ring> getValueAssPro() {
-    return this.valueAssPro;
-  }
-
-  /**
-   * Gets the valueAssOpp for this instance.
-   *
-   * @return The valueAssOpp.
-   */
-  public ValueAssignement<Ring> getValueAssOpp() {
-    return this.valueAssOpp;
+  public ValueAssignement<Ring> getValueMap() {
+    return this.valuesMap;
   }
 
   /**
@@ -426,54 +373,43 @@ public class ValuationDomain implements MultipleCDockableLayout {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private void refreshAllValues(final ADTNode node, final ValueAssignement proNew,
-      final ValueAssignement oppNew) {
+  private void refreshAllValues(final ADTNode node, final ValueAssignement mapNew) {
     String name = node.getName();
+    boolean proponent = node.getRole() == ADTNode.Role.PROPONENT;
     if (node.hasDefault()) {
-      if (node.getRole() == ADTNode.Role.OPPONENT) {
-        Ring value = (Ring) valueAssOpp.get(name);
-        if (value == null) {
-          oppNew.put(name, getDomain().getDefaultValue(node));
-        }
-        else {
-          oppNew.put(name, value);
-        }
+      Ring value = (Ring) this.valuesMap.get(proponent, name);
+      if (value == null) {
+        mapNew.put(proponent, name, getDomain().getDefaultValue(node));
       }
       else {
-        Ring value = (Ring) valueAssPro.get(name);
-        if (value == null) {
-          proNew.put(name, getDomain().getDefaultValue(node));
-        }
-        else {
-          proNew.put(name, value);
-        }
+        mapNew.put(proponent, name, value);
       }
     }
     if (!node.isLeaf()) {
       for (Node child : node.getChildren()) {
         if (child != null) {
-          refreshAllValues((ADTNode) child, proNew, oppNew);
+          refreshAllValues((ADTNode) child, mapNew);
         }
       }
     }
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  private void refreshAllValues(final SandNode node, final ValueAssignement proNew) {
+  private void refreshAllValues(final SandNode node, final ValueAssignement mapNew) {
     String name = node.getName();
     if (node.isLeaf()) {
-      Ring value = (Ring) valueAssPro.get(name);
+      Ring value = (Ring) valuesMap.get(true, name);
       if (value == null) {
-        proNew.put(name, getDomain().getDefaultValue(node));
+        mapNew.put(true, name, getDomain().getDefaultValue(node));
       }
       else {
-        proNew.put(name, value);
+        mapNew.put(true, name, value);
       }
     }
     else {
       for (Node child : node.getChildren()) {
         if (child != null) {
-          refreshAllValues((SandNode) child, proNew);
+          refreshAllValues((SandNode) child, mapNew);
         }
       }
     }
@@ -481,8 +417,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
 
   private Domain<Ring>              domain;
   transient private Evaluator<Ring> evaluator;
-  private ValueAssignement<Ring>    valueAssPro;
-  private ValueAssignement<Ring>    valueAssOpp;
+  private ValueAssignement<Ring>    valuesMap;
   /** if true we show calculated values for countered nodes */
   private boolean                   showAllLabels;
   private int                       treeId;

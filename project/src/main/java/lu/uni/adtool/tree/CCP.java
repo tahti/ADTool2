@@ -1,10 +1,12 @@
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.domains.ValueAssignement;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.PermaDockable;
 import lu.uni.adtool.ui.TreeDockable;
+import lu.uni.adtool.ui.ValuationsDockable;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
@@ -61,29 +63,36 @@ public class CCP {
 
   public void paste() {
     if (lastFocused != null) {
-      AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
       Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-      try {
-        if (contents != null && canv != null && canv.getFocused() != null) {
-          if (canv instanceof AbstractDomainCanvas) {
-          }
-          else if (canv.isSand() && contents.isDataFlavorSupported(NodeSelection.sandFlavor)) {
-            SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.sandFlavor));
-            Debug.log("paste sand");
-            ((SandTreeCanvas) canv).paste(copy);
-          }
-          else if (!canv.isSand() && contents.isDataFlavorSupported(NodeSelection.adtFlavor)) {
-            ADTNode copy = ((ADTNode) contents.getTransferData(NodeSelection.adtFlavor));
-            Debug.log("paste adt");
-            ((ADTreeCanvas) canv).paste(copy);
+      if (lastFocused instanceof ValuationsDockable) {
+      }
+      else {
+        AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
+        try {
+          if (contents != null && canv != null && canv.getFocused() != null) {
+            if (canv instanceof AbstractDomainCanvas && contents.isDataFlavorSupported(ValueSelection.valueFlavor)) {
+              Ring copy = ((Ring) contents.getTransferData(ValueSelection.valueFlavor));
+              ((AbstractDomainCanvas)canv).getValues().setValue(canv.getFocused(), copy);
+              ((AbstractDomainCanvas)canv).valuesUpdated();
+            }
+            else if (canv.isSand() && contents.isDataFlavorSupported(NodeSelection.sandFlavor)) {
+              SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.sandFlavor));
+              Debug.log("paste sand");
+              ((SandTreeCanvas) canv).paste(copy);
+            }
+            else if (!canv.isSand() && contents.isDataFlavorSupported(NodeSelection.adtFlavor)) {
+              ADTNode copy = ((ADTNode) contents.getTransferData(NodeSelection.adtFlavor));
+              Debug.log("paste adt");
+              ((ADTreeCanvas) canv).paste(copy);
+            }
           }
         }
-      }
-      catch (UnsupportedFlavorException e) {
-        e.printStackTrace();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
+        catch (UnsupportedFlavorException e) {
+          e.printStackTrace();
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
   }
@@ -92,22 +101,35 @@ public class CCP {
     if (lastFocused != null) {
       Debug.log("copy");
       Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
-      AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
-      if (canv != null && canv.getFocused() != null) {
-        if (canv instanceof AbstractDomainCanvas) {
-        }
-        else {
-          if (canv.getFocused() instanceof ADTNode) {
-            ADTNode copy = ((ADTNode) canv.getFocused()).deepCopy();
-            if (canv.getTree().getLayout().getSwitchRole()) {
-              copy.toggleRoleRecursive();
+      if (lastFocused instanceof ValuationsDockable) {
+      }
+      else {
+        AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
+        if (canv != null && canv.getFocused() != null) {
+          if (canv instanceof AbstractDomainCanvas) {
+            Ring copy;
+            if (canv.getFocused() instanceof ADTNode) {
+              copy = ((AbstractDomainCanvas)canv).getValues().getValue((ADTNode)canv.getFocused());
             }
-            cb.setContents(new NodeSelection(copy), null);
+            else {
+              copy = ((AbstractDomainCanvas)canv).getValues().getValue((SandNode)canv.getFocused());
+            }
+            cb.setContents(new ValueSelection(copy), null);
             return true;
           }
-          else if (canv.getFocused() instanceof SandNode) {
-            cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
-            return true;
+          else {
+            if (canv.getFocused() instanceof ADTNode) {
+              ADTNode copy = ((ADTNode) canv.getFocused()).deepCopy();
+              if (canv.getTree().getLayout().getSwitchRole()) {
+                copy.toggleRoleRecursive();
+              }
+              cb.setContents(new NodeSelection(copy), null);
+              return true;
+            }
+            else if (canv.getFocused() instanceof SandNode) {
+              cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
+              return true;
+            }
           }
         }
       }
@@ -204,6 +226,52 @@ public class CCP {
       finally {
         adtFlavor = d1;
         sandFlavor = d2;
+      }
+    }
+  }
+  static class ValuationSelection implements Transferable {
+    // Transferable class constructor
+    public ValuationSelection(ValueAssignement<?> va) {
+      this.values = va;
+    }
+
+    public Object getTransferData(DataFlavor df) throws UnsupportedFlavorException, IOException {
+      // If text/rtf flavor is requested
+      if (valuationFlavor.equals(df)) {
+        return this.values;
+      }
+      else {
+        throw new UnsupportedFlavorException(df);
+      }
+    }
+
+    public boolean isDataFlavorSupported(DataFlavor df) {
+      // If the flavor is text/rtf or tet/plain return true
+      if (valuationFlavor.equals(df)) {
+        return true;
+      }
+      return false;
+    }
+
+    public DataFlavor[] getTransferDataFlavors() {
+      // Return array of flavors
+      return new DataFlavor[] {valuationFlavor};
+    }
+
+    private ValueAssignement<?> values;
+
+    public static final DataFlavor valuationFlavor;
+
+    static {
+      DataFlavor d1 = null;
+      try {
+        d1 = new DataFlavor(
+            DataFlavor.javaJVMLocalObjectMimeType + ";class=lu.uni.adtool.domains.ValueAssignement");
+      }
+      catch (ClassNotFoundException e) {
+      }
+      finally {
+        valuationFlavor = d1;
       }
     }
   }

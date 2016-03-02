@@ -37,8 +37,19 @@ public class RealG0 implements Serializable, Ring {
    *
    */
   public final boolean updateFromString(String s) {
-    value = Double.parseDouble(s);
-    return checkValue();
+    double origValue = this.value;
+    try {
+      this.value = Double.parseDouble(s);
+    }
+    catch (NumberFormatException e) {
+      this.value = origValue;
+      return false;
+    }
+    if (!checkValue()) {
+      this.value = origValue;
+      return false;
+    }
+    return true;
   }
 
   /**

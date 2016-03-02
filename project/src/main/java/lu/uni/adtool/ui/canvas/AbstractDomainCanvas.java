@@ -344,6 +344,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
   public void setShowAllLabels(boolean showAllLabels) {
     values.setShowAllLabels(showAllLabels);
     if (tree != null) {
+      tree.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
       tree.getSharedExtentProvider().notifyTreeChanged();
     }
   }

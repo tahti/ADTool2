@@ -45,10 +45,11 @@ public class LMHValue implements Serializable, Ring {
    *
    */
   public final boolean updateFromString(String s) {
-    value = translate(s);
-    if (value == -1) {
+    int newValue = translate(s);
+    if (newValue == -1) {
       return false;
     }
+    this.value = newValue;
     return true;
   }
 

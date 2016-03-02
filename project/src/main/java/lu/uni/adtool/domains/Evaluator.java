@@ -56,14 +56,13 @@ public class Evaluator<Type extends Ring> {
    *          mapping between node names and values.
    * @return true if evaluation was successful.
    */
-  public final Type reevaluate(final ADTNode root, final ValueAssignement<Type> newProMap,
-      final ValueAssignement<Type> newOppMap) {
-    if (newProMap == null || root == null || newOppMap == null) {
+  public final Type reevaluate(final ADTNode root, final ValueAssignement<Type> valuesMap) {
+    if (valuesMap == null) {
       System.err.println("NULL result");
       return null;
     }
     resultMap = new HashMap<Node, Type>();
-    return evaluate(root, newProMap, newOppMap);
+    return this.evaluate(root, valuesMap);
   }
 
   public final Type reevaluate(final SandNode root, final ValueAssignement<Type> valueAssigment) {
@@ -81,8 +80,7 @@ public class Evaluator<Type extends Ring> {
    * @param root
    * @return
    */
-  private Type evaluate(final ADTNode root, ValueAssignement<Type> proMap,
-      final ValueAssignement<Type> oppMap) {
+  private Type evaluate(final ADTNode root, ValueAssignement<Type> valuesMap) {
     Type result = null;
     int c = 0;
     // if last element is counter - skip it
@@ -90,12 +88,7 @@ public class Evaluator<Type extends Ring> {
       c = 1;
     }
     if (root.hasDefault()) {
-      if (root.getRole() == ADTNode.Role.OPPONENT) {
-        result = oppMap.get(root.getName());
-      }
-      else {
-        result = proMap.get(root.getName());
-      }
+      result = valuesMap.get(root.getRole() == ADTNode.Role.PROPONENT, root.getName());
       if (result == null) {
         result = atdDomain.getDefaultValue(root);
       }
@@ -103,21 +96,21 @@ public class Evaluator<Type extends Ring> {
     else {
       for (int i = 0; i < (root.getChildren().size() - c); i++) {
         if (result == null) {
-          result = evaluate((ADTNode) root.getChildren().get(i), proMap, oppMap);
+          result = evaluate((ADTNode) root.getChildren().get(i), valuesMap);
         }
         else {
-          result = atdDomain.calc(result, evaluate((ADTNode) root.getChildren().get(i), proMap, oppMap), root.getType());
+          result = atdDomain.calc(result, evaluate((ADTNode) root.getChildren().get(i), valuesMap), root.getType());
         }
       }
     }
     if (root.isCountered()) {
       if (root.getRole() == ADTNode.Role.OPPONENT) {
         result = atdDomain.co(result, evaluate(
-            (ADTNode) root.getChildren().get(root.getChildren().size() - 1), proMap, oppMap));
+            (ADTNode) root.getChildren().get(root.getChildren().size() - 1), valuesMap));
       }
       else {
         result = atdDomain.cp(result, evaluate(
-            (ADTNode) root.getChildren().get(root.getChildren().size() - 1), proMap, oppMap));
+            (ADTNode) root.getChildren().get(root.getChildren().size() - 1), valuesMap));
       }
     }
     resultMap.put(root, result);
@@ -127,7 +120,7 @@ public class Evaluator<Type extends Ring> {
   private Type evaluate(final SandNode root, ValueAssignement<Type> map) {
     Type result = null;
     if (root.isLeaf()) {
-      result = map.get(root.getName());
+      result = map.get(true, root.getName());
       if (result == null) {
         result = sandDomain.getDefaultValue(root);
       }

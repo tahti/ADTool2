@@ -19,12 +19,13 @@ public class ValueAssignement<T> implements Serializable {
    * @see Object#ValueAssignement()
    */
   public ValueAssignement() {
-    map = new HashMap<String, T>(32);
+    proponent= new HashMap<String, T>(32);
+    opponent= new HashMap<String, T>();
   }
 
-  public String toString() {
-    return map.values().toString();
-  }
+//   public String toString() {
+//     return map.values().toString();
+//   }
 
   /**
    * Assigns value to a label.
@@ -32,8 +33,13 @@ public class ValueAssignement<T> implements Serializable {
    * @param value
    * @param label
    */
-  public void put(final String label, final T value) {
-    map.put(label.replaceAll("\\s+", " "), value);
+  public void put(boolean prop, final String label, final T value) {
+    if (prop) {
+      proponent.put(label.replaceAll("\\s+", " "), value);
+    }
+    else {
+      opponent.put(label.replaceAll("\\s+", " "), value);
+    }
   }
 
   /**
@@ -42,8 +48,13 @@ public class ValueAssignement<T> implements Serializable {
    * @param label
    *          label to be removed.
    */
-  public final void remove(final String label) {
-    map.remove(label.replaceAll("\\s+", " "));
+  public final void remove(boolean prop, final String label) {
+    if (prop) {
+      proponent.remove(label.replaceAll("\\s+", " "));
+    }
+    else {
+      opponent.remove(label.replaceAll("\\s+", " "));
+    }
   }
 
   /**
@@ -53,19 +64,31 @@ public class ValueAssignement<T> implements Serializable {
    *          label of the key
    * @return key
    */
-  public final T get(final String label) {
-    return map.get(label.replaceAll("\\s+", " "));
+  public final T get(boolean prop, final String label) {
+    if (prop) {
+      return proponent.get(label.replaceAll("\\s+", " "));
+    }
+    else {
+      return opponent.get(label.replaceAll("\\s+", " "));
+    }
   }
 
-  public Set<String> keySet() {
-    return map.keySet();
+  public Set<String> keySet(boolean prop) {
+    if (prop) {
+      return proponent.keySet();
+    }
+    else {
+      return opponent.keySet();
+    }
   }
   public void clear() {
-    map.clear();
+    proponent.clear();
+    opponent.clear();
   }
   static final long          serialVersionUID = 975147854358646403L;
   /**
    * Hash map for internal storage mapping labels to domain values
    */
-  private HashMap<String, T> map;
+  private HashMap<String, T> proponent;
+  private HashMap<String, T> opponent;
 }

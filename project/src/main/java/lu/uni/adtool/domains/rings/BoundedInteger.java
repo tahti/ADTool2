@@ -132,8 +132,19 @@ public class BoundedInteger implements Serializable, Ring {
    *
    */
   public final boolean updateFromString(String s) {
-    value = Integer.parseInt(s);
-    return checkValue();
+    int origValue = this.value;
+    try {
+      this.value = Integer.parseInt(s);
+    }
+    catch (NumberFormatException e) {
+      this.value = origValue;
+      return false;
+    }
+    if (!checkValue()) {
+      this.value = origValue;
+      return false;
+    }
+    return true;
   }
 
   /**
