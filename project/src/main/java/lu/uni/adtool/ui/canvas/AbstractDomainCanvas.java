@@ -390,7 +390,10 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
   }
 
   public boolean isSand() {
-    return tree.getRoot(true) instanceof SandNode;
+    if (tree != null) {
+      return tree.getRoot(true) instanceof SandNode;
+    }
+    return true;
   }
 
   private void markLabel(Node node, String label) {

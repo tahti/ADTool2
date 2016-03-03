@@ -1,5 +1,7 @@
 package lu.uni.adtool.ui;
 
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.ValueAssignement;
 import lu.uni.adtool.domains.rings.Bool;
 import lu.uni.adtool.domains.rings.BoundedInteger;
 import lu.uni.adtool.domains.rings.LMHEValue;
@@ -7,8 +9,12 @@ import lu.uni.adtool.domains.rings.LMHValue;
 import lu.uni.adtool.domains.rings.RealG0;
 import lu.uni.adtool.domains.rings.RealZeroOne;
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.CCP;
+import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
@@ -20,18 +26,22 @@ import lu.uni.adtool.ui.inputdialogs.RealZeroOneDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.EventObject;
+import java.awt.event.MouseListener;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -40,16 +50,15 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 import bibliothek.util.Path;
 
-public class ValuationsDockable extends PermaDockable
-    implements KeyListener, ListSelectionListener {
+public class ValuationsDockable extends PermaDockable implements ListSelectionListener {
 
-  public ValuationsDockable() {
+  public ValuationsDockable(CCP copyHandler) {
     super(new Path(ID_VALUATIONVIEW), ID_VALUATIONVIEW, Options.getMsg("windows.valuations.txt"));
     this.pane = new JPanel(new BorderLayout());
+    this.copyHandler = copyHandler;
     pane.add(getEmptyMessage());
     add(pane);
     ImageIcon icon = new IconFactory().createImageIcon("/icons/table_16x16.png",
@@ -64,7 +73,7 @@ public class ValuationsDockable extends PermaDockable
   public void setCanvas(AbstractTreeCanvas canvas) {
     pane.removeAll();
     this.canvas = canvas;
-    if (canvas instanceof AbstractDomainCanvas) {
+    if (canvas != null && canvas instanceof AbstractDomainCanvas) {
       JScrollPane scrollPane = new JScrollPane(this.createTable((AbstractDomainCanvas) canvas));
       pane.add(scrollPane);
       pane.revalidate();
@@ -81,13 +90,48 @@ public class ValuationsDockable extends PermaDockable
     return canvas;
   }
 
-  public void keyPressed(KeyEvent e) {
-  }
-
-  public void keyReleased(KeyEvent e) {
-  }
-
-  public void keyTyped(KeyEvent e) {
+  public boolean edit(int row) {
+    if (!table.isCellSelected(row, 1)) {
+      return false;
+    }
+    if (getCanvas().isSand()) {
+      String key = (String) table.getValueAt(row, 0);
+      int[] selection = table.getSelectedRows();
+      if (selection.length > 0) {
+        Ring value = editValue(true, key);
+        if (value != null) {
+          for (int i = 0; i < selection.length; i++) {
+            key = (String) table.getValueAt(selection[i], 0);
+            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, value);
+          }
+          ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+        }
+      }
+    }
+    else {
+      String key = (String) table.getValueAt(row, 1);
+      boolean proponent = table.getValueAt(row, 0).equals(Options.getMsg("tablemodel.proponent"));
+      int[] selection = table.getSelectedRows();
+      if (selection.length > 0) {
+        Ring value = editValue(proponent, key);
+        if (value != null) {
+          for (int i = 0; i < selection.length; i++) {
+            key = (String) table.getValueAt(selection[i], 1);
+            proponent =
+                table.getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
+            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, value);
+          }
+          ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+        }
+      }
+    }
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        // table.requestFocusInWindow();
+        table.requestFocus();
+      }
+    });
+    return false;
   }
 
   public Ring editValue(boolean proponent, String key) {
@@ -126,6 +170,122 @@ public class ValuationsDockable extends PermaDockable
     return value;
   }
 
+  public void paste(Ring copy) {
+    int[] selection = table.getSelectedRows();
+    if (selection.length > 0) {
+      Ring v = null;
+      if (getCanvas().isSand()) {
+        SandNode node = new SandNode();
+        v = ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+        if (!v.updateFromString(copy.toString())) {
+          return;
+        }
+      }
+      else {
+        ADTNode node = new ADTNode();
+        v = ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+        if (!v.updateFromString(copy.toString())) {
+          return;
+        }
+      }
+      for (int i = 0; i < selection.length; i++) {
+        if (getCanvas().isSand()) {
+          String key = (String) (table.getModel().getValueAt(selection[i], 0));
+          ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, v);
+        }
+        else {
+          boolean proponent = table.getModel().getValueAt(selection[i], 0)
+              .equals(Options.getMsg("tablemodel.proponent"));
+          String key = (String) (table.getModel().getValueAt(selection[i], 1));
+          ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, v);
+        }
+      }
+      ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+    }
+  }
+
+  public void paste(ValueAssignement<Ring> copy) {
+    ValuationDomain values = ((AbstractDomainCanvas) getCanvas()).getValues();
+    boolean sand = canvas.isSand();
+    ValuationTableModel tm = (ValuationTableModel) table.getModel();
+    boolean changed = false;
+    for (int i = 0; i < tm.getRowCount(); i++) {
+      if (getCanvas().isSand()) {
+        String key = (String) (tm.getValueAt(i, 0));
+        Ring value = copy.get(true, key);
+        if (value != null) {
+          SandNode node = new SandNode();
+          Ring v =
+              ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+          if (v.updateFromString(value.toString())) {
+            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, v);
+            changed = true;
+          }
+        }
+      }
+      else {
+        boolean proponent = tm.getValueAt(i, 0).equals(Options.getMsg("tablemodel.proponent"));
+        String key = (String) tm.getValueAt(i, 1);
+        Ring value = copy.get(proponent, key);
+        if (value != null) {
+          ADTNode node = new ADTNode();
+          if (proponent) {
+            node.setType(ADTNode.Type.AND_PRO);
+          }
+          else {
+            node.setType(ADTNode.Type.AND_OPP);
+          }
+          Ring v =
+              ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+          if (v.updateFromString(value.toString())) {
+            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, v);
+            changed = true;
+          }
+        }
+      }
+    }
+    if (changed) {
+      ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+    }
+  }
+
+  public Object copy() {
+    Object copy = null;
+    int[] selection = table.getSelectedRows();
+    if (selection.length > 0) {
+      if (selection.length == 1) {
+        if (getCanvas().isSand()) {
+            String key = (String) (table.getModel().getValueAt(selection[0], 0));
+            copy = ((AbstractDomainCanvas) getCanvas()).getValues().get(true, key);
+        }
+        else {
+          boolean proponent = table.getModel().getValueAt(selection[0], 0)
+            .equals(Options.getMsg("tablemodel.proponent"));
+          String key = (String) table.getModel().getValueAt(selection[0], 1);
+          copy = ((AbstractDomainCanvas) getCanvas()).getValues().get(proponent, key);
+        }
+      }
+      else {
+        copy = new ValueAssignement();
+        for (int i = 0; i < selection.length; i++) {
+          if (getCanvas().isSand()) {
+            String key = (String) (table.getModel().getValueAt(selection[i], 0));
+            Ring value = ((AbstractDomainCanvas) getCanvas()).getValues().get(true, key);
+            ((ValueAssignement)copy).put(true, key, value);
+          }
+          else {
+            boolean proponent = table.getModel().getValueAt(selection[i], 0)
+                .equals(Options.getMsg("tablemodel.proponent"));
+            String key = (String) table.getModel().getValueAt(selection[i], 1);
+            Ring value = ((AbstractDomainCanvas) getCanvas()).getValues().get(proponent, key);
+            ((ValueAssignement)copy).put(proponent, key, value);
+          }
+        }
+      }
+    }
+    return copy;
+  }
+
   public static final String ID_VALUATIONVIEW = "val_view";
 
   private JPanel createTable(AbstractDomainCanvas canvas) {
@@ -133,63 +293,86 @@ public class ValuationsDockable extends PermaDockable
     result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
     ValuationTableModel tableModel = new ValuationTableModel(canvas.isSand());
     tableModel.setCanvas(canvas);
-    this.table = new JTable(tableModel) {
-      public boolean editCellAt(int row, int column, EventObject e) {
-        // scrollPane.setVisible(false);
-        if (!isCellSelected(row, column)) {
-          return false;
-        }
-        if (getCanvas().isSand()) {
-          String key = (String) getValueAt(row, 0);
-
-          int[] selection = table.getSelectedRows();
-          if (selection.length > 0) {
-            Ring value = editValue(true, key);
-            if (value != null) {
-              selection = table.getSelectedRows();
-              for (int i = 0; i < selection.length; i++) {
-                key = (String) getValueAt(selection[i], 0);
-                ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, value);
-              }
-              ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
-            }
-          }
-        }
-        else {
-          String key = (String) getValueAt(row, 1);
-          boolean proponent = getValueAt(row, 0).equals(Options.getMsg("tablemodel.proponent"));
-
-          int[] selection = table.getSelectedRows();
-          if (selection.length > 0) {
-            Ring value = editValue(proponent, key);
-            if (value != null) {
-              selection = table.getSelectedRows();
-              for (int i = 0; i < selection.length; i++) {
-                key = (String) getValueAt(selection[i], 1);
-                proponent = getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
-                ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, value);
-              }
-              ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
-            }
-          }
-        }
-        SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            // table.requestFocusInWindow();
-            table.requestFocus();
-          }
-        });
-        return false;
-      }
-    };
+    this.table = new JTable(tableModel){};
+    MouseListener ml[] = table.getMouseListeners();
+    for (MouseListener m:ml) {
+      table.removeMouseListener(m);
+    }
     ListSelectionModel listSelectionModel = table.getSelectionModel();
     listSelectionModel.addListSelectionListener(this);
     table.setSelectionModel(listSelectionModel);
     table.setRowSorter(null);
     table.setAutoCreateRowSorter(false);
     table.setDefaultRenderer(Ring.class, new ValuationRenderer());
-    table.setRowSorter(new TableRowSorter<TableModel>(table.getModel()));
     table.setFillsViewportHeight(true);
+    table.addMouseListener(new java.awt.event.MouseAdapter() {
+      @Override
+      public void mouseClicked(java.awt.event.MouseEvent evt) {
+        int row = table.rowAtPoint(evt.getPoint());
+        int col = table.columnAtPoint(evt.getPoint());
+        if (row >= 0 && col >= 0) {
+          if (evt.isShiftDown()) {
+            table.changeSelection(row, col, evt.isControlDown(), true);
+          }
+          else if(evt.isControlDown()){
+            table.changeSelection(row, col, true, false);
+          }
+          else if(evt.isMetaDown() || evt.isAltDown()) {
+            return;
+          } else {
+            if (table.isCellSelected(row, col)) {
+              edit(row);
+            }
+            table.changeSelection(row, col, false, false);
+          }
+        }
+      }
+    });
+    InputMap im = table.getInputMap(JTable.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    KeyStroke key = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+    im.put(key, "edit");
+    key = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
+    im.put(key, "edit");
+    for (KeyStroke tkey : im.allKeys()) {
+      Debug.log("key:" + tkey.toString());
+      Debug.log("a:" + im.get(tkey).toString());
+    }
+    ActionMap am = table.getActionMap();
+    am.put("copy", new AbstractAction() {
+      public void actionPerformed(ActionEvent evt) {
+        copyHandler.copy();
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            table.requestFocus();
+          }
+        });
+      }
+    });
+    am.put("cut", new AbstractAction() {
+      public void actionPerformed(ActionEvent evt) {
+        copyHandler.cut();
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            table.requestFocus();
+          }
+        });
+      }
+    });
+    am.put("paste", new AbstractAction() {
+      public void actionPerformed(ActionEvent evt) {
+        copyHandler.paste();
+        SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            table.requestFocus();
+          }
+        });
+      }
+    });
+    am.put("edit", new AbstractAction() {
+      public void actionPerformed(ActionEvent evt) {
+        edit(table.getSelectionModel().getLeadSelectionIndex());
+      }
+    });
     result.add(new JLabel(((AbstractDomainCanvas) getCanvas()).getDomain().getName()));
     result.add(table.getTableHeader());
     result.add(table);
@@ -272,8 +455,8 @@ public class ValuationsDockable extends PermaDockable
       if (canvas != null) {
         updateRowData(canvas);
         fireTableDataChanged();
+        sand = canvas.isSand();
       }
-      sand = canvas.isSand();
     }
 
     private void updateRowData(AbstractDomainCanvas canvas) {
@@ -347,7 +530,7 @@ public class ValuationsDockable extends PermaDockable
         if (lsm.isSelectedIndex(i)) {
           int j = table.convertRowIndexToModel(i);
           String key = "";
-          if(getCanvas().isSand()){
+          if (getCanvas().isSand()) {
             key = (String) (table.getModel().getValueAt(j, 0));
           }
           else {
@@ -363,4 +546,5 @@ public class ValuationsDockable extends PermaDockable
   private JPanel             pane;
   private AbstractTreeCanvas canvas;
   private JTable             table;
+  private CCP                copyHandler;
 }

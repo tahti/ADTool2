@@ -84,20 +84,21 @@ public abstract class AbstractTreeCanvas extends JPanel
   }
 
   public boolean isSand() {
-    return tree.getLayout().isSand();
+    if (tree != null) {
+      return tree.getLayout().isSand();
+    }
+    else {
+      return true;
+    }
   }
 
   public void treeChanged() {
-    Debug.log("tree " + tree);
     this.recalculateLayout();
-    Debug.log("tree " + tree);
     this.repaint();
   }
 
   public void notifyAllTreeChanged() {
-    Debug.log("tree " + tree);
     controller.getFrame().getDomainFactory().notifyAllTreeChanged(this.getId());
-    Debug.log("tree " + tree);
     this.treeChanged();
   }
 
@@ -321,7 +322,6 @@ public abstract class AbstractTreeCanvas extends JPanel
     }
     this.repaint();
     if (this instanceof AbstractDomainCanvas) {
-      Debug.log("calling set focus with focused:"+ focused);
       controller.getFrame().getRankingView().setFocus(this, focused, false);
     }
   }

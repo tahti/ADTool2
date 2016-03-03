@@ -1,5 +1,6 @@
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.ValueAssignement;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
@@ -63,36 +64,45 @@ public class CCP {
 
   public void paste() {
     if (lastFocused != null) {
-      Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
-      if (lastFocused instanceof ValuationsDockable) {
-      }
-      else {
-        AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
-        try {
+      Debug.log("paste");
+      try {
+        Transferable contents = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
+        if (lastFocused instanceof ValuationsDockable) {
+          if (contents.isDataFlavorSupported(ValuationSelection.valuationFlavor)) {
+            ValueAssignement<Ring> copy =
+              (ValueAssignement<Ring>) contents.getTransferData(ValuationSelection.valuationFlavor);
+            ((ValuationsDockable) lastFocused).paste(copy);
+          }
+          if (contents.isDataFlavorSupported(ValueSelection.valueFlavor)) {
+            Ring copy = (Ring) contents.getTransferData(ValueSelection.valueFlavor);
+            ((ValuationsDockable) lastFocused).paste(copy);
+          }
+        }
+        else {
+          AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
           if (contents != null && canv != null && canv.getFocused() != null) {
-            if (canv instanceof AbstractDomainCanvas && contents.isDataFlavorSupported(ValueSelection.valueFlavor)) {
+            if (canv instanceof AbstractDomainCanvas
+                && contents.isDataFlavorSupported(ValueSelection.valueFlavor)) {
               Ring copy = ((Ring) contents.getTransferData(ValueSelection.valueFlavor));
-              ((AbstractDomainCanvas)canv).getValues().setValue(canv.getFocused(), copy);
-              ((AbstractDomainCanvas)canv).valuesUpdated();
+              ((AbstractDomainCanvas) canv).getValues().setValue(canv.getFocused(), copy);
+              ((AbstractDomainCanvas) canv).valuesUpdated();
             }
             else if (canv.isSand() && contents.isDataFlavorSupported(NodeSelection.sandFlavor)) {
               SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.sandFlavor));
-              Debug.log("paste sand");
               ((SandTreeCanvas) canv).paste(copy);
             }
             else if (!canv.isSand() && contents.isDataFlavorSupported(NodeSelection.adtFlavor)) {
               ADTNode copy = ((ADTNode) contents.getTransferData(NodeSelection.adtFlavor));
-              Debug.log("paste adt");
               ((ADTreeCanvas) canv).paste(copy);
             }
           }
         }
-        catch (UnsupportedFlavorException e) {
-          e.printStackTrace();
-        }
-        catch (IOException e) {
-          e.printStackTrace();
-        }
+      }
+      catch (UnsupportedFlavorException e) {
+        e.printStackTrace();
+      }
+      catch (IOException e) {
+        e.printStackTrace();
       }
     }
   }
@@ -102,6 +112,13 @@ public class CCP {
       Debug.log("copy");
       Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
       if (lastFocused instanceof ValuationsDockable) {
+        Object copy = ((ValuationsDockable) lastFocused).copy();
+        if (copy != null && copy instanceof ValueAssignement) {
+          cb.setContents(new ValuationSelection((ValueAssignement) copy), null);
+        }
+        else if (copy != null && copy instanceof Ring) {
+          cb.setContents(new ValueSelection((Ring)copy), null);
+        }
       }
       else {
         AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
@@ -109,10 +126,12 @@ public class CCP {
           if (canv instanceof AbstractDomainCanvas) {
             Ring copy;
             if (canv.getFocused() instanceof ADTNode) {
-              copy = ((AbstractDomainCanvas)canv).getValues().getValue((ADTNode)canv.getFocused());
+              copy =
+                  ((AbstractDomainCanvas) canv).getValues().getValue((ADTNode) canv.getFocused());
             }
             else {
-              copy = ((AbstractDomainCanvas)canv).getValues().getValue((SandNode)canv.getFocused());
+              copy =
+                  ((AbstractDomainCanvas) canv).getValues().getValue((SandNode) canv.getFocused());
             }
             cb.setContents(new ValueSelection(copy), null);
             return true;
@@ -142,17 +161,40 @@ public class CCP {
       Debug.log("cut");
       Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
       AbstractTreeCanvas canv = getCanvas(lastFocused, this.control);
-      if (canv != null && canv.getFocused() != null) {
-        if (canv instanceof AbstractDomainCanvas) {
+      if (lastFocused instanceof ValuationsDockable) {
+        Object copy = ((ValuationsDockable) lastFocused).copy();
+        if (copy instanceof ValueAssignement) {
+          cb.setContents(new ValuationSelection((ValueAssignement) copy), null);
         }
-        else {
-          if (canv.getFocused() instanceof ADTNode) {
-            cb.setContents(new NodeSelection(((ADTNode) canv.getFocused()).deepCopy()), null);
-            ((ADTreeCanvas) canv).removeTree((ADTNode) canv.getFocused());
+        else if (copy instanceof Ring) {
+          cb.setContents(new ValueSelection((Ring)copy), null);
+        }
+      }
+      else {
+        if (canv != null && canv.getFocused() != null) {
+          if (canv instanceof AbstractDomainCanvas) {
+            Ring copy;
+            ValuationDomain values = ((AbstractDomainCanvas) canv).getValues();
+            if (canv.getFocused() instanceof ADTNode) {
+              copy = values.getValue((ADTNode) canv.getFocused());
+              values.setDefaultValue((ADTNode) canv.getFocused());
+            }
+            else {
+              copy = ((AbstractDomainCanvas) canv).getValues().getValue((SandNode) canv.getFocused());
+              values.setDefaultValue((SandNode) canv.getFocused());
+            }
+            ((AbstractDomainCanvas) canv).valuesUpdated();
+            cb.setContents(new ValueSelection(copy), null);
           }
-          else if (canv.getFocused() instanceof SandNode) {
-            cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
-            ((SandTreeCanvas) canv).removeTree((SandNode) canv.getFocused());
+          else {
+            if (canv.getFocused() instanceof ADTNode) {
+              cb.setContents(new NodeSelection(((ADTNode) canv.getFocused()).deepCopy()), null);
+              ((ADTreeCanvas) canv).removeTree((ADTNode) canv.getFocused());
+            }
+            else if (canv.getFocused() instanceof SandNode) {
+              cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
+              ((SandTreeCanvas) canv).removeTree((SandNode) canv.getFocused());
+            }
           }
         }
       }
@@ -229,6 +271,7 @@ public class CCP {
       }
     }
   }
+
   static class ValuationSelection implements Transferable {
     // Transferable class constructor
     public ValuationSelection(ValueAssignement<?> va) {
@@ -258,15 +301,15 @@ public class CCP {
       return new DataFlavor[] {valuationFlavor};
     }
 
-    private ValueAssignement<?> values;
+    private ValueAssignement<?>    values;
 
     public static final DataFlavor valuationFlavor;
 
     static {
       DataFlavor d1 = null;
       try {
-        d1 = new DataFlavor(
-            DataFlavor.javaJVMLocalObjectMimeType + ";class=lu.uni.adtool.domains.ValueAssignement");
+        d1 = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType
+            + ";class=lu.uni.adtool.domains.ValueAssignement");
       }
       catch (ClassNotFoundException e) {
       }

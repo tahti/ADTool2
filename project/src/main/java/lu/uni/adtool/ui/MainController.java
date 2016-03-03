@@ -204,7 +204,9 @@ public final class MainController implements CControlListener, CFocusListener {
   public CControl getControl() {
     return this.control;
   }
-
+  public CCP getCopyHandler() {
+    return this.copyHandler;
+  }
   public void addTreeDockable(TreeDockable treeDockable) {
     control.addDockable(TreeDockable.getUniqueId(treeDockable.getId()), treeDockable);
     treeDockable.setWorkingArea(frame.getWorkArea());

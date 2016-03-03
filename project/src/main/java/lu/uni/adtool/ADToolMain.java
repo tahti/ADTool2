@@ -90,7 +90,7 @@ public final class ADToolMain extends JFrame {
     this.add(control.getContentArea());
 
     work = control.createWorkingArea("work");
-    this.valuationsView = new ValuationsDockable();
+    this.valuationsView = new ValuationsDockable(controller.getCopyHandler());
     this.rankingView = new RankingDockable();
     this.detailsView = new DetailsView();
 
