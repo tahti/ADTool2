@@ -67,7 +67,6 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     this.values = values;
     this.marked = new HashMap<Node, Color>();
     this.markEditable = false;
-    this.setLocalExtentProvider(false);
   }
 
   public Domain<Type> getDomain() {
@@ -319,15 +318,17 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     else {
       this.values.valuesUpdated((ADTNode) tree.getRoot(true));
     }
-    ValuationsDockable valuationsDockable = (ValuationsDockable) controller.getControl()
-        .getSingleDockable(ValuationsDockable.ID_VALUATIONVIEW);
-    if (valuationsDockable != null && valuationsDockable.getCanvas() == this) {
-      valuationsDockable.setCanvas(this);
-      controller.getFrame().getRankingView().setCanvas(this);
-    }
-    RankingDockable rank = controller.getFrame().getRankingView();
-    if (rank != null && rank.getCanvas() == this) {
-      rank.setFocus(this, this.getFocused(), true);
+    if (controller != null) {
+      ValuationsDockable valuationsDockable = (ValuationsDockable) controller.getControl()
+          .getSingleDockable(ValuationsDockable.ID_VALUATIONVIEW);
+      if (valuationsDockable != null && valuationsDockable.getCanvas() == this) {
+        valuationsDockable.setCanvas(this);
+        controller.getFrame().getRankingView().setCanvas(this);
+      }
+      RankingDockable rank = controller.getFrame().getRankingView();
+      if (rank != null && rank.getCanvas() == this) {
+        rank.setFocus(this, this.getFocused(), true);
+      }
     }
     tree.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
     if (!this.localExtentProvider) {
@@ -344,7 +345,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
       notify = true;
     }
     this.showLabels = showLabels;
-    if (notify) {
+    if (notify && tree != null) {
       if (this.localExtentProvider) {
         this.treeChanged();
       }

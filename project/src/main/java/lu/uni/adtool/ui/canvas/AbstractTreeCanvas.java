@@ -90,9 +90,6 @@ public abstract class AbstractTreeCanvas extends JPanel
     this.tree = tree;
     this.controller = null;
     this.localExtentProvider = true;
-    if (tree != null) {
-      this.getSharedExtentProvider().registerCanvas(this);
-    }
     this.setBackground(Options.canv_BackgroundColor);
     this.scrollPane = null;
     this.printAttr = new HashPrintRequestAttributeSet();
@@ -338,7 +335,7 @@ public abstract class AbstractTreeCanvas extends JPanel
           new Rectangle((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY()));
     }
     this.repaint();
-    if (this instanceof AbstractDomainCanvas) {
+    if (controller != null && this instanceof AbstractDomainCanvas) {
       controller.getFrame().getRankingView().setFocus(this, focused, false);
     }
   }

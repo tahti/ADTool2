@@ -149,7 +149,7 @@ public class ImportExport {
             ((AbstractDomainCanvas) canvas).setMarkEditable(this.markEditable);
             ((AbstractDomainCanvas) canvas).setShowLabels(!this.noLabels);
             ((AbstractDomainCanvas) canvas).getValues().setShowAllLabels(!this.noComputedValues);
-            // ((AbstractDomainCanvas)canvas).setLocalExtentProvider(this.localSize);
+            ((AbstractDomainCanvas) canvas).setTree(new NodeTree(this.tree));
           }
           if (this.viewPortSize != null) {
             canvas.setViewPortSize(this.viewPortSize);

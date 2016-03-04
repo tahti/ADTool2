@@ -38,6 +38,7 @@ public class Clo {
     option = new Option("d", "domain", true, Options.getMsg("clo.domain.txt"));
     option.setArgs(1);
     option.setArgName("domainID");
+    this.options.addOption(option);
     option = new Option("s", "size", true, Options.getMsg("clo.size.txt"));
     option.setArgs(1);
     option.setArgName("X>x<Y");

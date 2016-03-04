@@ -303,6 +303,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
   }
 
   public void treeChanged(ADTNode root) {
+    Debug.log("reevaluating");
     this.evaluator.reevaluate(root, this.valuesMap);
     this.refreshAllValues(root);
   }
