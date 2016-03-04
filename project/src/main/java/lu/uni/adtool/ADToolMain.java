@@ -1,10 +1,12 @@
 package lu.uni.adtool;
 
+import lu.uni.adtool.tools.Clo;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.DomainFactory;
 import lu.uni.adtool.tree.TreeFactory;
+import lu.uni.adtool.tree.XmlConverter;
 import lu.uni.adtool.ui.BackupFactory;
 import lu.uni.adtool.ui.DetailsView;
 import lu.uni.adtool.ui.MainController;
@@ -17,6 +19,8 @@ import lu.uni.adtool.ui.ValuationsDockable;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,7 +58,7 @@ import bibliothek.util.xml.XException;
 
 public final class ADToolMain extends JFrame {
 
-  public ADToolMain() {
+  public ADToolMain(Clo clo) {
     Options.loadOptions();
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
     // Use enter as space not pressing the default button
@@ -106,7 +110,26 @@ public final class ADToolMain extends JFrame {
     this.rankingView.doClose();
     this.detailsView.doClose();
     super.setJMenuBar(this.controller.getMenu());
-    Options.tryLoadLayout(control, this);
+    if (clo.getToOpen() == null) {
+      Options.tryLoadLayout(control, this);
+    }
+    else {
+      XmlConverter converter = new XmlConverter();
+      for (String fileName:clo.getToOpen()) {
+        FileInputStream in;
+        try {
+          in = new FileInputStream(fileName);
+          converter.importFrom(in, this.controller);
+          in.close();
+        }
+        catch (FileNotFoundException e) {
+          System.out.println(Options.getMsg("error.xmlimport.fail") + e.getLocalizedMessage());
+        }
+        catch (IOException e) {
+          System.out.println(Options.getMsg("error.xmlimport.fail") + e.getLocalizedMessage());
+        }
+      }
+    }
     this.pack();
     this.setVisible(true);
 //     this.setExtendedState(getExtendedState() |JFrame.MAXIMIZED_BOTH);
@@ -140,11 +163,14 @@ public final class ADToolMain extends JFrame {
   }
 
   public static void main(String[] args) {
-    ADToolMain adtool = new ADToolMain();
-    Debug.log(adtool.getClass().getPackage().getImplementationVersion());
-    Debug.log(Options.getAppFolder().toString());
-    adtool.setBounds(20, 20, 800, 600);
-    adtool.setVisible(true);
+    Clo clo = new Clo();
+    if(clo.parse(args)) {;
+      ADToolMain adtool = new ADToolMain(clo);
+      Debug.log(adtool.getClass().getPackage().getImplementationVersion());
+      Debug.log(Options.getAppFolder().toString());
+      adtool.setBounds(20, 20, 800, 600);
+      adtool.setVisible(true);
+    }
   }
 
   public StatusLine getStatusBar() {

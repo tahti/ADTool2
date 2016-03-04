@@ -70,9 +70,26 @@ public abstract class AbstractTreeCanvas extends JPanel
   public AbstractTreeCanvas(NodeTree tree, MainController mc) {
     super(new BorderLayout());
     this.tree = tree;
-    Debug.log("tree in constructor:"+tree);
     this.controller = mc;
     this.localExtentProvider = false;
+    if (tree != null) {
+      this.getSharedExtentProvider().registerCanvas(this);
+    }
+    this.setBackground(Options.canv_BackgroundColor);
+    this.scrollPane = null;
+    this.printAttr = new HashPrintRequestAttributeSet();
+    this.printAttr.add(MediaSizeName.ISO_A4);
+    this.pageFormat = new PageFormat();
+  }
+
+  /**
+   * Constructor used to export tree without showing it in a dockable
+   */
+  public AbstractTreeCanvas(NodeTree tree) {
+    super(new BorderLayout());
+    this.tree = tree;
+    this.controller = null;
+    this.localExtentProvider = true;
     if (tree != null) {
       this.getSharedExtentProvider().registerCanvas(this);
     }
@@ -398,12 +415,14 @@ public abstract class AbstractTreeCanvas extends JPanel
   public void setViewPortSize(Dimension viewPortSize) {
     this.viewPortSize = viewPortSize;
     // make up for dissapearing scrollbars
-    if (this.scrollPane.getHorizontalScrollBar().isVisible()) {
-      this.viewPortSize.height +=
-          this.scrollPane.getHorizontalScrollBar().getPreferredSize().height;
-    }
-    if (this.scrollPane.getVerticalScrollBar().isVisible()) {
-      this.viewPortSize.width += this.scrollPane.getVerticalScrollBar().getPreferredSize().width;
+    if(this.scrollPane != null) {
+      if (this.scrollPane.getHorizontalScrollBar().isVisible()) {
+        this.viewPortSize.height +=
+            this.scrollPane.getHorizontalScrollBar().getPreferredSize().height;
+      }
+      if (this.scrollPane.getVerticalScrollBar().isVisible()) {
+        this.viewPortSize.width += this.scrollPane.getVerticalScrollBar().getPreferredSize().width;
+      }
     }
     this.updateSize();
   }
@@ -477,7 +496,7 @@ public abstract class AbstractTreeCanvas extends JPanel
       extentProvider = new LocalExtentProvider(this);
     }
     else {
-      Debug.log("tree:"+tree);
+      Debug.log("tree:" + tree);
       extentProvider = tree.getSharedExtentProvider();
     }
     org.abego.treelayout.TreeLayout<Node> treeLayout = new org.abego.treelayout.TreeLayout<Node>(
@@ -498,7 +517,6 @@ public abstract class AbstractTreeCanvas extends JPanel
   public GuiNode getFocused() {
     return this.focused;
   }
-
 
   /**
    * Gets the lastFocused for this instance.
@@ -588,9 +606,15 @@ public abstract class AbstractTreeCanvas extends JPanel
    */
   public void createImage(FileOutputStream fileStream, String formatName) {
     Dimension dim = getPreferredSize();
+    Debug.log("dim:"+ dim);
     BufferedImage bufferedImage =
         new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = bufferedImage.createGraphics();
+    g2d.setColor(Options.canv_BackgroundColor);
+    Rectangle r = new Rectangle(dim);
+    if (r != null) {
+      g2d.fillRect(r.x, r.y, r.width, r.height);
+    }
     this.paintComponent(g2d);
     g2d.dispose();
     try {
@@ -756,6 +780,9 @@ public abstract class AbstractTreeCanvas extends JPanel
     if (r != null) {
       g2.fillRect(r.x, r.y, r.width, r.height);
     }
+    else {
+      Debug.log("null clip bounds");
+    }
     g2.transform(viewTransform);
     // g2.clearRect(-borderPad, -borderPad, (int) sizeX + borderPad, (int) sizeY
     // + borderPad);
@@ -865,7 +892,8 @@ public abstract class AbstractTreeCanvas extends JPanel
     fillCol = getFillColor(node);
     // ATTACKER type
     if (node instanceof ADTNode) {
-      ADTNode.Role defender = tree.getLayout().getSwitchRole()?ADTNode.Role.PROPONENT:ADTNode.Role.OPPONENT;
+      ADTNode.Role defender =
+          tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
       if (((ADTNode) node).getRole() == defender) {
         borderCol = Options.canv_BorderColorDef;
         textCol = Options.canv_TextColorDef;
@@ -951,13 +979,15 @@ public abstract class AbstractTreeCanvas extends JPanel
       Rectangle2D.Double b2 = new Rectangle2D.Double(0, 0, 0, 0);
       for (Node child : tree.getChildrenList(parent, false)) {
         b2 = bufferedLayout.get(child);
-        if (parent instanceof ADTNode && ((ADTNode)child).getRole() != ((ADTNode)parent).getRole()) {
+        if (parent instanceof ADTNode
+            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole()) {
           g2.setStroke(counterStroke);
         }
         else {
           g2.setStroke(basicStroke);
         }
-        if (!(parent instanceof ADTNode && ((ADTNode)child).getRole() != ((ADTNode)parent).getRole())) {
+        if (!(parent instanceof ADTNode
+            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole())) {
           maxX = Math.max(maxX, b2.getCenterX());
           minX = Math.min(minX, b2.getCenterX());
           noChildren++;
@@ -1043,7 +1073,8 @@ public abstract class AbstractTreeCanvas extends JPanel
     // ATTACKER type
     Options.ShapeType shape = Options.canv_ShapeAtt;
     if (node instanceof ADTNode) {
-      ADTNode.Role defender = tree.getLayout().getSwitchRole()?ADTNode.Role.PROPONENT:ADTNode.Role.OPPONENT;
+      ADTNode.Role defender =
+          tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
       if (((ADTNode) node).getRole() == defender) {
         shape = Options.canv_ShapeDef;
       }

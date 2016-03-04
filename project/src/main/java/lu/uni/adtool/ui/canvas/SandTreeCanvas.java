@@ -35,6 +35,24 @@ public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
     }
   }
 
+  /**
+   * Constructor used to export tree without showing it in a dockable
+   */
+  public SandTreeCanvas(NodeTree tree) {
+    super(tree);
+    this.labelCounter = tree.getLayout().getLabelCounter(LABEL_PREFIX);
+    this.listener = null;
+    this.configuration =
+        new DefaultConfiguration<Node>(Options.canv_gapBetweenLevels, Options.canv_gapBetweenNodes);
+    if (tree != null) {
+      this.setFocus(null);
+      this.lastFocused = (GuiNode) tree.getRoot(false);
+      // create the layout
+      this.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
+      this.recalculateLayout();
+    }
+  }
+
   public void paste(Node node) {
     if (this.focused != null && node instanceof SandNode) {
       SandNode n = (SandNode) node;
@@ -65,10 +83,10 @@ public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
     if (node.getParent() != null) {
       GuiNode newPos = null;
       if (onLeft) {
-        newPos = ((GuiNode)node).getLeftSibling();
+        newPos = ((GuiNode) node).getLeftSibling();
       }
       else {
-        newPos = ((GuiNode)node).getRightSibling();
+        newPos = ((GuiNode) node).getRightSibling();
       }
       if (newPos != null && newPos.getParent() != null) {
         tree.switchSibling(node, newPos);
@@ -130,7 +148,6 @@ public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
       this.terms.updateTerms();
     }
   }
-
 
   public void repaintAll() {
     controller.getFrame().getDomainFactory().repaintAllDomains(this.getId());

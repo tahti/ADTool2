@@ -28,7 +28,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 
-class AboutDialog extends JDialog {
+public class AboutDialog extends JDialog {
   public AboutDialog(Frame frame) {
     super(frame, Options.getMsg("help.about.title"), true);
     setLocationRelativeTo(frame);
@@ -57,7 +57,7 @@ class AboutDialog extends JDialog {
     mainPane.setBackground(Color.white);
     mainPane.setOpaque(true);
     mainPane.setLayout(new BoxLayout(mainPane, BoxLayout.Y_AXIS));
-    name = new JLabel("ADTool " + getVersionInfo());
+    name = new JLabel(getVersionInfo());
     name.setFont(new Font("Serif", Font.BOLD, 13));
     name.setAlignmentX(0.5f);
     mainPane.add(name);
@@ -120,7 +120,7 @@ class AboutDialog extends JDialog {
   }
 
   public static String getVersionInfo() {
-    String result = "";
+    String result = "ADTool";
     try {
       Class<ADToolMain> clazz = ADToolMain.class;
       String className = clazz.getSimpleName() + ".class";
@@ -133,7 +133,7 @@ class AboutDialog extends JDialog {
           classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
       Manifest manifest = new Manifest(new URL(manifestPath).openStream());
       Attributes mainAttribs = manifest.getMainAttributes();
-      result += mainAttribs.getValue("Implementation-Version") + " (";
+      result += " " + mainAttribs.getValue("Implementation-Version") + " (";
       result += mainAttribs.getValue("Date-Build") + " - ";
       result += mainAttribs.getValue("Implementation-Build").substring(0,6) + ")";
     }

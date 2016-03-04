@@ -369,7 +369,6 @@ public class ADTNode extends GuiNode {
     catch (XException exception) {
       switchRole = false;
     }
-    Debug.log("Switch role:" + switchRole + " node:" + getName());
     if (getParent() == null) {
       this.type = xmlToType(e.getString("refinement"), Role.PROPONENT);
     }
@@ -379,7 +378,6 @@ public class ADTNode extends GuiNode {
     if (switchRole) {
       this.toggleRole();
     }
-    Debug.log("type:" + this.type + " node:" + getName());
     for (XElement parameter : e.getElements("parameter")) {
       String category = parameter.getString("category");
       if (category == null) {

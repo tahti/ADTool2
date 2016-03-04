@@ -36,6 +36,23 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     }
   }
 
+  /**
+   * Constructor used to export tree without showing it in a dockable
+   */
+  public ADTreeCanvas(NodeTree tree) {
+    super(tree);
+    this.labelCounter = tree.getLayout().getLabelCounter(LABEL_PREFIX);
+    this.configuration =
+        new DefaultConfiguration<Node>(Options.canv_gapBetweenLevels, Options.canv_gapBetweenNodes);
+    if (tree != null) {
+      this.setFocus(null);
+      this.lastFocused = (GuiNode) tree.getRoot(false);
+      // create the layout
+      this.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
+      this.recalculateLayout();
+    }
+  }
+
   public void paste(Node node) {
     if (this.focused != null && node instanceof ADTNode) {
       ADTNode n = (ADTNode) node;

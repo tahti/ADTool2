@@ -56,6 +56,20 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     this.markEditable = true;
   }
 
+  /**
+   * Constructor used to export tree without showing it in a dockable
+   */
+  public AbstractDomainCanvas(ValuationDomain values) {
+    super(null);
+    this.configuration =
+        new DefaultConfiguration<Node>(Options.canv_gapBetweenLevels, Options.canv_gapBetweenNodes);
+    this.setFocus(null);
+    this.values = values;
+    this.marked = new HashMap<Node, Color>();
+    this.markEditable = false;
+    this.setLocalExtentProvider(false);
+  }
+
   public Domain<Type> getDomain() {
     return (Domain<Type>) this.values.getDomain();
   }
