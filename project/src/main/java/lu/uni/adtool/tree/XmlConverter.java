@@ -1,6 +1,11 @@
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.RankExporter;
+import lu.uni.adtool.domains.Ranker;
+import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.MainController;
@@ -33,7 +38,16 @@ public class XmlConverter {
     XElement rootXML = null;
     if (layout.isSand())  {
       rootXML = new XElement("sandtree");
-      rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains()));
+      ArrayList<RankExporter> rankers = null;
+      if (Options.main_saveRanking) {
+        rankers = new ArrayList<RankExporter>();
+        for (int i = 0; i <layout.getDomains().size(); i++) {
+          ValuationDomain values = layout.getDomains().get(i);
+          rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
+                                       new Ranker((SandDomain<Ring>)values.getDomain()), Options.rank_noRanked));
+        }
+      }
+      rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains(), rankers));
       if (layout.getDomains() != null && Options.main_saveDomains) {
         for (ValuationDomain d : layout.getDomains()) {
           d.exportXML(rootXML);
@@ -42,7 +56,16 @@ public class XmlConverter {
     }
     else {
       rootXML = new XElement("adtree");
-      XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains());
+      ArrayList<RankExporter> rankers = null;
+      if (Options.main_saveRanking) {
+        rankers = new ArrayList<RankExporter>();
+        for (int i = 0; i <layout.getDomains().size(); i++) {
+          ValuationDomain values = layout.getDomains().get(i);
+          rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
+                                       new Ranker((AdtDomain<Ring>)values.getDomain()), Options.rank_noRanked));
+        }
+      }
+      XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains(),rankers);
       if (layout.getSwitchRole())  {
         rootNode.addString("switchRole", "yes");
       }

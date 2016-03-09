@@ -228,7 +228,12 @@ public class CCP {
         // If plain flavor is requested
       }
       else if (DataFlavor.stringFlavor.equals(df)) {
-        return ((ADTNode) node).toTerms();
+        if (node instanceof ADTNode) {
+          return ((ADTNode) node).toTerms();
+        }
+        else {
+          return ((SandNode) node).toTerms();
+        }
       }
       else {
         throw new UnsupportedFlavorException(df);

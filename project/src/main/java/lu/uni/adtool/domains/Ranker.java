@@ -39,7 +39,7 @@ public class Ranker<Type extends Ring> {
       Debug.log("NULL result");
       return null;
     }
-    this.lastResult = rankRecursive(root, valuesMap , maxItems);
+    this.lastResult = rankRecursive(root, valuesMap, maxItems);
     return this.lastResult;
 
     // return rankRecursive(root, newProMap, newOppMap, maxItems);
@@ -56,7 +56,38 @@ public class Ranker<Type extends Ring> {
     return this.lastResult;
   }
 
-  private ArrayList<RankNode<Type>> rankRecursive(final ADTNode root, ValueAssignement<Type> valuesMap, int maxItems){
+  public final void initGetRanking(final Node root, final ValueAssignement<Type> valuesMap,
+      int maxItems) {
+    if (valuesMap == null || root == null || this.atdDomain == null
+        || !(this.atdDomain instanceof RankingDomain)) {
+      Debug.log("NULL result");
+      return;
+    }
+    ArrayList<RankNode<Type>> result;
+    if (root instanceof SandNode) {
+      result = rankRecursive((SandNode) root, valuesMap, maxItems);
+    }
+    else {
+      result = rankRecursive((ADTNode) root, valuesMap, maxItems);
+    }
+  }
+
+  /**
+   * Function used when exporting ranking to XML file. Should be called after
+   * initGetRanking(Node root)
+   */
+  public final ArrayList<Ring> getRanking(final Node node) {
+    return null;
+  }
+
+  public final void finishGetRanking(final Node root) {
+  }
+
+  public void rankNode(Node node) {
+  }
+
+  private ArrayList<RankNode<Type>> rankRecursive(final ADTNode root,
+      ValueAssignement<Type> valuesMap, int maxItems) {
     ArrayList<RankNode<Type>> result = new ArrayList<RankNode<Type>>();
     int c = 0;
     if (root.isCountered()) {
@@ -156,106 +187,37 @@ public class Ranker<Type extends Ring> {
     }
     // TODO change interface a bit
     ArrayList<Integer> choices = new ArrayList<Integer>(lastResult.get(index).getList());
+    Debug.log("mark: choices size:" + choices.size());
+    markRecursive(lastNode, canvas, (ValueAssignement<Type>)canvas.getValues().getValueMap(), choices);
     canvas.markNode(lastNode, Options.canv_rankRootMark);
-    if (lastNode.getChildren() != null && lastNode.getChildren().size() > 0) {
-      if (lastNode instanceof SandNode) {
-        if (((SandNode) lastNode).getType() == SandNode.Type.OR) {
-          int ind = choices.get(choices.size() - 1);
-          choices.remove(choices.size() - 1);
-          markRecursive(lastNode.getChildren().get(ind), canvas, choices);
-        }
-        else {
-          for (Node child : lastNode.getChildren()) {
-            markRecursive(child, canvas, choices);
-          }
-        }
-      }
-      else {
-        ADTNode node = (ADTNode) lastNode;
-        if (node.isCountered()) {
-          boolean doOr = false;
-          if (node.getRole() == ADTNode.Role.PROPONENT) {
-            if (((RankingDomain) this.atdDomain).isOrType(ADTNode.Type.AND_PRO)) {
-              doOr = true;
-            }
-          }
-          else {
-            if (((RankingDomain) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
-              doOr = true;
-            }
-          }
-          if (doOr) {
-            int ind = choices.get(choices.size() - 1);
-            choices.remove(choices.size() - 1);
-            if (ind == 0) {
-              if (((RankingDomain) this.atdDomain).isOrType(node.getType())) {
-                ind = choices.get(choices.size() - 1);
-                choices.remove(choices.size() - 1);
-                markRecursive(lastNode.getChildren().get(ind), canvas, choices);
-              }
-              else {
-                for (int i =0; i < lastNode.getChildren().size() - 1 ; i ++) {
-                  markRecursive(lastNode.getChildren().get(i), canvas, choices);
-                }
-              }
-            }
-            else {
-              //counter
-              markRecursive(lastNode.getChildren().get(lastNode.getChildren().size() - 1), canvas, choices);
-            }
-          }
-          else {
-            if (((RankingDomain) this.atdDomain).isOrType(node.getType())) {
-              int ind = choices.get(choices.size() - 1);
-              choices.remove(choices.size() - 1);
-              markRecursive(lastNode.getChildren().get(ind), canvas, choices);
-            }
-            else {
-              for (int i = 0; i < lastNode.getChildren().size() - 1 ; i ++) {
-                markRecursive(lastNode.getChildren().get(i), canvas, choices);
-              }
-            }
-            markRecursive(lastNode.getChildren().get(lastNode.getChildren().size() - 1), canvas, choices);
-          }
-        }
-        else {
-          if (((RankingDomain) this.atdDomain).isOrType(node.getType())) {
-            int ind = choices.get(choices.size() - 1);
-            choices.remove(choices.size() - 1);
-            markRecursive(lastNode.getChildren().get(ind), canvas, choices);
-          }
-          else {
-            for (Node child : lastNode.getChildren()) {
-              markRecursive(child, canvas, choices);
-            }
-          }
-        }
-      }
-    }
   }
 
-  private ArrayList<Integer> markRecursive(Node node, AbstractDomainCanvas canvas,
+  public Type markRecursive(Node node, NodeRanker consumer, ValueAssignement<Type> map,
       ArrayList<Integer> orChoices) {
-    // TODO change interface a bit
-    if (node.hasDefault()) {
-      canvas.markNode(node, Options.canv_rankLeafMark);
-    }
-    else {
-      canvas.markNode(node, Options.canv_rankNodeMark);
-    }
-    ArrayList<Integer> result = null;
+    Type value;
     if (node.getChildren() != null && node.getChildren().size() > 0) {
       if (node instanceof SandNode) {
-        if (((SandNode) node).getType() == SandNode.Type.OR) {
+        switch (((SandNode) node).getType()) {
+        case OR:
           int index = orChoices.get(orChoices.size() - 1);
           orChoices.remove(orChoices.size() - 1);
-          result = markRecursive(node.getChildren().get(index), canvas, orChoices);
-        }
-        else {
-          result = markRecursive(node.getChildren().get(0), canvas, orChoices);
+          value = markRecursive(node.getChildren().get(index), consumer, map, orChoices);
+          break;
+        case SAND:
+          value = markRecursive(node.getChildren().get(0), consumer, map, orChoices);
           for (int i = 1; i < node.getChildren().size(); i++) {
-            result = markRecursive(node.getChildren().get(i), canvas, result);
+            value = this.sandDomain.sand(value,
+                markRecursive(node.getChildren().get(i), consumer, map, orChoices));
           }
+          break;
+        case AND:
+        default:
+          value = markRecursive(node.getChildren().get(0), consumer, map, orChoices);
+          for (int i = 1; i < node.getChildren().size(); i++) {
+            value = this.sandDomain.and(value,
+                markRecursive(node.getChildren().get(i), consumer, map, orChoices));
+          }
+          break;
         }
       }
       else {
@@ -276,53 +238,91 @@ public class Ranker<Type extends Ring> {
             int ind = orChoices.get(orChoices.size() - 1);
             orChoices.remove(orChoices.size() - 1);
             if (ind == 0) {
-              if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
-                ind = orChoices.get(orChoices.size() - 1);
-                orChoices.remove(orChoices.size() - 1);
-                markRecursive(node.getChildren().get(ind), canvas, orChoices);
+              if (node.hasDefault()) {
+                value = this.atdDomain.getDefaultValue(node);
               }
               else {
-                for (int i =0; i < node.getChildren().size() - 1 ; i ++) {
-                  markRecursive(node.getChildren().get(i), canvas, orChoices);
+                if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
+                  ind = orChoices.get(orChoices.size() - 1);
+                  orChoices.remove(orChoices.size() - 1);
+                  value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);
+                }
+                else {
+                  value = markRecursive(node.getChildren().get(0), consumer, map, orChoices);
+                  for (int i = 1; i < node.getChildren().size() - 1; i++) {
+                    value = this.atdDomain.calc(value,
+                        markRecursive(node.getChildren().get(i), consumer, map, orChoices),
+                        ((ADTNode) node).getType());
+                  }
                 }
               }
             }
             else {
-              //counter
-              markRecursive(node.getChildren().get(node.getChildren().size() - 1), canvas, orChoices);
+              // counter
+              value = markRecursive(node.getChildren().get(node.getChildren().size() - 1), consumer,
+                  map, orChoices);
             }
           }
           else {
-            if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
-              int ind = orChoices.get(orChoices.size() - 1);
-              orChoices.remove(orChoices.size() - 1);
-              markRecursive(node.getChildren().get(ind), canvas, orChoices);
+            if (node.hasDefault()) {
+              value = this.atdDomain.getDefaultValue(node);
             }
             else {
-              for (int i = 0; i < node.getChildren().size() - 1 ; i ++) {
-                markRecursive(node.getChildren().get(i), canvas, orChoices);
+              if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
+                int ind = orChoices.get(orChoices.size() - 1);
+                orChoices.remove(orChoices.size() - 1);
+                value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);
+              }
+              else {
+                value = markRecursive(node.getChildren().get(0), consumer, map, orChoices);
+                for (int i = 1; i < node.getChildren().size() - 1; i++) {
+                  this.atdDomain.calc(value,
+                      markRecursive(node.getChildren().get(i), consumer, map, orChoices),
+                      ((ADTNode) node).getType());
+                }
               }
             }
-            markRecursive(node.getChildren().get(node.getChildren().size() - 1), canvas, orChoices);
+            if (((ADTNode) node).getRole() == ADTNode.Role.OPPONENT) {
+              value = this.atdDomain.co(value, markRecursive(
+                  node.getChildren().get(node.getChildren().size() - 1), consumer, map, orChoices));
+            }
+            else {
+              value = this.atdDomain.cp(value, markRecursive(
+                  node.getChildren().get(node.getChildren().size() - 1), consumer, map, orChoices));
+            }
           }
         }
         else {
           if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
             int ind = orChoices.get(orChoices.size() - 1);
             orChoices.remove(orChoices.size() - 1);
-            markRecursive(node.getChildren().get(ind), canvas, orChoices);
+            value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);
           }
           else {
+            value = null;
             for (Node child : node.getChildren()) {
-              markRecursive(child, canvas, orChoices);
+              if (value == null) {
+                value = markRecursive(child, consumer, map, orChoices);
+              }
+              else {
+                value = atdDomain.calc(value,
+                    markRecursive(child, consumer, map, orChoices), ((ADTNode) node).getType());
+              }
             }
           }
         }
       }
     }
-    else
-      return orChoices;
-    return result;
+    else {
+      if (node instanceof SandNode) {
+        value =  map.get(true, node.getName());
+      }
+      else {
+        value = map.get(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, node.getName());
+      }
+    }
+    consumer.rankNode(node, value);
+    return value;
   }
 
   private Node                      lastNode;

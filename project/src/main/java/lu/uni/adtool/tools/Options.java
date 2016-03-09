@@ -105,8 +105,9 @@ public final class Options {
   public static int          save_version              = 3;
   public static boolean      main_saveLayout           = true;
   public static boolean      main_saveDomains          = true;
+  public static boolean      main_saveRanking          = false;
   public static boolean      main_saveDerivedValues    = false;
-
+  public static int          rank_noRanked             = 10;
   /**
    * Constructs a new instance.
    */

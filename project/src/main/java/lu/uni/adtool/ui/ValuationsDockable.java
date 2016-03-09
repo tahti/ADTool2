@@ -336,10 +336,10 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
     im.put(key, "edit");
     key = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0);
     im.put(key, "edit");
-    for (KeyStroke tkey : im.allKeys()) {
-      Debug.log("key:" + tkey.toString());
-      Debug.log("a:" + im.get(tkey).toString());
-    }
+//     for (KeyStroke tkey : im.allKeys()) {
+//       Debug.log("key:" + tkey.toString());
+//       Debug.log("a:" + im.get(tkey).toString());
+//     }
     ActionMap am = table.getActionMap();
     am.put("copy", new AbstractAction() {
       public void actionPerformed(ActionEvent evt) {

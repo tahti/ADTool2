@@ -44,7 +44,6 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
       Options.getMsg("example.breakwarehouse.txt"), Options.getMsg("example.rfidwarehouse.txt"),
       Options.getMsg("example.data.txt"), Options.getMsg("example.bankaccount.txt")};
 
-  // {Options.getMsg("example., "RFID Dos Attack", "RFID Communication Block",
   // "Breaking into a Warehouse",
   // "RFID Dos Attack in Warehouse", "Data Confidentiality", "Bank Account"};
   private final String[]    examplesFileName =

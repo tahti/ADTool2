@@ -1,9 +1,9 @@
 package lu.uni.adtool.tree;
 
 import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.RankExporter;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 
 import java.io.DataInputStream;
@@ -107,7 +107,7 @@ public class ADTNode extends GuiNode {
    * Export to XML using format used by the first version of ADTool
    *
    */
-  public XElement exportXml(ArrayList<ValuationDomain> domains) {
+  public XElement exportXml(ArrayList<ValuationDomain> domains, ArrayList<RankExporter> rankers) {
     XElement result = new XElement("node");
     result.addString("refinement", typeToXml(type));
     if (getParent() != null && (((ADTNode) getParent()).getRole() != getRole())) {
@@ -142,11 +142,21 @@ public class ADTNode extends GuiNode {
             param.setString(vd.getTermValue(this).toString());
           }
         }
+        if (rankers != null && rankers.size() > i) {
+          for (int j=0; j < Options.rank_noRanked; j++) {
+            Ring value = rankers.get(i).getValue(this, j);
+            if(value != null) {
+              XElement rank = result.addElement("ranking");
+              rank.addInt("rank", j + 1);
+              rank.setString(value.toString());
+            }
+          }
+        }
       }
     }
     if (this.getChildren() != null) {
       for (Node node : this.getNotNullChildren()) {
-        result.addElement(((ADTNode) node).exportXml(domains));
+        result.addElement(((ADTNode) node).exportXml(domains, rankers));
       }
     }
     return result;

@@ -261,7 +261,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
       if (canvas.isSand()) {
         ValueAssignement<Ring> va = canvas.getValues().getValueMap();
         ArrayList<RankNode<Ring>> ranking;
-        ranking = ranker.rank((SandNode) root, va, noRanked);
+        ranking = ranker.rank((SandNode) root, va, Options.rank_noRanked);
         setRowCount(0);
         int i = 0;
         if (ranking != null) {
@@ -277,7 +277,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
       else if (((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain) {
         ValueAssignement<Ring> va = canvas.getValues().getValueMap();
         ArrayList<RankNode<Ring>> ranking;
-        ranking = ranker.rank((ADTNode) root, va, noRanked);
+        ranking = ranker.rank((ADTNode) root, va, Options.rank_noRanked);
         setRowCount(0);
         int i = 0;
         if (ranking != null) {
@@ -338,5 +338,4 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
   private JLabel             titleLabel;
   private JTable             table;
   private Ranker             ranker;
-  private final int          noRanked = 10;
 }

@@ -2,6 +2,7 @@ package lu.uni.adtool.ui.canvas;
 
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
+import lu.uni.adtool.domains.NodeRanker;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Bool;
@@ -36,7 +37,7 @@ import javax.swing.JScrollPane;
 
 import org.abego.treelayout.util.DefaultConfiguration;
 
-public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas {
+public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas implements NodeRanker {
   public AbstractDomainCanvas(MainController mc, ValuationDomain values) {
     super(null, mc);
     if (values.getDomain() instanceof SandDomain) {
@@ -207,6 +208,15 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
 
   public void markLabel(String label) {
     this.markLabel(tree.getRoot(true), label);
+  }
+
+  public void rankNode(Node node, Ring value) {
+    if (node.hasDefault()) {
+      this.markNode(node, Options.canv_rankLeafMark);
+    }
+    else {
+      this.markNode(node, Options.canv_rankNodeMark);
+    }
   }
 
   public void markNode(Node node, Color color) {

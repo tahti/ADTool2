@@ -50,6 +50,7 @@ public class FileHandler {
     FileFilter filter = new FileNameExtensionFilter("ADTree file", "adt", "ADT", "Adt");
     saveLayout.setVisible(true);
     exportDomains.setVisible(false);
+    exportRanking.setVisible(false);
     exportCalculatedValues.setVisible(false);
     fc.setSelectedFile(new File(getTreeFileNameWithExt("adt")));
     fc.setDialogTitle("Save Attack Defence Tree...");
@@ -70,6 +71,7 @@ public class FileHandler {
     if (canvas == null) return null;
     int id = canvas.getTree().getLayout().getId();
     exportDomains.setVisible(false);
+    exportRanking.setVisible(false);
     exportCalculatedValues.setVisible(false);
     saveLayout.setVisible(false);
     if (extension.equals("pdf")) {
@@ -80,6 +82,7 @@ public class FileHandler {
       ArrayList<DomainDockable> domains = controller.getFrame().getDomainFactory().getDomains(id);
       if (domains != null && domains.size() > 0) {
         exportDomains.setVisible(true);
+        exportRanking.setVisible(true);
         exportCalculatedValues.setVisible(true);
       }
     }
@@ -139,6 +142,7 @@ public class FileHandler {
       filter = new FileNameExtensionFilter("AD Term file", "txt", "TXT", "Txt");
     }
     exportDomains.setVisible(false);
+    exportRanking.setVisible(false);
     exportCalculatedValues.setVisible(false);
     saveLayout.setVisible(false);
     if (extension.equals("xml")) {
@@ -185,6 +189,7 @@ public class FileHandler {
     fc.setAcceptAllFileFilterUsed(true);
     FileFilter filter = new FileNameExtensionFilter("Layout file", "adl", "ADL", "Adl");
     exportDomains.setVisible(false);
+    exportRanking.setVisible(false);
     exportCalculatedValues.setVisible(false);
     saveLayout.setVisible(false);
     fc.setSelectedFile(new File(getTreeFileNameWithExt("adl")));
@@ -232,6 +237,7 @@ public class FileHandler {
   public ObjectInputStream getLoadTreeStream() {
     FileFilter filter = new FileNameExtensionFilter("Tree file", "adt", "ADT", "Adt");
     exportDomains.setVisible(false);
+    exportRanking.setVisible(false);
     exportCalculatedValues.setVisible(false);
     saveLayout.setVisible(false);
     fc.setSelectedFile(new File(getTreeFileNameWithExt("adt")));
@@ -253,6 +259,7 @@ public class FileHandler {
     fc.setDialogTitle("Load Layout...");
     fc.setSelectedFile(new File(getTreeFileNameWithExt("adl")));
     exportDomains.setVisible(false);
+    exportRanking.setVisible(false);
     exportCalculatedValues.setVisible(false);
     saveLayout.setVisible(false);
     return getLoadStream(filter);
@@ -336,11 +343,24 @@ public class FileHandler {
         Options.main_saveDomains = source.isSelected();
         if (!Options.main_saveDomains) {
           Options.main_saveDerivedValues = false;
+          Options.main_saveRanking = false;
           exportCalculatedValues.setSelected(Options.main_saveDerivedValues);
+          exportRanking.setSelected(Options.main_saveRanking);
         }
         exportCalculatedValues.setEnabled(Options.main_saveDomains);
+        exportRanking.setEnabled(Options.main_saveDomains);
       }
     });
+    exportRanking = new JCheckBox();
+    exportRanking.setText(Options.getMsg("file.export.xml.ranking"));
+    exportRanking.setSelected(Options.main_saveRanking);
+    exportRanking.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        JCheckBox source = (JCheckBox) e.getSource();
+        Options.main_saveRanking= source.isSelected();
+      }
+    });
+
     exportCalculatedValues = new JCheckBox();
     exportCalculatedValues.setText(Options.getMsg("file.export.xml.derived"));
     exportCalculatedValues.setSelected(Options.main_saveDerivedValues);
@@ -379,6 +399,7 @@ public class FileHandler {
     jp.add(showHiddenCheckBox);
     jp.add(exportDomains);
     jp.add(exportCalculatedValues);
+    jp.add(exportRanking);
     fc.setAccessory(jp);
   }
 
@@ -423,6 +444,7 @@ public class FileHandler {
   protected JFileChooser   fc;
   protected JCheckBox      saveLayout;
   protected JCheckBox      exportDomains;
+  protected JCheckBox      exportRanking;
   protected JCheckBox      exportCalculatedValues;
   private String           tempFileName;
 

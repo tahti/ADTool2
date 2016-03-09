@@ -585,10 +585,10 @@ public abstract class AbstractTreeCanvas extends JPanel
       fileStream.close();
     }
     catch (DocumentException e) {
-      reportError(Options.getMsg("error.exportingtopdf") + e);
+      reportError(Options.getMsg("error.exportingpdf") + e);
     }
     catch (IOException e) {
-      reportError(Options.getMsg("error.exportingtopdf") + e);
+      reportError(Options.getMsg("error.exportingpdf") + e);
     }
     setScale(oldScale);
   }
