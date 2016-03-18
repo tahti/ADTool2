@@ -4,6 +4,7 @@ import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.ADTParser;
 import lu.uni.adtool.tree.Node;
+import lu.uni.adtool.tree.NodeTree;
 import lu.uni.adtool.tree.Parser;
 import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.tree.SandParser;
@@ -101,6 +102,7 @@ public class TermView extends JPanel {
       public void actionPerformed(ActionEvent arg0) {
         parse();
       }
+
       private static final long serialVersionUID = -4345934200261947700L;
 
     };
@@ -144,7 +146,8 @@ public class TermView extends JPanel {
   }
 
   public void parse() {
-    Node newRoot = canvas.getTree().getRoot(true);
+    NodeTree tree = canvas.getTree();
+    Node newRoot = tree.getRoot(true);
     Parser parser = null;
     if (newRoot instanceof SandNode) {
       parser = new SandParser();
@@ -153,10 +156,10 @@ public class TermView extends JPanel {
       parser = new ADTParser();
     }
     if (editTerms.getText().length() > 0) {
-       newRoot = parser.parseString(editTerms.getText());
+      newRoot = parser.parseString(editTerms.getText());
       if (newRoot == null) {
         // parsing failed - display error messages
-        handleError(parser);
+        this.handleError(parser);
       }
       else {
         revert.setEnabled(false);
@@ -166,14 +169,15 @@ public class TermView extends JPanel {
         errorOutput.setText("");
         if (newRoot instanceof SandNode) {
           SandEulerTree et = new SandEulerTree();
-          et.transferLabels((SandNode)newRoot, ((SandTreeCanvas<?>) canvas).getRoot());
-          ((SandTreeCanvas<?>) canvas).setRoot((SandNode)newRoot);
+          et.transferLabels((SandNode) newRoot, ((SandTreeCanvas<?>) canvas).getRoot());
+          ((SandTreeCanvas<?>) canvas).setRoot((SandNode) newRoot);
         }
         else {
           ADEulerTree et = new ADEulerTree();
-          et.transferLabels((ADTNode)newRoot, ((ADTreeCanvas<?>) canvas).getRoot());
-          ((ADTreeCanvas<?>) canvas).setRoot((ADTNode)newRoot);
+          et.transferLabels((ADTNode) newRoot, ((ADTreeCanvas<?>) canvas).getRoot());
+          ((ADTreeCanvas<?>) canvas).setRoot((ADTNode) newRoot);
         }
+        tree.getLayout().refreshValues();
         // canvas.getMainWindow().getStatusBar().report("Validation of terms was
         // successful");
       }
@@ -220,5 +224,5 @@ public class TermView extends JPanel {
   private JTextArea          editTerms;
   private AbstractTreeCanvas canvas;
   private JButton            revert;
-  private JButton validate;
+  private JButton            validate;
 }

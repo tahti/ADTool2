@@ -12,6 +12,9 @@ All notable changes to the ADTool will be documented in this file.
 - changed labels to be visible in domains by default
 - code cleanup to remove warnings
 - fixed print preview dialog being over print dialog
+- fixed class cast exception when doing copy paste in SandDomain
+- fixed bug that made it impossible to edit value in domain after changing name of the node in term view-
+- added sorting values in valuations view by name of the node
 
 ## [2.0.1] - 2016-03-01
 - fixed bug with wrong Sand Tree terms

@@ -3,13 +3,14 @@ package lu.uni.adtool.domains;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tree.ADTNode;
-import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.DomainFactory;
+import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.SandNode;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
 
 import bibliothek.gui.dock.common.MultipleCDockableLayout;
@@ -200,12 +201,16 @@ public class ValuationDomain implements MultipleCDockableLayout {
     return valuesMap.get(proponent, key);
   }
 
-  public Set<String> sandKeySet() {
-    return valuesMap.keySet(true);
+  public ArrayList<String> sandKeySet() {
+    ArrayList<String> r = new ArrayList(valuesMap.keySet(true));
+    java.util.Collections.sort(r);
+    return r;
   }
 
-  public Set<String> oppKeySet() {
-    return valuesMap.keySet(false);
+  public ArrayList<String> oppKeySet() {
+    ArrayList<String> r = new ArrayList(valuesMap.keySet(false));
+    java.util.Collections.sort(r);
+    return r;
   }
 
   public final Ring getTermValue(final ADTNode node) {

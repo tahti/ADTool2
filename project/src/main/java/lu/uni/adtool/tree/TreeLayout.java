@@ -269,7 +269,8 @@ public class TreeLayout implements MultipleCDockableLayout {
       values.setDefaultValue(node);
     }
   }
-
+  /**Recalculates values - does not remove old uneccesary values
+   */
   public void recalculateValues() {
     for (ValuationDomain values : domains) {
       if (treeRoot instanceof SandNode) {
@@ -280,7 +281,9 @@ public class TreeLayout implements MultipleCDockableLayout {
       }
     }
   }
-
+  /**
+   * Recalculates values and removes unnecesary values
+   */
   public void refreshValues() {
     for (ValuationDomain values : domains) {
       if (treeRoot instanceof SandNode) {

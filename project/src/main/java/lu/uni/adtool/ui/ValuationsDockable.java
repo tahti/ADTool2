@@ -27,7 +27,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -472,7 +472,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         return;
       }
       if (sand) {
-        Set<String> keys = canvas.getValues().sandKeySet();
+        ArrayList<String> keys = canvas.getValues().sandKeySet();
         setRowCount(0);
         for (String key : keys) {
           Vector<Comparable<?>> v = new Vector<Comparable<?>>();
@@ -482,7 +482,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         }
       }
       else {
-        Set<String> keys = canvas.getValues().sandKeySet();
+        ArrayList<String> keys = canvas.getValues().sandKeySet();
         setRowCount(0);
         for (String key : keys) {
           Vector<Comparable<?>> v = new Vector<Comparable<?>>();
