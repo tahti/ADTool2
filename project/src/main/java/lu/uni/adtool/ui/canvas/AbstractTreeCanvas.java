@@ -838,7 +838,7 @@ public abstract class AbstractTreeCanvas extends JPanel
   public int getId() {
     if (tree == null) {
       if (this instanceof AbstractDomainCanvas) {
-        return ((AbstractDomainCanvas) this).values.getTreeId();
+        return ((AbstractDomainCanvas<?>) this).values.getTreeId();
       }
       return -1;
     }

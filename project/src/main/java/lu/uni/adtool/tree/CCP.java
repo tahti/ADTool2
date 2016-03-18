@@ -61,7 +61,7 @@ public class CCP {
   public void setFocus(CDockable dockable) {
     lastFocused = dockable;
   }
-
+@SuppressWarnings("unchecked")
   public void paste() {
     if (lastFocused != null) {
       Debug.log("paste");
@@ -84,16 +84,16 @@ public class CCP {
             if (canv instanceof AbstractDomainCanvas
                 && contents.isDataFlavorSupported(ValueSelection.valueFlavor)) {
               Ring copy = ((Ring) contents.getTransferData(ValueSelection.valueFlavor));
-              ((AbstractDomainCanvas) canv).getValues().setValue(canv.getFocused(), copy);
-              ((AbstractDomainCanvas) canv).valuesUpdated();
+              ((AbstractDomainCanvas<Ring>) canv).getValues().setValue(canv.getFocused(), copy);
+              ((AbstractDomainCanvas<Ring>) canv).valuesUpdated();
             }
             else if (canv.isSand() && contents.isDataFlavorSupported(NodeSelection.sandFlavor)) {
               SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.sandFlavor));
-              ((SandTreeCanvas) canv).paste(copy);
+              ((SandTreeCanvas<Ring>) canv).paste(copy);
             }
             else if (!canv.isSand() && contents.isDataFlavorSupported(NodeSelection.adtFlavor)) {
               ADTNode copy = ((ADTNode) contents.getTransferData(NodeSelection.adtFlavor));
-              ((ADTreeCanvas) canv).paste(copy);
+              ((ADTreeCanvas<Ring>) canv).paste(copy);
             }
           }
         }
@@ -107,6 +107,7 @@ public class CCP {
     }
   }
 
+@SuppressWarnings("unchecked")
   public boolean copy() {
     if (lastFocused != null) {
       Debug.log("copy");
@@ -114,7 +115,7 @@ public class CCP {
       if (lastFocused instanceof ValuationsDockable) {
         Object copy = ((ValuationsDockable) lastFocused).copy();
         if (copy != null && copy instanceof ValueAssignement) {
-          cb.setContents(new ValuationSelection((ValueAssignement) copy), null);
+          cb.setContents(new ValuationSelection((ValueAssignement<Ring>) copy), null);
         }
         else if (copy != null && copy instanceof Ring) {
           cb.setContents(new ValueSelection((Ring)copy), null);
@@ -127,11 +128,11 @@ public class CCP {
             Ring copy;
             if (canv.getFocused() instanceof ADTNode) {
               copy =
-                  ((AbstractDomainCanvas) canv).getValues().getValue((ADTNode) canv.getFocused());
+                  ((AbstractDomainCanvas<Ring>) canv).getValues().getValue((ADTNode) canv.getFocused());
             }
             else {
               copy =
-                  ((AbstractDomainCanvas) canv).getValues().getValue((SandNode) canv.getFocused());
+                  ((AbstractDomainCanvas<Ring>) canv).getValues().getValue((SandNode) canv.getFocused());
             }
             cb.setContents(new ValueSelection(copy), null);
             return true;
@@ -156,6 +157,7 @@ public class CCP {
     return false;
   }
 
+@SuppressWarnings("unchecked")
   public void cut() {
     if (lastFocused != null) {
       Debug.log("cut");
@@ -164,7 +166,7 @@ public class CCP {
       if (lastFocused instanceof ValuationsDockable) {
         Object copy = ((ValuationsDockable) lastFocused).copy();
         if (copy instanceof ValueAssignement) {
-          cb.setContents(new ValuationSelection((ValueAssignement) copy), null);
+          cb.setContents(new ValuationSelection((ValueAssignement<Ring>) copy), null);
         }
         else if (copy instanceof Ring) {
           cb.setContents(new ValueSelection((Ring)copy), null);
@@ -174,26 +176,26 @@ public class CCP {
         if (canv != null && canv.getFocused() != null) {
           if (canv instanceof AbstractDomainCanvas) {
             Ring copy;
-            ValuationDomain values = ((AbstractDomainCanvas) canv).getValues();
+            ValuationDomain values = ((AbstractDomainCanvas<Ring>) canv).getValues();
             if (canv.getFocused() instanceof ADTNode) {
               copy = values.getValue((ADTNode) canv.getFocused());
               values.setDefaultValue((ADTNode) canv.getFocused());
             }
             else {
-              copy = ((AbstractDomainCanvas) canv).getValues().getValue((SandNode) canv.getFocused());
+              copy = ((AbstractDomainCanvas<Ring>) canv).getValues().getValue((SandNode) canv.getFocused());
               values.setDefaultValue((SandNode) canv.getFocused());
             }
-            ((AbstractDomainCanvas) canv).valuesUpdated();
+            ((AbstractDomainCanvas<Ring>) canv).valuesUpdated();
             cb.setContents(new ValueSelection(copy), null);
           }
           else {
             if (canv.getFocused() instanceof ADTNode) {
               cb.setContents(new NodeSelection(((ADTNode) canv.getFocused()).deepCopy()), null);
-              ((ADTreeCanvas) canv).removeTree((ADTNode) canv.getFocused());
+              ((ADTreeCanvas<Ring>) canv).removeTree((ADTNode) canv.getFocused());
             }
             else if (canv.getFocused() instanceof SandNode) {
               cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
-              ((SandTreeCanvas) canv).removeTree((SandNode) canv.getFocused());
+              ((SandTreeCanvas<Ring>) canv).removeTree((SandNode) canv.getFocused());
             }
           }
         }

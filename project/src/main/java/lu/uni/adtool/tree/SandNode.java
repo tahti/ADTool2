@@ -15,6 +15,7 @@ import bibliothek.util.xml.XAttribute;
 import bibliothek.util.xml.XElement;
 
 public class SandNode extends GuiNode {
+
   public SandNode() {
     super("Root");
     this.type = Type.AND;
@@ -320,5 +321,6 @@ public class SandNode extends GuiNode {
   }
 
   private Type type;
+  private static final long serialVersionUID = -8503744808785401801L;
 
 }

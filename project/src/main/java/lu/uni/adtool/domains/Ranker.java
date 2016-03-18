@@ -63,12 +63,11 @@ public class Ranker<Type extends Ring> {
       Debug.log("NULL result");
       return;
     }
-    ArrayList<RankNode<Type>> result;
     if (root instanceof SandNode) {
-      result = rankRecursive((SandNode) root, valuesMap, maxItems);
+      rankRecursive((SandNode) root, valuesMap, maxItems);
     }
     else {
-      result = rankRecursive((ADTNode) root, valuesMap, maxItems);
+      rankRecursive((ADTNode) root, valuesMap, maxItems);
     }
   }
 
@@ -180,8 +179,8 @@ public class Ranker<Type extends Ring> {
     }
     return result;
   }
-
-  public void mark(int index, AbstractDomainCanvas canvas) {
+@SuppressWarnings("unchecked")
+  public void mark(int index, AbstractDomainCanvas<Type> canvas) {
     if (lastNode == null || lastResult == null) {
       return;
     }
@@ -225,12 +224,12 @@ public class Ranker<Type extends Ring> {
         if (n.isCountered()) {
           boolean doOr = false;
           if (n.getRole() == ADTNode.Role.PROPONENT) {
-            if (((RankingDomain) this.atdDomain).isOrType(ADTNode.Type.AND_PRO)) {
+            if (((RankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_PRO)) {
               doOr = true;
             }
           }
           else {
-            if (((RankingDomain) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
+            if (((RankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
               doOr = true;
             }
           }
@@ -242,7 +241,7 @@ public class Ranker<Type extends Ring> {
                 value = this.atdDomain.getDefaultValue(node);
               }
               else {
-                if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
+                if (((RankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
                   ind = orChoices.get(orChoices.size() - 1);
                   orChoices.remove(orChoices.size() - 1);
                   value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);
@@ -268,7 +267,7 @@ public class Ranker<Type extends Ring> {
               value = this.atdDomain.getDefaultValue(node);
             }
             else {
-              if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
+              if (((RankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
                 int ind = orChoices.get(orChoices.size() - 1);
                 orChoices.remove(orChoices.size() - 1);
                 value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);
@@ -293,7 +292,7 @@ public class Ranker<Type extends Ring> {
           }
         }
         else {
-          if (((RankingDomain) this.atdDomain).isOrType(n.getType())) {
+          if (((RankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
             int ind = orChoices.get(orChoices.size() - 1);
             orChoices.remove(orChoices.size() - 1);
             value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);

@@ -58,7 +58,7 @@ public class JPrintPreviewPane extends JPanel
     for (int i = 0; i < zoomLevels.length; i++) {
       zoomTexts[i] = zoomLevels[i] + "%";
     }
-    c3 = new JComboBox(zoomTexts);
+    c3 = new JComboBox<String>(zoomTexts);
     // Set a desired width
     c3.setPrototypeDisplayValue("XXXXX");
     c3.setMaximumSize(c3.getMinimumSize());
@@ -480,7 +480,7 @@ public class JPrintPreviewPane extends JPanel
   private final JToolBar      toolbar          = new JToolBar();
   private JScrollPane         scrollPane;
   private int                 scaleIndex       = 6;
-  private JComboBox           c3;
+  private JComboBox<String>   c3;
   private Pageable            pageable;
   private JPrintPreviewDialog parent;
   private Point               dragStart;

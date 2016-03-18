@@ -34,7 +34,6 @@ import java.util.Vector;
 
 import org.reflections.Reflections;
 
-import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.MultipleCDockableFactory;
 
 public class DomainFactory implements MultipleCDockableFactory<DomainDockable, ValuationDomain> {
@@ -63,6 +62,8 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
 
   /* Called when applying a stored layout */
   public DomainDockable read(ValuationDomain values) {
+    if (controller.getControl().getSingleDockable("tree1_treeView") != null) Debug.log("Work area:"
+        + controller.getControl().getSingleDockable("tree1_treeView").getWorkingArea());
     Debug.log("Reading domain treeId " + values.getTreeId() + " domainId " + values.getDomainId());
     DomainDockable dockable = new DomainDockable(this, values);
     Integer treeId = new Integer(values.getTreeId());
@@ -79,7 +80,6 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     d.add(dockable);
     Debug.log("adding tree of domains with id:" + treeId);
     this.domainDockables.put(treeId, d);
-    CControl control = controller.getControl();
     TreeDockable treeDockable = (TreeDockable) controller.getControl()
         .getMultipleDockable(TreeDockable.getUniqueId(treeId.intValue()));
     if (treeDockable != null) {
@@ -90,6 +90,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       if (treeDockable.getLayout().getDomains().indexOf(values) == -1) {
         treeDockable.getLayout().addDomain(values);
       }
+      dockable.setWorkingArea(treeDockable.getWorkArea());
     }
     return dockable;
   }
@@ -199,6 +200,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     return result;
   }
 
+@SuppressWarnings("unchecked")
   public static boolean isSandDomain(String domainName) {
     String name = domainName;
     if (!domainName.startsWith(sandDomainsPrefix)) {
@@ -212,7 +214,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     catch (ClassNotFoundException e) {
       return false;
     }
-    return true;
+    return ct != null;
   }
 
   /**

@@ -111,5 +111,5 @@ public abstract class GuiNode extends Node {
   private boolean aboveFolded;
   private GuiNode leftSibling;
   private GuiNode rightSibling;
-  // private int id;
+  private static final long serialVersionUID = 1285171599983300177L;
 }

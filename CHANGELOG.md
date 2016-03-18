@@ -7,6 +7,11 @@ All notable changes to the ADTool will be documented in this file.
 - added command line options
 - fixed several bugs in wrong/missing messages
 - fixed bug when marking ranking on countered node with no children
+- fixed bug where windows could be dragged outside a working area
+- added command line option to export ranking
+- changed labels to be visible in domains by default
+- code cleanup to remove warnings
+- fixed print preview dialog being over print dialog
 
 ## [2.0.1] - 2016-03-01
 - fixed bug with wrong Sand Tree terms

@@ -1,7 +1,6 @@
 package lu.uni.adtool.domains.adtpredefined;
 
 import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.rings.BoundedInteger;
 import lu.uni.adtool.domains.rings.LMHEValue;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;

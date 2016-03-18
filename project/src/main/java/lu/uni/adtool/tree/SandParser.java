@@ -1,7 +1,6 @@
 package lu.uni.adtool.tree;
 
 import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
 
 import java.util.Stack;
 

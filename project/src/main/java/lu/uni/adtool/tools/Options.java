@@ -16,7 +16,9 @@ import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 
 import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.CWorkingArea;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.SingleCDockable;
 
 /**
  * Class to store program options.
@@ -108,6 +110,7 @@ public final class Options {
   public static boolean      main_saveRanking          = false;
   public static boolean      main_saveDerivedValues    = false;
   public static int          rank_noRanked             = 10;
+
   /**
    * Constructs a new instance.
    */
@@ -176,7 +179,8 @@ public final class Options {
       Preferences prefs = Preferences.userRoot().node(PREF_PATH);
       pref_layoutfile = prefs.get("layoutfile", def_layoutfile);
       boolean success = prefs.getBoolean("loadedLayout", true);
-      if (success ||OptionPane.showYNDialog(frame, Options.getMsg("reloaddialog.txt"),  Options.getMsg("reloaddialog.title")) == JOptionPane.YES_OPTION) {
+      if (success || OptionPane.showYNDialog(frame, Options.getMsg("reloaddialog.txt"),
+          Options.getMsg("reloaddialog.title")) == JOptionPane.YES_OPTION) {
         prefs.putBoolean("loadedLayout", false);
         control.readXML(layout);
         // control.read(layout);
@@ -184,6 +188,21 @@ public final class Options {
             .getSingleDockable(TreeDockable.getUniqueId(1) + TreeDockable.TREEVIEW_ID);
         if (dock != null) {
           dock.toFront();
+          Debug.log("Work Area after loading layout:"+dock.getWorkingArea() + " id:"+TreeDockable.getUniqueId(1) + TreeDockable.TREEVIEW_ID);
+        }
+        int i = 1;
+        CWorkingArea workArea =(CWorkingArea) control.getSingleDockable("tree" + i + "_workArea");
+        while (workArea != null) {
+          SingleCDockable dockable = (SingleCDockable) control.getSingleDockable("tree"+ i + "_treeView");
+          if (dockable != null) {
+            dockable.setWorkingArea(workArea);
+          }
+          dockable = (SingleCDockable) control.getSingleDockable("tree"+ i + "_termView");
+          if (dockable != null) {
+            dockable.setWorkingArea(workArea);
+          }
+          ++i;
+          workArea =(CWorkingArea) control.getSingleDockable("tree" + i + "_workArea");
         }
         prefs.putBoolean("loadedLayout", true);
       }

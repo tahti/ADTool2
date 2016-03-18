@@ -5,13 +5,15 @@ import lu.uni.adtool.ui.AboutDialog;
 
 import java.awt.Dimension;
 
-import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
-
+/**
+ * Class to parse command line options
+ */
 public class Clo {
 
   public Clo() {
@@ -23,6 +25,7 @@ public class Clo {
     this.options.addOption("m", "mark-editable", false, Options.getMsg("clo.markEditable.txt"));
     this.options.addOption("L", "no-labels", false, Options.getMsg("clo.labels.txt"));
     this.options.addOption("C", "no-computed", false, Options.getMsg("clo.computed.txt"));
+    this.options.addOption("r", "rank", false, Options.getMsg("clo.rank.txt"));
 
     Option option = new Option("o", "open", true, Options.getMsg("clo.open.txt"));
     // Set option c to take 1 to oo arguments
@@ -51,7 +54,7 @@ public class Clo {
    * be shown
    */
   public boolean parse(String[] args) {
-    CommandLineParser parser = new BasicParser();
+    CommandLineParser parser = new DefaultParser();
     CommandLine cmd = null;
     try {
       cmd = parser.parse(options, args);
@@ -79,6 +82,9 @@ public class Clo {
         }
         if (cmd.hasOption("m")) {
           exporter.setMarkEditable(true);
+        }
+        if (cmd.hasOption("r")) {
+          exporter.setExportRanking(true);
         }
         if (cmd.hasOption("L")) {
           exporter.setNoLabels(true);

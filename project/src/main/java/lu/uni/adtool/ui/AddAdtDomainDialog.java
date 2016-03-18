@@ -57,8 +57,7 @@ public class AddAdtDomainDialog extends JDialog
     // Create and initialize the buttons.
     chosenDomain = null;
     selectPressed = false;
-    this.frame = frame;
-    setAlwaysOnTop(true);
+//     setAlwaysOnTop(true);
     this.setLocationRelativeTo(frame);
     setLocation(60, 60);
     // setSize(1900, 600);
@@ -146,11 +145,7 @@ public class AddAdtDomainDialog extends JDialog
     setButton.setActionCommand(Options.getMsg("button.add"));
     setButton.addActionListener(this);
     getRootPane().setDefaultButton(setButton);
-    list = new JList(getDomainsAsArray(ds)) {
-      /**
-       *
-       */
-      private static final long serialVersionUID = 3976580603641311787L;
+    list = new JList<String>(getDomainsAsArray(ds)) {
 
       // Subclass JList to workaround bug 4832765, which can cause the
       // scroll pane to not let the user easily scroll up to the beginning
@@ -176,6 +171,7 @@ public class AddAdtDomainDialog extends JDialog
         }
         return super.getScrollableUnitIncrement(visibleRect, orientation, direction);
       }
+      private static final long serialVersionUID = 3976580603641311787L;
     };
     list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     list.setVisibleRowCount(15);
@@ -269,8 +265,7 @@ public class AddAdtDomainDialog extends JDialog
   }
 
   private static final long serialVersionUID = 1848945612200055156L;
-  private JFrame            frame;
-  private JList             list;
+  private JList<String>     list;
   private JButton           setButton;
   private JLabel            description;
   private AdtDomain<?>      chosenDomain;

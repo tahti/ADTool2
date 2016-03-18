@@ -1,10 +1,8 @@
 package lu.uni.adtool.domains.adtpredefined;
 
-import lu.uni.adtool.domains.ADTRank;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.RankNode;
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tree.ADTNode;
 
 import java.util.ArrayList;
@@ -14,7 +12,8 @@ import java.util.ArrayList;
  *
  */
 
-public abstract class RankingDomain<Type extends Ring> implements  AdtDomain<Type> {
+public abstract class RankingDomain<Type extends Ring> implements AdtDomain<Type> {
+
   public RankingDomain() {
   }
 
@@ -43,13 +42,13 @@ public abstract class RankingDomain<Type extends Ring> implements  AdtDomain<Typ
       for (i = 1; i < children.size(); i++) {
         if (indices[i] < children.get(i).size()) {
           Type newMinValue = this.calc(children.get(i).get(indices[i]).value, minValue, type);
-          if( newMinValue.compareTo(minValue) != 0){
+          if (newMinValue.compareTo(minValue) != 0) {
             index = i;
             minValue = newMinValue;
           }
         }
       }
-      result.add(new RankNode(children.get(index).get(indices[index]), index));
+      result.add(new RankNode<Type>(children.get(index).get(indices[index]), index));
       indices[index]++;
       ir++;
     }
@@ -74,22 +73,24 @@ public abstract class RankingDomain<Type extends Ring> implements  AdtDomain<Typ
     int ib = 0;
     int ir = 0;
     while (ir < maxItems && ia < a.size() && ib < b.size()) {
-      result.add(
-                 new RankNode<Type>(this.calc(a.get(ia).value, b.get(ib).value, type), a.get(ia), b.get(ib)));
+      result.add(new RankNode<Type>(this.calc(a.get(ia).value, b.get(ib).value, type), a.get(ia),
+          b.get(ib)));
       ir++;
       if ((ia + 1) >= a.size() && (ib + 1) >= b.size()) break;
-      if (((ib + 1) >= b.size()) || (((ia + 1) < a.size()) && (a.get(ia + 1).value.compareTo(b.get(ib + 1).value) < 0))) {
+      if (((ib + 1) >= b.size())
+          || (((ia + 1) < a.size()) && (a.get(ia + 1).value.compareTo(b.get(ib + 1).value) < 0))) {
         ia++;
-        for (int i = 0; i< ib && ir < maxItems; i++) {
-          result.add(new RankNode<Type>(this.calc(a.get(ia).value, b.get(i).value, type), a.get(ia), b.get(i)));
+        for (int i = 0; i < ib && ir < maxItems; i++) {
+          result.add(new RankNode<Type>(this.calc(a.get(ia).value, b.get(i).value, type), a.get(ia),
+              b.get(i)));
           ir++;
         }
       }
       else {
         ib++;
-        for (int i = 0; i< ia && ir < maxItems; i++) {
-          result.add(
-                     new RankNode<Type>(this.calc(a.get(i).value, b.get(ib).value, type), a.get(i), b.get(ib)));
+        for (int i = 0; i < ia && ir < maxItems; i++) {
+          result.add(new RankNode<Type>(this.calc(a.get(i).value, b.get(ib).value, type), a.get(i),
+              b.get(ib)));
           ir++;
         }
       }
@@ -97,4 +98,5 @@ public abstract class RankingDomain<Type extends Ring> implements  AdtDomain<Typ
     return result;
   }
 
+  private static final long serialVersionUID = 363858497457035591L;
 }

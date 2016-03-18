@@ -1,8 +1,5 @@
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.tools.Debug;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -12,7 +9,6 @@ public class ADTParser extends Parser {
 
   public ADTNode parseString(String toParse) {
     this.counterMap = new HashMap<Integer, Counter>();
-     //Debug.log("Parsing:" + toParse);
     String name = "";
     String token = "";
     ADTNode result = null;
@@ -23,14 +19,7 @@ public class ADTParser extends Parser {
     for (position = 0; position < toParse.length(); position++) {
       char ch = toParse.charAt(position);
       switch (ch) {
-      // case '"':
-      // errString = Options.getMsg("parser.notallowed");
-      // endError = position;
-      // startError = position - 1;
-      // return null;
-      case '(':
-         //Debug.log("(" + getDefense(lparen) + " lparen:" + lparen + " (+" + getDefense(lparen + 1)
-//             + " lparen:" + (lparen + 1));
+     case '(':
         lparen++;
         token = name.trim();
         name = "";
@@ -93,14 +82,10 @@ public class ADTParser extends Parser {
             return null;
           }
           stack.push(n);
-          //Debug.log(" , stack n push:" + n.getName());
         }
-        //Debug.log("( end" + getDefense(lparen) + " lparen:" + (lparen + 1));
         break;
 
       case ',':
-        //Debug.log("," + getDefense(lparen) + " lparen:" + lparen + " ,+" + getDefense(lparen + 1)
-//             + " lparen:" + (lparen + 1));
         if (getDefense(lparen) == Counter.CO2 || getDefense(lparen) == Counter.CP2) {
           setError(1, "parser.adt.twoparams");
           return null;

@@ -66,33 +66,28 @@ public class ValuationDomain implements MultipleCDockableLayout {
     this.domainId = in.readInt();
     Debug
         .log("Read domain " + domainName + " treeId:" + this.treeId + " domainId:" + this.domainId);
-    if (node != null) {
-      int counter = in.readInt();
-      this.valuesMap.clear();
+    int counter = in.readInt();
+    this.valuesMap.clear();
+    for (int i = 0; i < counter; i++) {
+      String name = in.readUTF();
+      String value = in.readUTF();
+      Ring v = domain.getDefaultValue(node);
+      v.updateFromString(value);
+      this.setValue(true, name, v);
+    }
+    if (domain instanceof AdtDomain) {
+      counter = in.readInt();
       for (int i = 0; i < counter; i++) {
         String name = in.readUTF();
         String value = in.readUTF();
         Ring v = domain.getDefaultValue(node);
         v.updateFromString(value);
-        this.setValue(true, name, v);
+        this.setValue(false, name, v);
       }
-      if (domain instanceof AdtDomain) {
-        counter = in.readInt();
-        for (int i = 0; i < counter; i++) {
-          String name = in.readUTF();
-          String value = in.readUTF();
-          Ring v = domain.getDefaultValue(node);
-          v.updateFromString(value);
-          this.setValue(false, name, v);
-        }
-        this.evaluator = new Evaluator<Ring>((AdtDomain) domain);
-      }
-      else {
-        this.evaluator = new Evaluator<Ring>((SandDomain) domain);
-      }
+      this.evaluator = new Evaluator<Ring>((AdtDomain<Ring>) domain);
     }
     else {
-      System.err.println("Error reading stream");
+      this.evaluator = new Evaluator<Ring>((SandDomain<Ring>) domain);
     }
   }
 
@@ -130,10 +125,10 @@ public class ValuationDomain implements MultipleCDockableLayout {
         r.updateFromString(value);
         this.setValue(false, key, r);
       }
-      this.evaluator = new Evaluator<Ring>((AdtDomain) domain);
+      this.evaluator = new Evaluator<Ring>((AdtDomain<Ring>) domain);
     }
     else {
-      this.evaluator = new Evaluator<Ring>((SandDomain) domain);
+      this.evaluator = new Evaluator<Ring>((SandDomain<Ring>) domain);
     }
     // fileName = element.getElement( "name" ).getString();
     // fileContent = element.getElement( "content" ).getString();

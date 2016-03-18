@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 public class OptionPane {
-  void OptionPane() {
+  public OptionPane() {
   }
 
   public int showYNDialog(String question, String title) {

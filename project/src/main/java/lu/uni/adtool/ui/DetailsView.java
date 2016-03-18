@@ -33,6 +33,7 @@ public class DetailsView extends PermaDockable {
   private void initLayout() {
     JPanel panel = new JPanel(new BorderLayout());
     text = new JLabel(Options.getMsg("windows.details.nochosen")) {
+
       public Dimension getPreferredSize() {
         return new Dimension(400, 300);
       }
@@ -44,6 +45,7 @@ public class DetailsView extends PermaDockable {
       public Dimension getMaximumSize() {
         return new Dimension(400, 300);
       }
+      private static final long serialVersionUID = -6129269462785233124L;
     };
     text.setVerticalAlignment(SwingConstants.TOP);
     text.setFont(new Font("Sans", Font.TRUETYPE_FONT, 13));

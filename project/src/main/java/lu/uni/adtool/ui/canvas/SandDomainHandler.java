@@ -24,7 +24,7 @@ import javax.swing.KeyStroke;
  * @author Piot Kordy
  */
 public class SandDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
-  public SandDomainHandler(final AbstractDomainCanvas canvas) {
+  public SandDomainHandler(final AbstractDomainCanvas<Type> canvas) {
     super(canvas);
     initPopupMenu();
   }
@@ -127,6 +127,7 @@ public class SandDomainHandler<Type extends Ring> extends AbstractCanvasHandler 
    *
    * @see MouseListener#mouseClicked(MouseEvent)
    */
+  @SuppressWarnings("unchecked")
   public void mouseClicked(final MouseEvent e) {
     canvas.requestFocusInWindow();
     final Node node = this.canvas.getNode(e.getX(), e.getY());
@@ -188,6 +189,7 @@ public class SandDomainHandler<Type extends Ring> extends AbstractCanvasHandler 
 
   }
 
+  @SuppressWarnings("unchecked")
   private void changeValueActionPerformed() {
     if (menuNode != null) {
       ((AbstractDomainCanvas<Type>) canvas).editValue(menuNode);

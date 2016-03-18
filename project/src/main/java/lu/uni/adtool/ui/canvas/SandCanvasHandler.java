@@ -29,7 +29,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
    * @param canvas
    *          parent canvas
    */
-  public SandCanvasHandler(final SandTreeCanvas canvas) {
+  public SandCanvasHandler(final SandTreeCanvas<?> canvas) {
     super(canvas);
     initPopupMenu();
   }
@@ -46,29 +46,29 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
       if (node != null) {
         switch (e.getKeyCode()) {
         case KeyEvent.VK_LEFT:
-          ((SandTreeCanvas) this.canvas).switchSibling(node, true);
+          ((SandTreeCanvas<?>) this.canvas).switchSibling(node, true);
           break;
         case KeyEvent.VK_RIGHT:
-          ((SandTreeCanvas) this.canvas).switchSibling(node, false);
+          ((SandTreeCanvas<?>) this.canvas).switchSibling(node, false);
           break;
         case KeyEvent.VK_J:
-          ((SandTreeCanvas) canvas).toggleOp(node);
+          ((SandTreeCanvas<?>) canvas).toggleOp(node);
           break;
         // case KeyEvent.VK_I:
         // canvas.addCounter(node);
         // break;
         case KeyEvent.VK_A:
-          ((SandTreeCanvas) canvas).addChild(node);
+          ((SandTreeCanvas<?>) canvas).addChild(node);
           break;
         case KeyEvent.VK_L:
           menuNode = node;
           changeLabelActionPerformed();
           break;
         case KeyEvent.VK_R:
-          ((SandTreeCanvas) canvas).removeTree(node);
+          ((SandTreeCanvas<?>) canvas).removeTree(node);
           break;
         case KeyEvent.VK_S:
-          ((SandTreeCanvas) canvas).addSibling(node, !e.isShiftDown());
+          ((SandTreeCanvas<?>) canvas).addSibling(node, !e.isShiftDown());
           break;
         default:
           consume = false;
@@ -90,7 +90,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
         case KeyEvent.VK_R:
           if (node != null) {
             menuNode = node;
-            ((SandTreeCanvas) canvas).removeChildren(node);
+            ((SandTreeCanvas<?>) canvas).removeChildren(node);
           }
           break;
         default:
@@ -225,7 +225,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     menuItem.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).toggleOp(menuNode);
+          ((SandTreeCanvas<?>) canvas).toggleOp(menuNode);
         }
       }
     });
@@ -258,7 +258,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     menuItem.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).addChild(menuNode);
+          ((SandTreeCanvas<?>) canvas).addChild(menuNode);
         }
       }
     });
@@ -283,7 +283,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     addLeft.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).addSibling(menuNode, true);
+          ((SandTreeCanvas<?>) canvas).addSibling(menuNode, true);
         }
       }
     });
@@ -294,7 +294,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     addRight.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).addSibling(menuNode, false);
+          ((SandTreeCanvas<?>) canvas).addSibling(menuNode, false);
         }
       }
     });
@@ -306,7 +306,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     switchLeft.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).switchSibling(menuNode, true);
+          ((SandTreeCanvas<?>) canvas).switchSibling(menuNode, true);
         }
       }
     });
@@ -317,7 +317,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     switchRight.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).switchSibling(menuNode, false);
+          ((SandTreeCanvas<?>) canvas).switchSibling(menuNode, false);
         }
       }
     });
@@ -328,7 +328,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     removeTree.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).removeTree(menuNode);
+          ((SandTreeCanvas<?>) canvas).removeTree(menuNode);
         }
       }
     });
@@ -339,7 +339,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     removeChildren.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((SandTreeCanvas) canvas).removeChildren(menuNode);
+          ((SandTreeCanvas<?>) canvas).removeChildren(menuNode);
         }
       }
     });
@@ -386,7 +386,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
    * @return
    */
   private boolean validLabel(String s) {
-    return ((SandTreeCanvas) canvas).validLabel(s);
+    return ((SandTreeCanvas<?>) canvas).validLabel(s);
   }
 
   /**
@@ -417,8 +417,8 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
                                                               // +| +$| +\n|(
                                                               // )+","$1");
       menuNode.setName(s);
-      ((SandTreeCanvas) canvas).setLabel(menuNode, s);
-      ((SandTreeCanvas) canvas).setFocus(menuNode);
+      ((SandTreeCanvas<?>) canvas).setLabel(menuNode, s);
+      ((SandTreeCanvas<?>) canvas).setFocus(menuNode);
     }
   }
 

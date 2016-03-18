@@ -1,9 +1,8 @@
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.DomainDockable;
+import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TreeDockable;
 
 import java.util.ArrayList;
@@ -67,17 +66,6 @@ public class TreeFactory implements MultipleCDockableFactory<TreeDockable, TreeL
   public TreeDockable load(TreeLayout layout) {
     this.idCount = Math.max(this.idCount, layout.getId());
     TreeDockable dockable = new TreeDockable(this, layout, false);
-    DomainFactory factory = controller.getFrame().getDomainFactory();
-//     if(layout.getDomains() != null){
-//       for(ValuationDomain values:layout.getDomains()){
-//         DomainDockable d = factory.read(values);
-//           d.setWorkingArea(dockable.getWorkArea());
-//           Debug.log("Adding domain to control with id:" + d.getUniqueId());
-//           controller.getControl().addDockable(d.getUniqueId(), d);
-//           dockable.showDomain(d);
-//           d.getCanvas().setTree(dockable.getCanvas().getTree());
-//       }
-//     }
     return dockable;
   }
 

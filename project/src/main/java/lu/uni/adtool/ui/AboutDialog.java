@@ -29,6 +29,7 @@ import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 
 public class AboutDialog extends JDialog {
+
   public AboutDialog(Frame frame) {
     super(frame, Options.getMsg("help.about.title"), true);
     setLocationRelativeTo(frame);
@@ -141,4 +142,5 @@ public class AboutDialog extends JDialog {
     }
     return result;
   }
+  private static final long serialVersionUID = 6478653678873713617L;
 }

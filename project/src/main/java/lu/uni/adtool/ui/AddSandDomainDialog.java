@@ -57,8 +57,7 @@ public class AddSandDomainDialog extends JDialog
     // Create and initialize the buttons.
     this.chosenDomain = null;
     this.selectPressed = false;
-    this.frame = frame;
-    setAlwaysOnTop(true);
+//     setAlwaysOnTop(true);
     this.setLocationRelativeTo(frame);
     setLocation(60, 60);
     // setSize(1900, 600);
@@ -137,7 +136,7 @@ public class AddSandDomainDialog extends JDialog
     setButton.setActionCommand(Options.getMsg("button.add"));
     setButton.addActionListener(this);
     getRootPane().setDefaultButton(setButton);
-    list = new JList(getDomainsAsArray(ds)) {
+    list = new JList<String>(getDomainsAsArray(ds)) {
       /**
        *
        */
@@ -284,7 +283,6 @@ public class AddSandDomainDialog extends JDialog
     return rootPane;
   }
 
-  private JFrame            frame;
   private JList             list;
   private JButton           setButton;
   private JLabel            description;

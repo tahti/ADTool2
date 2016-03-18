@@ -6,12 +6,6 @@ import lu.uni.adtool.domains.Ranker;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValueAssignement;
 import lu.uni.adtool.domains.adtpredefined.RankingDomain;
-import lu.uni.adtool.domains.rings.Bool;
-import lu.uni.adtool.domains.rings.BoundedInteger;
-import lu.uni.adtool.domains.rings.LMHEValue;
-import lu.uni.adtool.domains.rings.LMHValue;
-import lu.uni.adtool.domains.rings.RealG0;
-import lu.uni.adtool.domains.rings.RealZeroOne;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
@@ -21,12 +15,6 @@ import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
-import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
-import lu.uni.adtool.ui.inputdialogs.InputDialog;
-import lu.uni.adtool.ui.inputdialogs.LMHDialog;
-import lu.uni.adtool.ui.inputdialogs.LMHEDialog;
-import lu.uni.adtool.ui.inputdialogs.RealG0Dialog;
-import lu.uni.adtool.ui.inputdialogs.RealZeroOneDialog;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -68,13 +56,14 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
    * @param canvas
    *          the canvas to set
    */
+  @SuppressWarnings("unchecked")
   public void setCanvas(AbstractTreeCanvas canvas) {
     pane.removeAll();
     this.canvas = canvas;
     if (this.getCanvas() instanceof AbstractDomainCanvas) {
       if (canvas.getTree() != null && (canvas.isSand() || (canvas instanceof AbstractDomainCanvas
-          && ((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain))) {
-        JScrollPane scrollPane = new JScrollPane(this.createTable((AbstractDomainCanvas) canvas));
+          && ((AbstractDomainCanvas<Ring>) canvas).getValues().getDomain() instanceof RankingDomain))) {
+        JScrollPane scrollPane = new JScrollPane(this.createTable((AbstractDomainCanvas<Ring>) canvas));
         pane.add(scrollPane);
         pane.revalidate();
       }
@@ -88,6 +77,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     pane.revalidate();
   }
 
+  @SuppressWarnings("unchecked")
   public void setFocus(AbstractTreeCanvas canvas, Node root, boolean recalculate) {
     if (canvas != this.canvas || this.table == null || root == null) {
       Debug.log("Setting canvas with no node - using root");
@@ -95,12 +85,12 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     }
     else {
       if (canvas.isSand() || (canvas instanceof AbstractDomainCanvas
-          && ((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain)) {
+          && ((AbstractDomainCanvas<Ring>) canvas).getValues().getDomain() instanceof RankingDomain)) {
         Debug.log("Root used with name:" + root.getName());
         RankingTableModel model = ((RankingTableModel) this.table.getModel());
         if (model != null) {
           this.titleLabel.setText(Options.getMsg("windows.ranking.labeltitle",
-              ((AbstractDomainCanvas) getCanvas()).getDomain().getName(), root.getName()));
+              ((AbstractDomainCanvas<Ring>) getCanvas()).getDomain().getName(), root.getName()));
 
           model.setCanvas((AbstractDomainCanvas<Ring>) canvas, root, recalculate);
         }
@@ -130,51 +120,52 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
   public void keyTyped(KeyEvent e) {
   }
 
-//   public Ring editValue(String key) {
-//     Ring value;
-//     InputDialog dialog;
-//     value = ((AbstractDomainCanvas) getCanvas()).getValues().get(key);
-// 
-//     if (value instanceof Bool) {
-//       value = (Ring) Bool.not((Bool) value);
-//     }
-//     else if (value instanceof RealG0) {
-//       dialog = new RealG0Dialog(getCanvas().getFrame());
-//       value = (Ring) (dialog.showInputDialog(value));
-//     }
-//     else if (value instanceof RealZeroOne) {
-//       dialog = new RealZeroOneDialog(getCanvas().getFrame());
-//       value = (Ring) (dialog.showInputDialog(value));
-//     }
-//     else if (value instanceof LMHValue) {
-//       dialog = new LMHDialog(getCanvas().getFrame());
-//       value = (Ring) (dialog.showInputDialog(value));
-//     }
-//     else if (value instanceof LMHEValue) {
-//       dialog = new LMHEDialog(getCanvas().getFrame());
-//       value = (Ring) (dialog.showInputDialog(value));
-//     }
-//     else if (value instanceof BoundedInteger) {
-//       // if(getDomain() instanceof MinSkill){
-//       // dialog = new BoundedIntegerInfDialog(getMainWindow());
-//       // }
-//       // else{
-//       dialog = new BoundedIntegerDialog(getCanvas().getFrame());
-//       // }
-//       value = (Ring) (dialog.showInputDialog(value));
-//     }
-//     return value;
-//   }
+  // public Ring editValue(String key) {
+  // Ring value;
+  // InputDialog dialog;
+  // value = ((AbstractDomainCanvas) getCanvas()).getValues().get(key);
+  //
+  // if (value instanceof Bool) {
+  // value = (Ring) Bool.not((Bool) value);
+  // }
+  // else if (value instanceof RealG0) {
+  // dialog = new RealG0Dialog(getCanvas().getFrame());
+  // value = (Ring) (dialog.showInputDialog(value));
+  // }
+  // else if (value instanceof RealZeroOne) {
+  // dialog = new RealZeroOneDialog(getCanvas().getFrame());
+  // value = (Ring) (dialog.showInputDialog(value));
+  // }
+  // else if (value instanceof LMHValue) {
+  // dialog = new LMHDialog(getCanvas().getFrame());
+  // value = (Ring) (dialog.showInputDialog(value));
+  // }
+  // else if (value instanceof LMHEValue) {
+  // dialog = new LMHEDialog(getCanvas().getFrame());
+  // value = (Ring) (dialog.showInputDialog(value));
+  // }
+  // else if (value instanceof BoundedInteger) {
+  // // if(getDomain() instanceof MinSkill){
+  // // dialog = new BoundedIntegerInfDialog(getMainWindow());
+  // // }
+  // // else{
+  // dialog = new BoundedIntegerDialog(getCanvas().getFrame());
+  // // }
+  // value = (Ring) (dialog.showInputDialog(value));
+  // }
+  // return value;
+  // }
 
   public static final String ID_RANKINGVIEW = "rank_view";
 
+  @SuppressWarnings("unchecked")
   private JPanel createTable(AbstractDomainCanvas<Ring> canvas) {
     JPanel result = new JPanel();
     if (canvas.isSand()) {
-      this.ranker = new Ranker((SandDomain<Ring>) canvas.getValues().getDomain());
+      this.ranker = new Ranker<Ring>((SandDomain<Ring>) canvas.getValues().getDomain());
     }
     else {
-      this.ranker = new Ranker((AdtDomain<Ring>) canvas.getValues().getDomain());
+      this.ranker = new Ranker<Ring>((AdtDomain<Ring>) canvas.getValues().getDomain());
     }
     result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
     RankingTableModel tableModel = new RankingTableModel();
@@ -184,6 +175,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         // scrollPane.setVisible(false);
         return false;
       }
+      private static final long serialVersionUID = 4413320872836263114L;
     };
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     ListSelectionModel listSelectionModel = table.getSelectionModel();
@@ -195,7 +187,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     // table.setRowSorter(new TableRowSorter<TableModel>(table.getModel()));
     table.setFillsViewportHeight(true);
     this.titleLabel = new JLabel(Options.getMsg("windows.ranking.labeltitle",
-        ((AbstractDomainCanvas) getCanvas()).getDomain().getName(),
+        ((AbstractDomainCanvas<Ring>) getCanvas()).getDomain().getName(),
         getCanvas().getTree().getRoot(true).getName()));
     result.add(titleLabel);
     result.add(table.getTableHeader());
@@ -254,7 +246,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
       }
     }
 
-    private void updateRowData(AbstractDomainCanvas canvas, Node root, boolean recalculate) {
+    private void updateRowData(AbstractDomainCanvas<Ring> canvas, Node root, boolean recalculate) {
       if (canvas == null || root == null) {
         return;
       }
@@ -267,14 +259,14 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         if (ranking != null) {
           for (RankNode<Ring> attack : ranking) {
             i++;
-            Vector<Comparable> v = new Vector<Comparable>();
+            Vector<Comparable<?>> v = new Vector<Comparable<?>>();
             v.add(new Integer(i));
             v.add(attack.value);
             addRow(v);
           }
         }
       }
-      else if (((AbstractDomainCanvas) canvas).getValues().getDomain() instanceof RankingDomain) {
+      else if (((AbstractDomainCanvas<Ring>) canvas).getValues().getDomain() instanceof RankingDomain) {
         ValueAssignement<Ring> va = canvas.getValues().getValueMap();
         ArrayList<RankNode<Ring>> ranking;
         ranking = ranker.rank((ADTNode) root, va, Options.rank_noRanked);
@@ -283,7 +275,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         if (ranking != null) {
           for (RankNode<Ring> attack : ranking) {
             i++;
-            Vector<Comparable> v = new Vector<Comparable>();
+            Vector<Comparable<?>> v = new Vector<Comparable<?>>();
             v.add(new Integer(i));
             v.add(attack.value);
             addRow(v);
@@ -294,12 +286,14 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         setRowCount(0);
       }
     }
+    private static final long serialVersionUID = -1257930650408184329L;
   }
 
   /**
    * Renderer for table cells.
    */
   class RankingRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
+
 
     public RankingRenderer() {
       super();
@@ -315,19 +309,21 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       }
     }
+    private static final long serialVersionUID = 2175461852890197527L;
   }
 
+  @SuppressWarnings("unchecked")
   public void valueChanged(ListSelectionEvent e) {
     if (getCanvas() == null) return;
     ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-    ((AbstractDomainCanvas) getCanvas()).unmarkAll();
+    ((AbstractDomainCanvas<?>) getCanvas()).unmarkAll();
     if (!lsm.isSelectionEmpty()) {
       // Find out which indexes are selected.
       int minIndex = lsm.getMinSelectionIndex();
       // Mark
       if (canvas instanceof AbstractDomainCanvas) {
         Integer index = (Integer) (table.getModel().getValueAt(minIndex, 0));
-        ranker.mark(index.intValue() - 1, (AbstractDomainCanvas) getCanvas());
+        ranker.mark(index.intValue() - 1, (AbstractDomainCanvas<Ring>) getCanvas());
       }
     }
     getCanvas().repaint();
@@ -337,5 +333,5 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
   private AbstractTreeCanvas canvas;
   private JLabel             titleLabel;
   private JTable             table;
-  private Ranker             ranker;
+  private Ranker<Ring>       ranker;
 }

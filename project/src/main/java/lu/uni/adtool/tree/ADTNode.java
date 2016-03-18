@@ -17,6 +17,7 @@ import bibliothek.util.xml.XElement;
 import bibliothek.util.xml.XException;
 
 public class ADTNode extends GuiNode {
+
   public enum Type {
     AND_OPP, OR_OPP, AND_PRO, OR_PRO
   }
@@ -118,7 +119,7 @@ public class ADTNode extends GuiNode {
       for (int i = 0; i < domains.size(); i++) {
         ValuationDomain vd = domains.get(i);
         String domainId = vd.getExportXmlId();
-        if (this.isEditable((AdtDomain) vd.getDomain())) {
+        if (this.isEditable((AdtDomain<Ring>) vd.getDomain())) {
           if (vd.getValue(this) != null) {
             XElement param = result.addElement("parameter");
             param.addString("domainId", domainId);
@@ -162,7 +163,7 @@ public class ADTNode extends GuiNode {
     return result;
   }
 
-  public boolean isEditable(AdtDomain domain) {
+  public boolean isEditable(AdtDomain<Ring> domain) {
     return hasDefault() && domain.isValueModifiable(this);
   }
 
@@ -474,5 +475,6 @@ public class ADTNode extends GuiNode {
   private static final String C_OPP = "co";
 
   private Type                type;
+  private static final long serialVersionUID = -8433351516296617004L;
 
 }

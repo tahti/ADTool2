@@ -17,7 +17,7 @@ public class RankNode<Type extends Ring> {
     this.list = new ArrayList<Integer>();
   }
 
-  public RankNode(Type value, RankNode left, RankNode right) {
+  public RankNode(Type value, RankNode<Type> left, RankNode<Type> right) {
       this.value = value;
       this.list = new ArrayList<Integer>();
       //add right first as we will be taking numbers from the end

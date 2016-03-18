@@ -22,7 +22,7 @@ public class JPrintPreviewDialog extends JDialog
   {
     super(controller.getFrame(), true);
     JPrintPreviewPane preview = new JPrintPreviewPane(pageable,this);
-    setAlwaysOnTop(true);
+//     setAlwaysOnTop(true);
     setTitle("Print preview");
     this.setLocationRelativeTo(controller.getFrame());
 

@@ -105,7 +105,6 @@ public class LogDockable extends PermaDockable {
     return dateFormat.format(date);
   }
 
-  private static final long serialVersionUID = -1627291937521951134L;
   private LinkedList<String> messages;
   private JTextPane log;
   private JScrollPane scrollPane;

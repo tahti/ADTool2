@@ -25,7 +25,7 @@ import javax.swing.KeyStroke;
  * @author Piot Kordy
  */
 public class AdtDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
-  public AdtDomainHandler(final AbstractDomainCanvas canvas) {
+  public AdtDomainHandler(final AbstractDomainCanvas<Type> canvas) {
     super(canvas);
     initPopupMenu();
   }
@@ -34,7 +34,7 @@ public class AdtDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
     if (node != null) {
       // final ADTNode.Type t = node.getTerm().getType();
       editValueItem.setEnabled(((ADTNode) node)
-          .isEditable((AdtDomain) ((AbstractDomainCanvas) canvas).getValues().getDomain()));
+          .isEditable((AdtDomain<Ring>) ((AbstractDomainCanvas<?>) canvas).getValues().getDomain()));
       boolean canFold;
       boolean canFoldAbove;
       if (((GuiNode) node).isFolded()) {
@@ -129,6 +129,7 @@ public class AdtDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
    *
    * @see MouseListener#mouseClicked(MouseEvent)
    */
+  @SuppressWarnings("unchecked")
   public void mouseClicked(final MouseEvent e) {
     canvas.requestFocusInWindow();
     final Node node = this.canvas.getNode(e.getX(), e.getY());
@@ -141,7 +142,7 @@ public class AdtDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
       else {
         if (node.equals(canvas.getFocused())) {
           menuNode = node;
-          ((AbstractDomainCanvas<Type>) canvas).editValue(menuNode);
+          ((AbstractDomainCanvas<Ring>) canvas).editValue(menuNode);
         }
         else {
           setFocus(node);
@@ -190,6 +191,7 @@ public class AdtDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
 
   }
 
+  @SuppressWarnings("unchecked")
   private void changeValueActionPerformed() {
     if (menuNode != null) {
       ((AbstractDomainCanvas<Type>) canvas).editValue(menuNode);

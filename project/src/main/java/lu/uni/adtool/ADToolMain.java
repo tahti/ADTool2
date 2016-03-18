@@ -212,7 +212,6 @@ public final class ADToolMain extends JFrame {
   private RankingDockable                rankingView;
   private DetailsView                    detailsView;
   private static final long              serialVersionUID = 2554846105872850570L;
-  private MainController                 controlller;
   private TreeFactory                    treeFactory;
   private DomainFactory                  domainFactory;
   private CWorkingArea                   work;

@@ -11,7 +11,6 @@ import java.util.HashMap;
 
 public class RankExporter implements NodeRanker {
   public RankExporter(Node root, ValueAssignement<Ring> valuesMap, Ranker<Ring> ranker, int maxItems) {
-    this.maxItems = maxItems;
     ArrayList<RankNode<Ring>> result;
     if (root instanceof SandNode) {
       result = ranker.rank((SandNode)root, valuesMap, maxItems);
@@ -42,6 +41,5 @@ public class RankExporter implements NodeRanker {
   }
 
   private ArrayList<HashMap<Node, Ring>> ranking;
-  private int maxItems;
 }
 

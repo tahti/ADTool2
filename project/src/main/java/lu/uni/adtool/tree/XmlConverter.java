@@ -6,7 +6,6 @@ import lu.uni.adtool.domains.Ranker;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TreeDockable;
@@ -44,7 +43,7 @@ public class XmlConverter {
         for (int i = 0; i <layout.getDomains().size(); i++) {
           ValuationDomain values = layout.getDomains().get(i);
           rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
-                                       new Ranker((SandDomain<Ring>)values.getDomain()), Options.rank_noRanked));
+                                       new Ranker<Ring>((SandDomain<Ring>)values.getDomain()), Options.rank_noRanked));
         }
       }
       rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains(), rankers));
@@ -62,7 +61,7 @@ public class XmlConverter {
         for (int i = 0; i <layout.getDomains().size(); i++) {
           ValuationDomain values = layout.getDomains().get(i);
           rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
-                                       new Ranker((AdtDomain<Ring>)values.getDomain()), Options.rank_noRanked));
+                                       new Ranker<Ring>((AdtDomain<Ring>)values.getDomain()), Options.rank_noRanked));
         }
       }
       XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains(),rankers);
@@ -76,15 +75,9 @@ public class XmlConverter {
         }
       }
     }
-    if (rootXML != null) {
-      BufferedOutputStream out = new BufferedOutputStream(fileStream);
-      XIO.writeUTF(rootXML, out);
-      out.close();
-    }
-    else {
-      Debug.log("export to xml failed");
-      fileStream.close();
-    }
+    BufferedOutputStream out = new BufferedOutputStream(fileStream);
+    XIO.writeUTF(rootXML, out);
+    out.close();
   }
 
   public void importFrom(InputStream fileStream, MainController controller) throws IOException {

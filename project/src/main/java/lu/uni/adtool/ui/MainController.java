@@ -5,6 +5,7 @@ import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
@@ -692,25 +693,31 @@ public final class MainController implements CControlListener, CFocusListener {
     fileExit.setSmallIcon(iconFac.createImageIcon("/icons/exit.png"));
 
     editCut = new ADAction(Options.getMsg("edit.cut.txt")) {
+
       public void actionPerformed(final ActionEvent e) {
         copyHandler.cut();
       }
+      private static final long serialVersionUID = 229256580368467602L;
     };
     editCut.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.cut.key")));
     editCut.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.cut.acc")));
     editCut.setSmallIcon(iconFac.createImageIcon("/icons/cut.png"));
     editPaste = new ADAction(Options.getMsg("edit.paste.txt")) {
+
       public void actionPerformed(final ActionEvent e) {
         copyHandler.paste();
       }
+      private static final long serialVersionUID = -9187280429559390662L;
     };
     editPaste.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.paste.key")));
     editPaste.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.paste.acc")));
     editPaste.setSmallIcon(iconFac.createImageIcon("/icons/paste.png"));
     editCopy = new ADAction(Options.getMsg("edit.copy.txt")) {
+
       public void actionPerformed(final ActionEvent e) {
         copyHandler.copy();
       }
+      private static final long serialVersionUID = 3236243103402493159L;
     };
     editCopy.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.copy.key")));
     editCopy.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.copy.acc")));
@@ -738,7 +745,8 @@ public final class MainController implements CControlListener, CFocusListener {
       if (lastFocusedTree.isSand()) {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(true);
         AddSandDomainDialog addDialog = new AddSandDomainDialog(this.frame);
-        SandDomain<?> d = addDialog.showDomainDialog(domains);
+        @SuppressWarnings("unchecked")
+        SandDomain<Ring> d = addDialog.showDomainDialog(domains);
         if (d == null) {
           return;
         }
@@ -866,8 +874,8 @@ public final class MainController implements CControlListener, CFocusListener {
   private ArrayList<JMenuItem> toDisableItems;
   private static ADAction      fileNewSand;
   private static ADAction      fileNewADT;
-  private static ADAction      fileOpen;
-  private static ADAction      fileSave;
+//   private static ADAction      fileOpen;
+//   private static ADAction      fileSave;
   private static ADAction      fileExportToPdf;
   private static ADAction      fileExportToPng;
   private static ADAction      fileExportToJpg;

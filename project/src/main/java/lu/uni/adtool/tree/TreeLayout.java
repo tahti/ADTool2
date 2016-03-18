@@ -5,7 +5,6 @@ import lu.uni.adtool.domains.Parametrized;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 
 import java.io.DataInputStream;
@@ -75,8 +74,8 @@ public class TreeLayout implements MultipleCDockableLayout {
     }
     else {
       this.treeRoot = ADTNode.readStream(in);
-      int sR= in.readInt();
-      if (sR == 0 ) {
+      int sR = in.readInt();
+      if (sR == 0) {
         this.switchRole = false;
       }
       else {
@@ -95,7 +94,7 @@ public class TreeLayout implements MultipleCDockableLayout {
       out.writeInt(ADT_ID);
       out.writeInt(this.id);
       ((ADTNode) this.treeRoot).writeStream(out);
-      if(this.switchRole){
+      if (this.switchRole) {
         out.writeInt(1);
       }
       else {
@@ -155,7 +154,7 @@ public class TreeLayout implements MultipleCDockableLayout {
     else {
       element.addElement("type").setInt(ADT_ID);
       XElement root = ((ADTNode) this.treeRoot).toXml();
-      if (this.getSwitchRole())  {
+      if (this.getSwitchRole()) {
         root.addString("switchRole", "yes");
       }
       element.addElement(root);
@@ -171,7 +170,7 @@ public class TreeLayout implements MultipleCDockableLayout {
       for (XElement domain : e.getElements("domain")) {
         i++;
         String domainName = domain.getElement("class").getString();
-        SandDomain d = (SandDomain) DomainFactory.createFromString(domainName);
+        SandDomain<Ring> d = (SandDomain<Ring>) DomainFactory.createFromString(domainName);
         if (d == null) {
           throw new IllegalArgumentException(Options.getMsg("exception.nodomain") + domainName);
         }
@@ -190,7 +189,7 @@ public class TreeLayout implements MultipleCDockableLayout {
       for (XElement domain : e.getElements("domain")) {
         i++;
         String domainName = domain.getElement("class").getString();
-        AdtDomain d = (AdtDomain) DomainFactory.createFromString(domainName);
+        AdtDomain<Ring> d = (AdtDomain<Ring>) DomainFactory.createFromString(domainName);
         if (d == null) {
           throw new IllegalArgumentException(Options.getMsg("exception.nodomain") + domainName);
         }

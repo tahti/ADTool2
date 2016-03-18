@@ -37,7 +37,7 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
   private static final long serialVersionUID = 1223325877545646416L;
   private ADToolMain        frame;
   private JButton           setButton;
-  private JList             list;
+  private JList<String>     list;
   private JLabel            description;
   private final String[]    examplesList     = {Options.getMsg("example.auctionfraud.txt"),
       Options.getMsg("example.rfiddos.txt"), Options.getMsg("example.rfidblock.txt"),
@@ -100,7 +100,7 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
     setButton.setActionCommand(Options.getMsg("button.load"));
     setButton.addActionListener(this);
     getRootPane().setDefaultButton(setButton);
-    list = new JList(examplesList) {
+    list = new JList<String>(examplesList) {
       // Subclass JList to workaround bug 4832765, which can cause the
       // scroll pane to not let the user easily scroll up to the beginning
       // of the list. An alternative would be to set the unitIncrement

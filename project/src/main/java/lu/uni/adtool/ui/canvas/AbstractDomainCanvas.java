@@ -38,6 +38,7 @@ import javax.swing.JScrollPane;
 import org.abego.treelayout.util.DefaultConfiguration;
 
 public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas implements NodeRanker {
+
   public AbstractDomainCanvas(MainController mc, ValuationDomain values) {
     super(null, mc);
     if (values.getDomain() instanceof SandDomain) {
@@ -69,7 +70,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     this.marked = new HashMap<Node, Color>();
     this.markEditable = false;
   }
-
+@SuppressWarnings("unchecked")
   public Domain<Type> getDomain() {
     return (Domain<Type>) this.values.getDomain();
   }
@@ -155,7 +156,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     }
     else if (n instanceof ADTNode) {
       ADTNode node = (ADTNode) n;
-      if (node.isEditable((AdtDomain) values.getDomain())) {
+      if (node.isEditable((AdtDomain<Ring>) values.getDomain())) {
         InputDialog dialog;
         Ring value = (Ring) this.values.getValue(node);
         if (value instanceof Bool) {
@@ -269,7 +270,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
         }
       }
       else {
-        if (((ADTNode) node).isEditable((AdtDomain) values.getDomain())) {
+        if (((ADTNode) node).isEditable((AdtDomain<Ring>) values.getDomain())) {
           return Options.canv_EditableColor;
         }
       }
@@ -283,7 +284,6 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
    * @see ADTreeCanvas#getLabel(ADTreeNode)
    */
   public String getLabel(Node n) {
-    @SuppressWarnings("unchecked")
     String result;
     if (n == null) {
       return "Null node";
@@ -448,4 +448,5 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
   private HashMap<Node, Color>    marked;
   private boolean                 markEditable;
   private boolean                 showLabels;
+  private static final long serialVersionUID = -2360795431357785877L;
 }

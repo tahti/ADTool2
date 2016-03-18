@@ -19,6 +19,7 @@ import javax.swing.border.TitledBorder;
  */
 public class CollapsiblePanel extends JPanel {
 
+
   public CollapsiblePanel(String title) {
     this.title = title;
     border = BorderFactory.createTitledBorder(title);
@@ -145,5 +146,6 @@ public class CollapsiblePanel extends JPanel {
 
   private String       title;
   private TitledBorder border;
+  private static final long serialVersionUID = -8281128253938039955L;
 
 }

@@ -12,6 +12,7 @@ import lu.uni.adtool.tree.Node;
 import java.util.ArrayList;
 
 public class MinTime implements SandDomain<RealG0> {
+
   public MinTime() {
   }
 
@@ -116,7 +117,7 @@ public class MinTime implements SandDomain<RealG0> {
         }
       }
       Debug.log("Final added min value:" + minValue.toString() + " index:" + i + " ir" + (ir + 1));
-      result.add(new RankNode(children.get(index).get(indices[index]), index));
+      result.add(new RankNode<RealG0>(children.get(index).get(indices[index]), index));
       indices[index]++;
       ir++;
     }
@@ -189,36 +190,6 @@ public class MinTime implements SandDomain<RealG0> {
     return result;
   }
 
-//   private ArrayList<RankNode<RealG0>> sand(ArrayList<RankNode<RealG0>> a,
-//       ArrayList<RankNode<RealG0>> b, int maxItems) {
-//     ArrayList<RankNode<RealG0>> result = new ArrayList<RankNode<RealG0>>();
-//     result.ensureCapacity(maxItems);
-//     int ia = 0;
-//     int ib = 0;
-//     int ir = 0;
-//     while (ir < maxItems && ia < a.size() && ib < b.size()) {
-//       result.add(
-//           new RankNode<RealG0>(this.sand(a.get(ia).value, b.get(ib).value), a.get(ia), b.get(ib)));
-//       ir++;
-//       if ((ia + 1) >= a.size() && (ib + 1) >= b.size()) break;
-//       if ((((ib + 1) >= b.size()) || (a.get(ia + 1).value.compareTo(b.get(ib + 1).value) < 0))) {
-//         ia++;
-//         for (int i = (ib - 1); i >= 0 && ir < maxItems; i--) {
-//           result.add(new RankNode<RealG0>(this.sand(a.get(ia).value, b.get(i).value), a.get(ia),
-//               b.get(i)));
-//           ir++;
-//         }
-//       }
-//       else {
-//         ib++;
-//         for (int i = (ia - 1); i >= 0 && ir < maxItems; i--) {
-//           result.add(new RankNode<RealG0>(this.sand(a.get(i).value, b.get(ib).value), a.get(i),
-//               b.get(ib)));
-//           ir++;
-//         }
-//       }
-//     }
-//     return result;
-//   }
+  private static final long serialVersionUID = -3603484192500901319L;
 
 }

@@ -1,7 +1,6 @@
 package lu.uni.adtool.domains;
 
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tree.ADTNode;
 
 import java.util.ArrayList;
 

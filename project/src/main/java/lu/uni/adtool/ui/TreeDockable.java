@@ -3,6 +3,7 @@ package lu.uni.adtool.ui;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
@@ -53,16 +54,23 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
     if (this.workArea == null) {
       this.workArea = control.createWorkingArea(getWorkAreaId(id));
     }
-    CGrid grid2 = new CGrid(control);
     if (!preloaded) {
+      CGrid grid2 = new CGrid(control);
       grid2.add(0, 0, 1, 1, termDockable);
       grid2.add(0, 1, 1, 1, canvasDockable);
       this.workArea.deploy(grid2);
       grid2 = new CGrid(control);
-      grid2.add(0, 0, 1, 1, workArea);
+      grid2.add(0, 0, 1, 1, this.workArea);
       center.deploy(grid2);
     }
     add(center);
+//     if (preloaded) {
+//       Debug.log("setting work area on preloaded");
+//       control.addDockable(termDockable);
+//       control.addDockable(canvasDockable);
+//       termDockable.setWorkingArea(this.workArea);
+//       canvasDockable.setWorkingArea(this.workArea);
+//     }
     addVetoClosingListener(this);
   }
 
@@ -143,21 +151,20 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
     dockable.setVisible(true);
   }
 
-  public void addDomain(SandDomain domain) {
+  public void addDomain(SandDomain<Ring> domain) {
     DomainFactory factory = controller.getFrame().getDomainFactory();
     DomainDockable d = factory.read(new ValuationDomain(this.treeCanvas.getId(),
         factory.getNewUniqueId(new Integer(this.treeCanvas.getId())), domain));
-    d.setWorkingArea(this.workArea);
     Debug.log("Adding domain to control with id:" + d.getUniqueId());
     controller.getControl().addDockable(d.getUniqueId(), d);
     this.showDomain(d);
   }
 
-  public void addDomain(AdtDomain domain) {
+  public void addDomain(AdtDomain<?> domain) {
     DomainFactory factory = controller.getFrame().getDomainFactory();
+    @SuppressWarnings("unchecked")
     DomainDockable d = factory.read(new ValuationDomain(this.treeCanvas.getId(),
-        factory.getNewUniqueId(new Integer(this.treeCanvas.getId())), domain));
-    d.setWorkingArea(this.workArea);
+                                                        factory.getNewUniqueId(new Integer(this.treeCanvas.getId())), (AdtDomain<Ring>)domain));
     Debug.log("Adding domain to control with id:" + d.getUniqueId());
     controller.getControl().addDockable(d.getUniqueId(), d);
     this.showDomain(d);
@@ -174,10 +181,10 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
       dockable.getContentPane().removeAll();
     }
     if (layout.isSand()) {
-      this.treeCanvas = new SandTreeCanvas(new NodeTree(layout), this.controller);
+      this.treeCanvas = new SandTreeCanvas<Ring>(new NodeTree(layout), this.controller);
     }
     else {
-      this.treeCanvas = new ADTreeCanvas(new NodeTree(layout), this.controller);
+      this.treeCanvas = new ADTreeCanvas<Ring>(new NodeTree(layout), this.controller);
     }
     final JScrollPane scrollPane = new JScrollPane(treeCanvas);
     scrollPane.setAutoscrolls(true);
@@ -199,12 +206,12 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
     }
     TermView termView;
     if (treeCanvas instanceof SandTreeCanvas) {
-      termView = new TermView((SandTreeCanvas)treeCanvas);
-      ((SandTreeCanvas)treeCanvas).setTerms(termView);
+      termView = new TermView((SandTreeCanvas<?>)treeCanvas);
+      ((SandTreeCanvas<?>)treeCanvas).setTerms(termView);
     }
     else {
-      termView = new TermView((ADTreeCanvas)treeCanvas);
-      ((ADTreeCanvas)treeCanvas).setTerms(termView);
+      termView = new TermView((ADTreeCanvas<?>)treeCanvas);
+      ((ADTreeCanvas<?>)treeCanvas).setTerms(termView);
     }
     dockable.add(termView);
     controller.getControl().addDockable(dockable);

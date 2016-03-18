@@ -30,7 +30,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
    * @param canvas
    *          parent canvas
    */
-  public ADTCanvasHandler(final ADTreeCanvas canvas) {
+  public ADTCanvasHandler(final ADTreeCanvas<?> canvas) {
     super(canvas);
     initPopupMenu();
   }
@@ -47,29 +47,29 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
       if (node != null) {
         switch (e.getKeyCode()) {
         case KeyEvent.VK_LEFT:
-          ((ADTreeCanvas) this.canvas).switchSibling(node, true);
+          ((ADTreeCanvas<?>) this.canvas).switchSibling(node, true);
           break;
         case KeyEvent.VK_RIGHT:
-          ((ADTreeCanvas) this.canvas).switchSibling(node, false);
+          ((ADTreeCanvas<?>) this.canvas).switchSibling(node, false);
           break;
         case KeyEvent.VK_J:
-          ((ADTreeCanvas) canvas).toggleOp(node);
+          ((ADTreeCanvas<?>) canvas).toggleOp(node);
           break;
         case KeyEvent.VK_I:
-          ((ADTreeCanvas) canvas).addCounter(node);
+          ((ADTreeCanvas<?>) canvas).addCounter(node);
           break;
         case KeyEvent.VK_A:
-          ((ADTreeCanvas) canvas).addChild(node);
+          ((ADTreeCanvas<?>) canvas).addChild(node);
           break;
         case KeyEvent.VK_L:
           menuNode = node;
           changeLabelActionPerformed();
           break;
         case KeyEvent.VK_R:
-          ((ADTreeCanvas) canvas).removeTree(node);
+          ((ADTreeCanvas<?>) canvas).removeTree(node);
           break;
         case KeyEvent.VK_S:
-          ((ADTreeCanvas) canvas).addSibling(node, !e.isShiftDown());
+          ((ADTreeCanvas<?>) canvas).addSibling(node, !e.isShiftDown());
           break;
         default:
           consume = false;
@@ -91,7 +91,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
         case KeyEvent.VK_R:
           if (node != null) {
             menuNode = node;
-            ((ADTreeCanvas) canvas).removeChildren(node);
+            ((ADTreeCanvas<?>) canvas).removeChildren(node);
           }
           break;
         default:
@@ -228,7 +228,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     menuItem.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).toggleOp(menuNode);
+          ((ADTreeCanvas<?>) canvas).toggleOp(menuNode);
         }
       }
     });
@@ -261,7 +261,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     menuItem.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).addChild(menuNode);
+          ((ADTreeCanvas<?>) canvas).addChild(menuNode);
         }
       }
     });
@@ -272,7 +272,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     addCounter.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas)canvas).addCounter(menuNode);
+          ((ADTreeCanvas<?>)canvas).addCounter(menuNode);
         }
       }
     });
@@ -283,7 +283,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     addLeft.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).addSibling(menuNode, true);
+          ((ADTreeCanvas<?>) canvas).addSibling(menuNode, true);
         }
       }
     });
@@ -294,7 +294,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     addRight.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).addSibling(menuNode, false);
+          ((ADTreeCanvas<?>) canvas).addSibling(menuNode, false);
         }
       }
     });
@@ -306,7 +306,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     switchLeft.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).switchSibling(menuNode, true);
+          ((ADTreeCanvas<?>) canvas).switchSibling(menuNode, true);
         }
       }
     });
@@ -317,7 +317,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     switchRight.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).switchSibling(menuNode, false);
+          ((ADTreeCanvas<?>) canvas).switchSibling(menuNode, false);
         }
       }
     });
@@ -328,7 +328,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     removeTree.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).removeTree(menuNode);
+          ((ADTreeCanvas<?>) canvas).removeTree(menuNode);
         }
       }
     });
@@ -339,7 +339,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     removeChildren.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas) canvas).removeChildren(menuNode);
+          ((ADTreeCanvas<?>) canvas).removeChildren(menuNode);
         }
       }
     });
@@ -386,7 +386,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
    * @return
    */
   private boolean validLabel(String s) {
-    return ((ADTreeCanvas) canvas).validLabel(s);
+    return ((ADTreeCanvas<?>) canvas).validLabel(s);
   }
 
   /**
@@ -417,8 +417,8 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
                                                               // +| +$| +\n|(
                                                               // )+","$1");
       menuNode.setName(s);
-      ((ADTreeCanvas) canvas).setLabel(menuNode, s);
-      ((ADTreeCanvas) canvas).setFocus(menuNode);
+      ((ADTreeCanvas<?>) canvas).setLabel(menuNode, s);
+      ((ADTreeCanvas<?>) canvas).setFocus(menuNode);
     }
   }
 

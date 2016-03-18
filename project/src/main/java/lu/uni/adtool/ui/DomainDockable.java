@@ -1,6 +1,7 @@
 package lu.uni.adtool.ui;
 
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
@@ -32,7 +33,7 @@ public class DomainDockable extends DefaultMultipleCDockable
   public DomainDockable(DomainFactory factory, ValuationDomain values) {
     super(factory);
     this.setCloseable(true);
-    this.canvas = new AbstractDomainCanvas(factory.getController(), values);
+    this.canvas = new AbstractDomainCanvas<Ring>(factory.getController(), values);
     ImageIcon icon = new IconFactory().createImageIcon("/icons/treeEx_16x16.png", getTitleText());
     this.setTitleIcon(icon);
     if (values.getDomain() != null) {
@@ -79,7 +80,7 @@ public class DomainDockable extends DefaultMultipleCDockable
     // do nothing
   }
 
-  public AbstractDomainCanvas getCanvas() {
+  public AbstractDomainCanvas<Ring> getCanvas() {
     return canvas;
   }
 
@@ -144,11 +145,11 @@ public class DomainDockable extends DefaultMultipleCDockable
     labelBox = new JCheckBox(Options.getMsg("sanddomain.showlabels.txt"));
     labelBox.setMnemonic(
         KeyStroke.getKeyStroke(Options.getMsg("sanddomain.showlabels.key")).getKeyCode());
-    labelBox.setSelected(false);
+    labelBox.setSelected(true);
     labelBox.addItemListener(this);
     allLabelBox = new JCheckBox(Options.getMsg("sanddomain.alllabels.txt"));
     allLabelBox.setMnemonic(
-    KeyStroke.getKeyStroke(Options.getMsg("sanddomain.alllabels.key")).getKeyCode());
+        KeyStroke.getKeyStroke(Options.getMsg("sanddomain.alllabels.key")).getKeyCode());
     allLabelBox.setSelected(true);
     allLabelBox.addItemListener(this);
     markEditableBox = new JCheckBox(Options.getMsg("sanddomain.markeditable.txt"));
@@ -156,7 +157,7 @@ public class DomainDockable extends DefaultMultipleCDockable
         KeyStroke.getKeyStroke(Options.getMsg("sanddomain.markeditable.key")).getKeyCode());
     markEditableBox.setSelected(this.canvas.isMarkEditable());
     markEditableBox.addItemListener(this);
-    this.canvas.setShowLabels(false);
+    this.canvas.setShowLabels(true);
     this.canvas.setShowAllLabels(true);
     nodeSizeBox = new JCheckBox(Options.getMsg("sanddomain.localsize.txt"));
     nodeSizeBox.setMnemonic(KeyEvent.VK_S);
@@ -182,10 +183,10 @@ public class DomainDockable extends DefaultMultipleCDockable
     this.add(optionsPanel, BorderLayout.PAGE_END);
   }
 
-  private AbstractDomainCanvas canvas;
-  private JCheckBox            labelBox;
-  private JCheckBox            allLabelBox;
-  private JCheckBox            nodeSizeBox;
-  private JCheckBox            markEditableBox;
+  private AbstractDomainCanvas<Ring> canvas;
+  private JCheckBox                  labelBox;
+  private JCheckBox                  allLabelBox;
+  private JCheckBox                  nodeSizeBox;
+  private JCheckBox                  markEditableBox;
 
 }

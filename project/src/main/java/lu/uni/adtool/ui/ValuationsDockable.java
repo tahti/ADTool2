@@ -1,6 +1,5 @@
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.ValueAssignement;
 import lu.uni.adtool.domains.rings.Bool;
 import lu.uni.adtool.domains.rings.BoundedInteger;
@@ -9,7 +8,6 @@ import lu.uni.adtool.domains.rings.LMHValue;
 import lu.uni.adtool.domains.rings.RealG0;
 import lu.uni.adtool.domains.rings.RealZeroOne;
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
@@ -49,7 +47,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import bibliothek.util.Path;
@@ -71,11 +68,12 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
    * @param canvas
    *          the canvas to set
    */
+  @SuppressWarnings("unchecked")
   public void setCanvas(AbstractTreeCanvas canvas) {
     pane.removeAll();
     this.canvas = canvas;
     if (canvas != null && canvas instanceof AbstractDomainCanvas) {
-      JScrollPane scrollPane = new JScrollPane(this.createTable((AbstractDomainCanvas) canvas));
+      JScrollPane scrollPane = new JScrollPane(this.createTable((AbstractDomainCanvas<Ring>) canvas));
       pane.add(scrollPane);
       pane.revalidate();
     }
@@ -103,9 +101,9 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         if (value != null) {
           for (int i = 0; i < selection.length; i++) {
             key = (String) table.getValueAt(selection[i], 0);
-            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, value);
+            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(true, key, value);
           }
-          ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+          ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
         }
       }
     }
@@ -120,9 +118,9 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
             key = (String) table.getValueAt(selection[i], 1);
             proponent =
                 table.getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
-            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, value);
+            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(proponent, key, value);
           }
-          ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+          ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
         }
       }
     }
@@ -138,7 +136,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
   public Ring editValue(boolean proponent, String key) {
     Ring value;
     InputDialog dialog;
-    value = ((AbstractDomainCanvas) getCanvas()).getValues().get(proponent, key);
+    value = ((AbstractDomainCanvas<?>) getCanvas()).getValues().get(proponent, key);
 
     if (value instanceof Bool) {
       value = (Ring) Bool.not((Bool) value);
@@ -177,14 +175,14 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
       Ring v = null;
       if (getCanvas().isSand()) {
         SandNode node = new SandNode();
-        v = ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+        v = ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
         if (!v.updateFromString(copy.toString())) {
           return;
         }
       }
       else {
         ADTNode node = new ADTNode();
-        v = ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+        v = ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
         if (!v.updateFromString(copy.toString())) {
           return;
         }
@@ -192,22 +190,20 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
       for (int i = 0; i < selection.length; i++) {
         if (getCanvas().isSand()) {
           String key = (String) (table.getModel().getValueAt(selection[i], 0));
-          ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, v);
+          ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(true, key, v);
         }
         else {
           boolean proponent = table.getModel().getValueAt(selection[i], 0)
               .equals(Options.getMsg("tablemodel.proponent"));
           String key = (String) (table.getModel().getValueAt(selection[i], 1));
-          ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, v);
+          ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(proponent, key, v);
         }
       }
-      ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+      ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
     }
   }
 
   public void paste(ValueAssignement<Ring> copy) {
-    ValuationDomain values = ((AbstractDomainCanvas) getCanvas()).getValues();
-    boolean sand = canvas.isSand();
     ValuationTableModel tm = (ValuationTableModel) table.getModel();
     boolean changed = false;
     for (int i = 0; i < tm.getRowCount(); i++) {
@@ -217,9 +213,9 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         if (value != null) {
           SandNode node = new SandNode();
           Ring v =
-              ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+              ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
           if (v.updateFromString(value.toString())) {
-            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(true, key, v);
+            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(true, key, v);
             changed = true;
           }
         }
@@ -237,19 +233,20 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
             node.setType(ADTNode.Type.AND_OPP);
           }
           Ring v =
-              ((AbstractDomainCanvas) getCanvas()).getValues().getDomain().getDefaultValue(node);
+              ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
           if (v.updateFromString(value.toString())) {
-            ((AbstractDomainCanvas) getCanvas()).getValues().setValue(proponent, key, v);
+            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(proponent, key, v);
             changed = true;
           }
         }
       }
     }
     if (changed) {
-      ((AbstractDomainCanvas) getCanvas()).valuesUpdated();
+      ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
     }
   }
 
+  @SuppressWarnings("unchecked")
   public Object copy() {
     Object copy = null;
     int[] selection = table.getSelectedRows();
@@ -257,29 +254,29 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
       if (selection.length == 1) {
         if (getCanvas().isSand()) {
           String key = (String) (table.getModel().getValueAt(selection[0], 0));
-          copy = ((AbstractDomainCanvas) getCanvas()).getValues().get(true, key);
+          copy = ((AbstractDomainCanvas<?>) getCanvas()).getValues().get(true, key);
         }
         else {
           boolean proponent = table.getModel().getValueAt(selection[0], 0)
               .equals(Options.getMsg("tablemodel.proponent"));
           String key = (String) table.getModel().getValueAt(selection[0], 1);
-          copy = ((AbstractDomainCanvas) getCanvas()).getValues().get(proponent, key);
+          copy = ((AbstractDomainCanvas<?>) getCanvas()).getValues().get(proponent, key);
         }
       }
       else {
-        copy = new ValueAssignement();
+        copy = new ValueAssignement<Ring>();
         for (int i = 0; i < selection.length; i++) {
           if (getCanvas().isSand()) {
             String key = (String) (table.getModel().getValueAt(selection[i], 0));
-            Ring value = ((AbstractDomainCanvas) getCanvas()).getValues().get(true, key);
-            ((ValueAssignement) copy).put(true, key, value);
+            Ring value = ((AbstractDomainCanvas<?>) getCanvas()).getValues().get(true, key);
+            ((ValueAssignement<Ring>) copy).put(true, key, value);
           }
           else {
             boolean proponent = table.getModel().getValueAt(selection[i], 0)
                 .equals(Options.getMsg("tablemodel.proponent"));
             String key = (String) table.getModel().getValueAt(selection[i], 1);
-            Ring value = ((AbstractDomainCanvas) getCanvas()).getValues().get(proponent, key);
-            ((ValueAssignement) copy).put(proponent, key, value);
+            Ring value = ((AbstractDomainCanvas<?>) getCanvas()).getValues().get(proponent, key);
+            ((ValueAssignement<Ring>) copy).put(proponent, key, value);
           }
         }
       }
@@ -289,12 +286,13 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
 
   public static final String ID_VALUATIONVIEW = "val_view";
 
-  private JPanel createTable(AbstractDomainCanvas canvas) {
+  private JPanel createTable(AbstractDomainCanvas<Ring> canvas) {
     JPanel result = new JPanel();
     result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
     ValuationTableModel tableModel = new ValuationTableModel(canvas.isSand());
     tableModel.setCanvas(canvas);
     this.table = new JTable(tableModel) {
+      private static final long serialVersionUID = -8834465928956864103L;
     };
     MouseListener ml[] = table.getMouseListeners();
     for (MouseListener m : ml) {
@@ -342,6 +340,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
 //     }
     ActionMap am = table.getActionMap();
     am.put("copy", new AbstractAction() {
+
       public void actionPerformed(ActionEvent evt) {
         copyHandler.copy();
         SwingUtilities.invokeLater(new Runnable() {
@@ -350,6 +349,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
           }
         });
       }
+      private static final long serialVersionUID = 823562942713655994L;
     });
     am.put("cut", new AbstractAction() {
       public void actionPerformed(ActionEvent evt) {
@@ -360,8 +360,10 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
           }
         });
       }
+      private static final long serialVersionUID = -7011637827296467946L;
     });
     am.put("paste", new AbstractAction() {
+
       public void actionPerformed(ActionEvent evt) {
         copyHandler.paste();
         SwingUtilities.invokeLater(new Runnable() {
@@ -370,13 +372,15 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
           }
         });
       }
+      private static final long serialVersionUID = -5767425987370641468L;
     });
     am.put("edit", new AbstractAction() {
       public void actionPerformed(ActionEvent evt) {
         edit(table.getSelectionModel().getLeadSelectionIndex());
       }
+      private static final long serialVersionUID = -7359453212974793708L;
     });
-    result.add(new JLabel(((AbstractDomainCanvas) getCanvas()).getDomain().getName()));
+    result.add(new JLabel(((AbstractDomainCanvas<?>) getCanvas()).getDomain().getName()));
     result.add(table.getTableHeader());
     result.add(table);
     return result;
@@ -389,6 +393,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
   }
 
   class ValuationTableModel extends DefaultTableModel {
+
 
     public ValuationTableModel(boolean sand) {
       super();
@@ -462,7 +467,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
       }
     }
 
-    private void updateRowData(AbstractDomainCanvas canvas) {
+    private void updateRowData(AbstractDomainCanvas<?> canvas) {
       if (canvas == null) {
         return;
       }
@@ -470,7 +475,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         Set<String> keys = canvas.getValues().sandKeySet();
         setRowCount(0);
         for (String key : keys) {
-          Vector<Comparable> v = new Vector<Comparable>();
+          Vector<Comparable<?>> v = new Vector<Comparable<?>>();
           v.add(key);
           v.add(canvas.getValues().get(true, key));
           addRow(v);
@@ -480,7 +485,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         Set<String> keys = canvas.getValues().sandKeySet();
         setRowCount(0);
         for (String key : keys) {
-          Vector<Comparable> v = new Vector<Comparable>();
+          Vector<Comparable<?>> v = new Vector<Comparable<?>>();
           v.add(Options.getMsg("tablemodel.proponent"));
           v.add(key);
           v.add(canvas.getValues().get(true, key));
@@ -488,7 +493,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         }
         keys = canvas.getValues().oppKeySet();
         for (String key : keys) {
-          Vector<Comparable> v = new Vector<Comparable>();
+          Vector<Comparable<?>> v = new Vector<Comparable<?>>();
           v.add(Options.getMsg("tablemodel.opponent"));
           v.add(key);
           v.add(canvas.getValues().get(false, key));
@@ -498,12 +503,14 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
     }
 
     private boolean sand;
+    private static final long serialVersionUID = -1732533423111800331L;
   }
 
   /**
    * Renderer for table cells.
    */
   class ValuationRenderer extends DefaultTableCellRenderer implements TableCellRenderer {
+
 
     public ValuationRenderer() {
       super();
@@ -519,12 +526,13 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
       }
     }
+    private static final long serialVersionUID = 8345195096257288633L;
   }
 
   public void valueChanged(ListSelectionEvent e) {
     if (getCanvas() == null) return;
     ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-    ((AbstractDomainCanvas) getCanvas()).unmarkAll();
+    ((AbstractDomainCanvas<?>) getCanvas()).unmarkAll();
     if (!lsm.isSelectionEmpty()) {
       // Find out which indexes are selected.
       int minIndex = lsm.getMinSelectionIndex();
@@ -539,7 +547,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
           else {
             key = (String) (table.getModel().getValueAt(j, 1));
           }
-          ((AbstractDomainCanvas) getCanvas()).markLabel(key);
+          ((AbstractDomainCanvas<?>) getCanvas()).markLabel(key);
         }
       }
     }

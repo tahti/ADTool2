@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public abstract class Node implements Serializable{
+
   public Node() {
     this.name = "root";
   }
@@ -131,4 +132,5 @@ public abstract class Node implements Serializable{
   protected ArrayList<Node> children;
   private String            name;
   private Node              parent;
+  private static final long serialVersionUID = -983678473499189388L;
 }

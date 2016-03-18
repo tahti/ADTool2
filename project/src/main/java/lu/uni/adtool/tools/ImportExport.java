@@ -1,6 +1,7 @@
 package lu.uni.adtool.tools;
 
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tree.NodeTree;
 import lu.uni.adtool.tree.TreeLayout;
 import lu.uni.adtool.tree.XmlConverter;
@@ -43,11 +44,10 @@ public class ImportExport {
       System.err.println(Options.getMsg("error.xmlimport.fail") + " " + e.getLocalizedMessage());
       return false;
     }
-
-    if (fileStream != null) {
-      BufferedInputStream in = new BufferedInputStream(fileStream);
-      XElement element = null;
-      try {
+    try {
+      if (fileStream != null) {
+        BufferedInputStream in = new BufferedInputStream(fileStream);
+        XElement element = null;
         element = XIO.readUTF(in);
         in.close();
         if (element == null) return false;
@@ -75,21 +75,22 @@ public class ImportExport {
         }
 
       }
-      catch (IllegalArgumentException e) {
-        System.err.println(Options.getMsg("error.xmlimport.fail") + " " + e.getLocalizedMessage());
-        this.tree = null;
-        return false;
-      }
-      catch (IOException e) {
-        System.err.println(Options.getMsg("error.xmlimport.fail") + " " + e.getLocalizedMessage());
-        this.tree = null;
-        return false;
-      }
+      fileStream.close();
       return true;
     }
-    return false;
+    catch (IllegalArgumentException e) {
+      System.err.println(Options.getMsg("error.xmlimport.fail") + " " + e.getLocalizedMessage());
+      this.tree = null;
+      return false;
+    }
+    catch (IOException e) {
+      System.err.println(Options.getMsg("error.xmlimport.fail") + " " + e.getLocalizedMessage());
+      this.tree = null;
+      return false;
+    }
   }
 
+  @SuppressWarnings("unchecked")
   public void doExport(String fileName) {
     String ext = this.getExtension(fileName);
     if (tree == null || ext == null) {
@@ -111,10 +112,10 @@ public class ImportExport {
       if (ext.toLowerCase().equals("txt")) {
         AbstractTreeCanvas canvas = null;
         if (tree.isSand()) {
-          canvas = new SandTreeCanvas(new NodeTree(tree));
+          canvas = new SandTreeCanvas<Ring>(new NodeTree(tree));
         }
         else {
-          canvas = new ADTreeCanvas(new NodeTree(tree));
+          canvas = new ADTreeCanvas<Ring>(new NodeTree(tree));
         }
         try {
           if (this.viewPortSize != null) {
@@ -133,23 +134,29 @@ public class ImportExport {
           AbstractTreeCanvas canvas = null;
           if (exportDomain == 0) {
             if (tree.isSand()) {
-              canvas = new SandTreeCanvas(new NodeTree(tree));
+              canvas = new SandTreeCanvas<Ring>(new NodeTree(tree));
             }
             else {
-              canvas = new ADTreeCanvas(new NodeTree(tree));
+              canvas = new ADTreeCanvas<Ring>(new NodeTree(tree));
             }
           }
           else {
             ArrayList<ValuationDomain> domains = tree.getDomains();
             if (domains.size() < (exportDomain - 1)) {
               System.err.println(Options.getMsg("clo.nodomain"));
+              try {
+                out.close();
+              }
+              catch (IOException e) {
+                System.err.println(e.getLocalizedMessage());
+              }
               return;
             }
-            canvas = new AbstractDomainCanvas(domains.get(exportDomain - 1));
-            ((AbstractDomainCanvas) canvas).setMarkEditable(this.markEditable);
-            ((AbstractDomainCanvas) canvas).setShowLabels(!this.noLabels);
-            ((AbstractDomainCanvas) canvas).getValues().setShowAllLabels(!this.noComputedValues);
-            ((AbstractDomainCanvas) canvas).setTree(new NodeTree(this.tree));
+            canvas = new AbstractDomainCanvas<Ring>(domains.get(exportDomain - 1));
+            ((AbstractDomainCanvas<Ring>) canvas).setMarkEditable(this.markEditable);
+            ((AbstractDomainCanvas<Ring>) canvas).setShowLabels(!this.noLabels);
+            ((AbstractDomainCanvas<Ring>) canvas).getValues().setShowAllLabels(!this.noComputedValues);
+            ((AbstractDomainCanvas<Ring>) canvas).setTree(new NodeTree(this.tree));
           }
           if (this.viewPortSize != null) {
             canvas.setViewPortSize(this.viewPortSize);
@@ -165,6 +172,12 @@ public class ImportExport {
       }
       else {
         System.err.println(Options.getMsg("clo.noextError", ext));
+        try {
+          out.close();
+        }
+        catch (IOException e) {
+          System.err.println(e.getLocalizedMessage());
+        }
         return;
       }
     }
@@ -173,6 +186,8 @@ public class ImportExport {
   private void exportXml(FileOutputStream fileStream, TreeLayout layout) {
     boolean oldSaveDerived = Options.main_saveDerivedValues;
     Options.main_saveDerivedValues = exportAllDomains;
+    boolean oldSaveRanking = Options.main_saveRanking;
+    Options.main_saveRanking = this.exportRanking;
     boolean oldSaveDomain = Options.main_saveDomains;
     Options.main_saveDomains = !noDerivedValues;
     try {
@@ -183,7 +198,8 @@ public class ImportExport {
     }
 
     Options.main_saveDerivedValues = oldSaveDerived;
-    Options.main_saveDomains = !oldSaveDomain;
+    Options.main_saveRanking = oldSaveRanking;
+    Options.main_saveDomains = oldSaveDomain;
   }
 
   /**
@@ -234,6 +250,10 @@ public class ImportExport {
     this.exportDomainStr = domainId;
   }
 
+  public void setExportRanking(boolean exportRanking) {
+    this.exportRanking = exportRanking;
+  }
+
   private String getExtension(String filename) {
     if (filename == null) {
       return null;
@@ -255,6 +275,7 @@ public class ImportExport {
   private boolean    noLabels;
   private boolean    noComputedValues;
   private boolean    noDerivedValues;
+  private boolean    exportRanking;
   private TreeLayout tree;
   private Dimension  viewPortSize;
 }

@@ -1,6 +1,5 @@
 package lu.uni.adtool.ui.canvas;
 
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.ADTParser;
