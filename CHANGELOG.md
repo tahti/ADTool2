@@ -1,6 +1,7 @@
 # Change Log
 All notable changes to the ADTool will be documented in this file.
-## Unreleased
+
+## [2.0.2] - 2016-03-21
 - added copy/paste of values in Domain View
 - fixed not updating node size after checking "Computed Values" checkbox
 - added copy/paste of values in Valuations View
