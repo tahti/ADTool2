@@ -130,7 +130,7 @@ public class ImportExport {
       }
       else if (ext.toLowerCase().equals("pdf") || ext.toLowerCase().equals("png")
           || ext.toLowerCase().equals("jpg") || ext.toLowerCase().equals("jpeg")) {
-        if (exportDomain > -1) {
+        if (exportDomain > -1 && (exportDomain -1 <tree.getDomains().size())) {
           AbstractTreeCanvas canvas = null;
           if (exportDomain == 0) {
             if (tree.isSand()) {
@@ -168,6 +168,9 @@ public class ImportExport {
           else {
             canvas.createImage(out, ext.toLowerCase());
           }
+        }
+        else {
+          System.err.println(Options.getMsg("clo.nodomainError", new Integer(tree.getDomains().size()).toString()));
         }
       }
       else {

@@ -142,7 +142,7 @@ public class Clo {
     HelpFormatter formater = new HelpFormatter();
     formater.setSyntaxPrefix(Options.getMsg("clo.usage.txt") + " ");
     String header = Options.getMsg("clo.header.txt");
-    String footer = Options.getMsg("clo.footer.txt");
+    String footer = Options.getMsg("clo.footer.txt", getUsageName());
     // * formatter.printHelp("myapp", header, options, footer, true);
 
     formater.printHelp(getUsageName() + " ", header, options, footer, true);
