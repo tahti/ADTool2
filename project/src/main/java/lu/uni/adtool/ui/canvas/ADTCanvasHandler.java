@@ -1,5 +1,6 @@
 package lu.uni.adtool.ui.canvas;
 
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.GuiNode;
@@ -416,7 +417,6 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
                                                               // "").replaceAll("^
                                                               // +| +$| +\n|(
                                                               // )+","$1");
-      menuNode.setName(s);
       ((ADTreeCanvas<?>) canvas).setLabel(menuNode, s);
       ((ADTreeCanvas<?>) canvas).setFocus(menuNode);
     }

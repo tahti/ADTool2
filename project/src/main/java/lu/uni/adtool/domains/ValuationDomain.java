@@ -265,21 +265,30 @@ public class ValuationDomain implements MultipleCDockableLayout {
 
   public void rename(Node node, String name) {
     Ring value = null;
+    Ring toOverwriteValue = null;
     if (node instanceof SandNode) {
       value = valuesMap.get(true, node.getName());
+      toOverwriteValue = valuesMap.get(true, name);
       if (value == null) {
         value = getDomain().getDefaultValue(node);
       }
-      valuesMap.put(true, name, value);
+      if (toOverwriteValue == null || toOverwriteValue == getDomain().getDefaultValue(node)){
+        valuesMap.put(true, name, value);
+      }
     }
     else {
       value =
           this.valuesMap.get(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, node.getName());
+      toOverwriteValue =
+          this.valuesMap.get(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, name);
       if (value == null) {
         value = getDomain().getDefaultValue(node);
       }
-      valuesMap.put(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, name, value);
+      if (toOverwriteValue == null || toOverwriteValue == getDomain().getDefaultValue(node)){
+        valuesMap.put(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, name, value);
+      }
     }
+
   }
 
   public void refreshAllValues(ADTNode root) {

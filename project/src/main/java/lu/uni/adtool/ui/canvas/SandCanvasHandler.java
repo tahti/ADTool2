@@ -416,7 +416,6 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
                                                               // "").replaceAll("^
                                                               // +| +$| +\n|(
                                                               // )+","$1");
-      menuNode.setName(s);
       ((SandTreeCanvas<?>) canvas).setLabel(menuNode, s);
       ((SandTreeCanvas<?>) canvas).setFocus(menuNode);
     }

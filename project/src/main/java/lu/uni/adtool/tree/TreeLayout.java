@@ -164,6 +164,7 @@ public class TreeLayout implements MultipleCDockableLayout {
   public void importXml(XElement e, int treeId) throws IllegalArgumentException {
     XElement root;
     root = e.getElement("node");
+    // map from domainid to domain
     HashMap<String, ValuationDomain> domainsHash = new HashMap<String, ValuationDomain>();
     int i = 0;
     if (e.getName().equals("sandtree")) {

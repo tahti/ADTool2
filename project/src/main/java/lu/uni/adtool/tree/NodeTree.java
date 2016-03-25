@@ -80,9 +80,10 @@ public class NodeTree {
   }
 
   public void setName(Node node, String label) {
+    Debug.log("setName ****"+ node.getName() + " to "+ label);
     this.layout.rename(node, label);
-    this.layout.refreshValues();
     node.setName(label);
+    this.layout.refreshValues();
     this.sharedExtentProvider.updateNodeSize(node);
   }
 

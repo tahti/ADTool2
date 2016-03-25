@@ -71,19 +71,19 @@ public class Ranker<Type extends Ring> {
     }
   }
 
-  /**
-   * Function used when exporting ranking to XML file. Should be called after
-   * initGetRanking(Node root)
-   */
-  public final ArrayList<Ring> getRanking(final Node node) {
-    return null;
-  }
-
-  public final void finishGetRanking(final Node root) {
-  }
-
-  public void rankNode(Node node) {
-  }
+//   /**
+//    * Function used when exporting ranking to XML file. Should be called after
+//    * initGetRanking(Node root)
+//    */
+//   public final ArrayList<Ring> getRanking(final Node node) {
+//     return null;
+//   }
+// 
+//   public final void finishGetRanking(final Node root) {
+//   }
+// 
+//   public void rankNode(Node node) {
+//   }
 
   private ArrayList<RankNode<Type>> rankRecursive(final ADTNode root,
       ValueAssignement<Type> valuesMap, int maxItems) {
@@ -97,6 +97,7 @@ public class Ranker<Type extends Ring> {
       value = valuesMap.get(root.getRole() == ADTNode.Role.PROPONENT, root.getName());
       if (value == null) {
         value = atdDomain.getDefaultValue(root);
+        valuesMap.put(root.getRole() == ADTNode.Role.PROPONENT, root.getName(), value);
       }
       result.add(new RankNode<Type>(value));
     }
@@ -153,6 +154,7 @@ public class Ranker<Type extends Ring> {
       Type value = map.get(true, root.getName());
       if (value == null) {
         value = sandDomain.getDefaultValue(root);
+        map.put(true, root.getName(), value);
       }
       result.add(new RankNode<Type>(value));
     }

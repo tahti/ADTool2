@@ -27,7 +27,7 @@ public class RankExporter implements NodeRanker {
   }
 
   public void rankNode(Node node, Ring value) {
-//     Debug.log("Name:"+node.getName() + " val:"+value.toString());
+    Debug.log("Name:"+node.getName() + " val:"+value.toString());
     this.ranking.get(this.ranking.size() - 1).put(node, value);
   }
 
