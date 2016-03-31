@@ -79,41 +79,6 @@ public class ProbSucc implements AdtDomain<RealZeroOne> {
     return DescriptionGenerator.generateDescription(this, name, vd, operators);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see AdtDomain#op(RealZeroOne,RealZeroOne)
-   */
-  public final RealZeroOne op(final RealZeroOne a, final RealZeroOne b) {
-    return RealZeroOne.plusProb(a, b);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see AdtDomain#ap(RealZeroOne,RealZeroOne)
-   */
-  public final RealZeroOne ap(final RealZeroOne a, final RealZeroOne b) {
-    return RealZeroOne.times(a, b);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see AdtDomain#oo(RealZeroOne,RealZeroOne)
-   */
-  public final RealZeroOne oo(final RealZeroOne a, final RealZeroOne b) {
-    return RealZeroOne.plusProb(a, b);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see AdtDomain#ao(RealZeroOne,RealZeroOne)
-   */
-  public final RealZeroOne ao(final RealZeroOne a, final RealZeroOne b) {
-    return RealZeroOne.times(a, b);
-  }
 
   /**
    * {@inheritDoc}

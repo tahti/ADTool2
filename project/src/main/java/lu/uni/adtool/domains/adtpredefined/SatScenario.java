@@ -86,42 +86,6 @@ public class SatScenario implements AdtDomain<Bool> {
   /**
    * {@inheritDoc}
    *
-   * @see AdtDomain#op(Bool,Bool)
-   */
-  public final Bool op(final Bool a, final Bool b) {
-    return Bool.or(a, b);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see AdtDomain#ap(Bool,Bool)
-   */
-  public final Bool ap(final Bool a, final Bool b) {
-    return Bool.and(a, b);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see AdtDomain#oo(Bool,Bool)
-   */
-  public final Bool oo(final Bool a, final Bool b) {
-    return Bool.or(a, b);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see AdtDomain#ao(Bool,Bool)
-   */
-  public final Bool ao(final Bool a, final Bool b) {
-    return Bool.and(a, b);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see AdtDomain#cp(Bool,Bool)
    */
   public final Bool cp(final Bool a, final Bool b) {
