@@ -298,7 +298,17 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     if (this.values.hasEvaluator()) {
       if (this.isSand()) {
         value = this.values.getTermValue((SandNode) n);
-        result += value.toUnicode();
+        if (value instanceof RealG0 || value instanceof RealZeroOne) {
+          try {
+            result += Options.canv_precision.format(Double.parseDouble(value.toUnicode()));
+          }
+          catch(NumberFormatException e) {
+            result += value.toUnicode();
+          }
+        }
+        else {
+          result += value.toUnicode();
+        }
       }
       else {
         if (((ADTNode)n).hasDefault() && ((ADTNode)n).isCountered()) {

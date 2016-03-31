@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -36,7 +37,7 @@ public final class Options {
   /**
    * Debugging messages
    */
-  public static boolean      debug_enable              = true;
+  public static boolean      debug_enable              = false;
   /**
    * Indentation level when printing Terms.
    */
@@ -86,6 +87,7 @@ public final class Options {
   public static Color        canv_rankRootMark         = new Color(150, 150, 0);
   public static Color        canv_rankNodeMark         = new Color(50, 170, 50);
   public static Color        canv_rankLeafMark         = new Color(150, 255, 150);
+  public static DecimalFormat canv_precision           = new DecimalFormat("#.###");
   // public static ADTNode.Role canv_Defender = ADTNode.Role.OPPONENT; // moved
   // to treeLayout
   /**

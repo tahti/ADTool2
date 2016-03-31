@@ -1,9 +1,10 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
-## Unreleased
+## [2.0.3] - 2016-03-31 ##
   - added command line examples
   - fixed regression bug when exporting ranking from command line
   - renaming node now perserves the node value in domains
+  - added rounding of real numbers to three digits in display
 ## [2.0.2] - 2016-03-21 ##
   - added copy/paste of values in Domain View
   - fixed not updating node size after checking "Computed Values" checkbox
