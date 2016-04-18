@@ -1,5 +1,7 @@
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.adtree.ADTreeNode;
+import lu.uni.adtool.adtree.ADTreeNode.RefinementType;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.RankExporter;
 import lu.uni.adtool.domains.ValuationDomain;
@@ -29,6 +31,26 @@ public class ADTNode extends GuiNode {
   public ADTNode() {
     super();
     type = Type.AND_PRO;
+  }
+
+  public ADTNode(ADTreeNode node) {
+    super(node.getLabel());
+    if (node.getType() == ADTreeNode.Type.OPPONENT) {
+      if (node.getRefinmentType() == ADTreeNode.RefinementType.DISJUNCTIVE) {
+        type = Type.OR_OPP;
+      }
+      else {
+        type = Type.AND_OPP;
+      }
+    }
+    else {
+      if (node.getRefinmentType() == ADTreeNode.RefinementType.DISJUNCTIVE) {
+        type = Type.OR_PRO;
+      }
+      else {
+        type = Type.AND_PRO;
+      }
+    }
   }
 
   public ADTNode(Type type) {
@@ -90,6 +112,10 @@ public class ADTNode extends GuiNode {
    */
   public void fromXml(XElement e) throws IOException {
     setName(e.getElement("label").getString());
+    XElement commentXml = e.getElement("comment");
+    if (commentXml != null) {
+      setComment(commentXml.getString());
+    }
     this.type = stringToType(e.getString("refinement"));
     int i = 0;
     XElement elements[] = e.getElements("node");
@@ -115,6 +141,9 @@ public class ADTNode extends GuiNode {
       result.addString("switchRole", "yes");
     }
     result.addElement("label").setString(getName());
+    if (getComment()!= null && (!getComment().equals(""))) {
+      result.addElement("comment").setString(getComment());
+    }
     if (domains != null && Options.main_saveDomains) {
       for (int i = 0; i < domains.size(); i++) {
         ValuationDomain vd = domains.get(i);
@@ -178,6 +207,9 @@ public class ADTNode extends GuiNode {
     typeAttribute.setString(typeToString(type));
     result.addAttribute(typeAttribute);
     result.addElement("label").setString(getName());
+    if (getComment()!= null && (!getComment().equals(""))) {
+      result.addElement("comment").setString(getComment());
+    }
     if (this.getChildren() != null) {
       for (Node node : this.getNotNullChildren()) {
         result.addElement(((ADTNode) node).toXml());
@@ -242,6 +274,7 @@ public class ADTNode extends GuiNode {
   public SandNode sandCopy() {
     SandNode result = new SandNode();
     result.setName(getName());
+    result.setComment(getComment());
     if (type == Type.OR_PRO ||type == Type.OR_OPP) {
       result.setType(SandNode.Type.OR);
     }
@@ -261,6 +294,7 @@ public class ADTNode extends GuiNode {
   public ADTNode deepCopy() {
     ADTNode result = new ADTNode();
     result.setName(getName());
+    result.setComment(getComment());
     result.setType(getType());
     result.setLeftSibling(null);
     result.setRightSibling(null);
@@ -372,6 +406,10 @@ public class ADTNode extends GuiNode {
   public void importXml(XElement e, HashMap<String, ValuationDomain> domains)
       throws IllegalArgumentException {
     setName(e.getElement("label").getString());
+    XElement commentXml = e.getElement("comment");
+    if (commentXml != null) {
+      setComment(commentXml.getString());
+    }
     boolean switchRole;
     try {
       switchRole = (e.getString("switchRole").toLowerCase().equals("yes")

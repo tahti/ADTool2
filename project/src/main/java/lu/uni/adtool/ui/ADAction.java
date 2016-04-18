@@ -43,6 +43,10 @@ public abstract class ADAction extends AbstractAction {
     putValue(SMALL_ICON, icon);
   }
 
+  public final void setName(final String name) {
+    putValue(NAME, name);
+  }
+
   /**
    * Sets tooltip for the action.
    *

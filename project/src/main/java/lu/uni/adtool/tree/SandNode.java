@@ -35,10 +35,12 @@ public class SandNode extends GuiNode {
 
   public static SandNode readStream(DataInputStream in) throws IOException {
     String name = in.readUTF();
+    String comment = in.readUTF();
     Type type = Type.values()[in.readInt()];
     SandNode result = new SandNode(type);
     result.setParent(null);
     result.setName(name);
+    result.setComment(comment);
     int noChildren = in.readInt();
     for (int i = 0; i < noChildren; i++) {
       SandNode child = readStream(in);
@@ -49,6 +51,7 @@ public class SandNode extends GuiNode {
 
   public void writeStream(DataOutputStream out) throws IOException {
     out.writeUTF(this.getName());
+    out.writeUTF(this.getComment());
     out.writeInt(this.type.ordinal());
     if (getChildren() == null || getChildren().size() == 0) {
       out.writeInt(0);
@@ -67,6 +70,10 @@ public class SandNode extends GuiNode {
 
   public void fromXml(XElement e) {
     setName(e.getElement("label").getString());
+    XElement commentXml = e.getElement("comment");
+    if (commentXml != null) {
+      setComment(commentXml.getString());
+    }
     this.type = stringToType(e.getString("refinement"));
     for (XElement child : e.getElements("node")) {
       SandNode ch = new SandNode();
@@ -83,6 +90,9 @@ public class SandNode extends GuiNode {
     XElement result = new XElement("node");
     result.addString("refinement", typeToXml(type));
     result.addElement("label").setString(getName());
+    if (getComment()!= null && (!getComment().equals(""))) {
+      result.addElement("comment").setString(getComment());
+    }
     if (domains != null && Options.main_saveDomains) {
       for (int i = 0; i < domains.size(); i++) {
         ValuationDomain vd = domains.get(i);
@@ -132,6 +142,9 @@ public class SandNode extends GuiNode {
     typeAttribute.setString(typeToString(type));
     result.addAttribute(typeAttribute);
     result.addElement("label").setString(getName());
+    if (getComment()!= null && (!getComment().equals(""))) {
+      result.addElement("comment").setString(getComment());
+    }
     if (this.getChildren() != null) {
       for (Node node : this.getNotNullChildren()) {
         result.addElement(((SandNode) node).toXml());
@@ -217,6 +230,10 @@ public class SandNode extends GuiNode {
   public void importXml(XElement e, HashMap<String, ValuationDomain> domains)
       throws IllegalArgumentException {
     setName(e.getElement("label").getString());
+    XElement commentXml = e.getElement("comment");
+    if (commentXml != null) {
+      setComment(commentXml.getString());
+    }
     this.type = xmlToType(e.getString("refinement"));
     for (XElement parameter: e.getElements("parameter")) {
       String category = parameter.getString("category");
@@ -242,6 +259,7 @@ public class SandNode extends GuiNode {
   public ADTNode adtCopy() {
     ADTNode result = new ADTNode();
     result.setName(getName());
+    result.setComment(getComment());
     if (type == Type.OR) {
       result.setType(ADTNode.Type.OR_PRO);
     }
@@ -261,6 +279,7 @@ public class SandNode extends GuiNode {
   public SandNode deepCopy() {
     SandNode result = new SandNode();
     result.setName(getName());
+    result.setComment(getComment());
     result.setType(getType());
     result.setLeftSibling(null);
     result.setRightSibling(null);

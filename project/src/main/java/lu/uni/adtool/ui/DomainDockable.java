@@ -27,7 +27,7 @@ import bibliothek.gui.dock.common.event.CVetoClosingListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 
 public class DomainDockable extends DefaultMultipleCDockable
-    implements CVetoClosingListener, ItemListener {
+    implements ItemListener {
   public static final String DOMAIN_ID = "_domain";
 
   public DomainDockable(DomainFactory factory, ValuationDomain values) {
@@ -42,7 +42,6 @@ public class DomainDockable extends DefaultMultipleCDockable
     else {
       this.setTitleText("Null Domain");
     }
-    addVetoClosingListener(this);
     initLayout();
   }
 
@@ -50,23 +49,6 @@ public class DomainDockable extends DefaultMultipleCDockable
     return this.canvas.getValues();
   }
 
-  /**
-   * Called before a set of {@link CDockable}s gets closed. This method may be
-   * invoked with events that are already canceled, check the
-   * {@link CVetoClosingEvent#isCanceled()} property.
-   *
-   * @param event
-   *          the event that will happen but may be canceled
-   */
-  public void closing(CVetoClosingEvent event) {
-    if (event.isCancelable()) {
-      int result = OptionPane.showYNDialog(this.canvas.getController().getFrame(),
-          Options.getMsg("domainclosedialog.txt"), Options.getMsg("domainclosedialog.title"));
-      if (result != JOptionPane.YES_OPTION) {
-        event.cancel();
-      }
-    }
-  }
 
   /**
    * Called after a set of {@link CDockable}s has been closed. This method may

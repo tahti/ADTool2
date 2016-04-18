@@ -166,7 +166,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     if (node != null) {
       final Node parent = canvas.getParentNode(node);
       boolean canAddSibling;
-      if (parent == null) {
+      if (parent == null || ((ADTNode)parent).getType() != ((ADTNode) node).getType()) {
         canAddSibling = false;
       }
       else {
@@ -190,12 +190,13 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
         toggleAboveFold.setText(Options.getMsg("handler.foldabove.txt"));
         canFoldAbove = (node.getParent() != null);
       }
-      switchLeft.setVisible(
-          ((GuiNode) node).getLeftSibling() != null && ((GuiNode) node).getLeftSibling() != node &&
-          ((ADTNode)((GuiNode) node).getLeftSibling()).getRole() ==  ((ADTNode) node).getRole());
+      switchLeft.setVisible(((GuiNode) node).getLeftSibling() != null
+          && ((GuiNode) node).getLeftSibling() != node
+          && ((ADTNode) ((GuiNode) node).getLeftSibling()).getRole() == ((ADTNode) node).getRole());
       switchRight.setVisible(
-          ((GuiNode) node).getRightSibling() != null && ((GuiNode) node).getRightSibling() != node &&
-          ((ADTNode)((GuiNode) node).getRightSibling()).getRole() ==  ((ADTNode) node).getRole());
+          ((GuiNode) node).getRightSibling() != null && ((GuiNode) node).getRightSibling() != node
+              && ((ADTNode) ((GuiNode) node).getRightSibling()).getRole() == ((ADTNode) node)
+                  .getRole());
       toggleAboveFold.setVisible(canFoldAbove);
       toggleFold.setVisible(canFold);
       addCounter.setVisible(!((ADTNode) node).isCountered());
@@ -273,7 +274,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     addCounter.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent evt) {
         if (menuNode != null) {
-          ((ADTreeCanvas<?>)canvas).addCounter(menuNode);
+          ((ADTreeCanvas<?>) canvas).addCounter(menuNode);
         }
       }
     });
@@ -398,7 +399,8 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
     if (menuNode != null) {
       String s =
           (String) MultiLineInput.showInputDialog(Options.getMsg("handler.dialog.newlabel.txt"),
-              Options.getMsg("handler.dialog.newlabel.title"), menuNode.getName());
+              Options.getMsg("handler.dialog.newlabel.title"), menuNode.getName(),
+              menuNode.getComment());
       if (s == null) {
         return;
       }
@@ -407,7 +409,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
         s = (String) MultiLineInput.showInputDialog(
             "<html><body><font color=\"red\">" + Options.getMsg("handler.dialog.newlabel.invalid")
                 + ".</font> " + Options.getMsg("handler.dialog.newlabel.txt") + "</body></html>",
-            Options.getMsg("handler.dialog.newlabel.title"), s.trim());
+            Options.getMsg("handler.dialog.newlabel.title"), s.trim(), MultiLineInput.getComment());
         if (s == null) {
           return;
         }
@@ -417,7 +419,7 @@ public class ADTCanvasHandler extends AbstractCanvasHandler {
                                                               // "").replaceAll("^
                                                               // +| +$| +\n|(
                                                               // )+","$1");
-      ((ADTreeCanvas<?>) canvas).setLabel(menuNode, s);
+      ((ADTreeCanvas<?>) canvas).setLabel(menuNode, s, MultiLineInput.getComment());
       ((ADTreeCanvas<?>) canvas).setFocus(menuNode);
     }
   }

@@ -1,6 +1,13 @@
 package lu.uni.adtool.ui.canvas;
 
 import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tools.undo.AddChild;
+import lu.uni.adtool.tools.undo.AddCounter;
+import lu.uni.adtool.tools.undo.AddSibling;
+import lu.uni.adtool.tools.undo.SetLabel;
+import lu.uni.adtool.tools.undo.SwitchAttacker;
+import lu.uni.adtool.tools.undo.SwitchSibling;
+import lu.uni.adtool.tools.undo.ToggleOpAction;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.ADTParser;
 import lu.uni.adtool.tree.GuiNode;
@@ -70,6 +77,7 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
    * @param node
    */
   public void addChild(Node node) {
+    addEditAction(new AddChild(node));
     Node child = new ADTNode(((ADTNode) node).getType());
     child.setName(this.getNewLabel());
     tree.addChild(node, child);
@@ -81,6 +89,7 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     if (((ADTNode) node).isCountered()) {
       return;
     }
+    addEditAction(new AddCounter(node));
     Node child = new ADTNode(((ADTNode) node).getType());
     ((ADTNode) child).toggleRole();
     child.setName(this.getNewLabel());
@@ -101,7 +110,8 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
    *          if true we add sibling to the left.
    */
   public void addSibling(Node node, boolean onLeft) {
-    if (node.getParent() != null) {
+    addEditAction(new AddSibling(node, onLeft));
+    if (node.getParent() != null && ((ADTNode)node.getParent()).getType() == ((ADTNode) node).getType()) {
       ADTNode sibling = new ADTNode(((ADTNode) node).getType());
       sibling.setName(this.getNewLabel());
       tree.addSibling(node, sibling, onLeft);
@@ -138,8 +148,13 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
    * @param label
    *          new label for the node.
    */
-  public void setLabel(Node node, String label) {
+  public void setLabel(Node node, String label, String comment) {
+    if (node.getName().equals(label) && node.getComment().equals(comment)) {
+      return;
+    }
+    addEditAction(new SetLabel(node, node.getName(), node.getComment(), label, comment));
     tree.setName(node, label);
+    node.setComment(comment);
     this.notifyAllTreeChanged();
     if (node.hasDefault()) {
       this.terms.updateTerms();
@@ -165,50 +180,16 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
   }
 
   public void toggleOp(Node node) {
+    addEditAction(new ToggleOpAction(node));
     ((ADTNode) node).toggleOp();
     tree.getLayout().recalculateValues();
     this.repaintAll();
     this.terms.updateTerms();
   }
 
-  /**
-   * Removes the subtree with node as root.
-   *
-   * @param node
-   *          root of a subtree.
-   */
-  public void removeTree(Node node) {
-    if (!node.equals(tree.getRoot(true))) {
-      if (lastFocused.equals(node)) {
-        lastFocused = ((GuiNode) node).getParent(true);
-        if (lastFocused == null) {
-          lastFocused = (GuiNode) tree.getRoot(true);
-        }
-      }
-      if (focused != null) {
-        if (focused.equals(node)) {
-          setFocus(((GuiNode) node).getParent(true));
-        }
-      }
-      tree.removeTree(node);
-      this.notifyAllTreeChanged();
-      this.terms.updateTerms();
-    }
-  }
-
-  /**
-   * Removes all children of a node
-   *
-   * @param node
-   *          node for which we remove children.
-   */
-  public void removeChildren(Node node) {
-    tree.removeAllChildren(node);
-    this.notifyAllTreeChanged();
-    this.terms.updateTerms();
-  }
 
   public void switchSibling(Node node, boolean onLeft) {
+    addEditAction(new SwitchSibling(node, onLeft));
     if (node.getParent() != null) {
       GuiNode newPos = null;
       if (onLeft) {
@@ -243,6 +224,12 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     return (ADTNode) tree.getRoot(true);
   }
 
+  public void switchAttacker() {
+    addEditAction(new SwitchAttacker());
+    tree.getLayout().toggleRole();
+    notifyAllTreeChanged();
+  }
+
   public void setScrollPane(JScrollPane pane) {
     this.scrollPane = pane;
     this.scrollPane.addMouseWheelListener(listener);
@@ -255,14 +242,7 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     return Options.canv_FillColorAtt;
   }
 
-  protected String getNewLabel() {
-    labelCounter = labelCounter + 1;
-    return LABEL_PREFIX + labelCounter;
-  }
 
   protected ADTCanvasHandler  listener;
-  private int                 labelCounter;
-  private TermView            terms;
   private static final long   serialVersionUID = 6626362203605041529L;
-  private static final String LABEL_PREFIX     = "N_";
 }

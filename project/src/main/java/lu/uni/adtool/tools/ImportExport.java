@@ -22,7 +22,9 @@ import java.util.ArrayList;
 
 import bibliothek.util.xml.XElement;
 import bibliothek.util.xml.XIO;
-
+/**
+ * Class used by command line importing/exporting
+ */
 public class ImportExport {
   public ImportExport() {
     exportAllDomains = false;
@@ -89,6 +91,7 @@ public class ImportExport {
       return false;
     }
   }
+
 
   @SuppressWarnings("unchecked")
   public void doExport(String fileName) {

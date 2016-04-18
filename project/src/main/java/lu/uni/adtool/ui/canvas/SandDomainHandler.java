@@ -63,7 +63,7 @@ public class SandDomainHandler<Type extends Ring> extends AbstractCanvasHandler 
     boolean consume = true;
     final GuiNode node = canvas.getFocused();
     if (node == null) {
-      return;
+      consume = false;
     }
     else {
       menuNode = node;
@@ -71,7 +71,7 @@ public class SandDomainHandler<Type extends Ring> extends AbstractCanvasHandler 
     if (e.isControlDown()) {
       consume = false;
     }
-    else {
+    else if (consume) {
       if (e.isShiftDown()) {
 
         switch (e.getKeyCode()) {
@@ -93,18 +93,6 @@ public class SandDomainHandler<Type extends Ring> extends AbstractCanvasHandler 
             menuNode = node;
             changeValueActionPerformed();
           }
-          break;
-        case KeyEvent.VK_PLUS:
-        case KeyEvent.VK_ADD:
-        case KeyEvent.VK_EQUALS:
-          canvas.zoomIn();
-          break;
-        case KeyEvent.VK_MINUS:
-        case KeyEvent.VK_SUBTRACT:
-          canvas.zoomOut();
-          break;
-        case KeyEvent.VK_O:
-          canvas.resetZoom();
           break;
         case KeyEvent.VK_SPACE:
           if (node != null) {

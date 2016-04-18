@@ -106,11 +106,6 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
     return getUniqueId(id) + "_workArea";
   }
 
-  public void removeDomain(DomainDockable dockable) {
-    this.getLayout().removeValuation(dockable.getCanvas().getValues());
-    this.controller.getFrame().getDomainFactory().removeDomain(dockable);
-  }
-
   /**
    * Called before a set of {@link CDockable}s gets closed. This method may be
    * invoked with events that are already canceled, check the
@@ -149,25 +144,6 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
 //     this.toFront();
     dockable.setLocation(this.workArea.getDropLocation());
     dockable.setVisible(true);
-  }
-
-  public void addDomain(SandDomain<Ring> domain) {
-    DomainFactory factory = controller.getFrame().getDomainFactory();
-    DomainDockable d = factory.read(new ValuationDomain(this.treeCanvas.getId(),
-        factory.getNewUniqueId(new Integer(this.treeCanvas.getId())), domain));
-    Debug.log("Adding domain to control with id:" + d.getUniqueId());
-    controller.getControl().addDockable(d.getUniqueId(), d);
-    this.showDomain(d);
-  }
-
-  public void addDomain(AdtDomain<?> domain) {
-    DomainFactory factory = controller.getFrame().getDomainFactory();
-    @SuppressWarnings("unchecked")
-    DomainDockable d = factory.read(new ValuationDomain(this.treeCanvas.getId(),
-                                                        factory.getNewUniqueId(new Integer(this.treeCanvas.getId())), (AdtDomain<Ring>)domain));
-    Debug.log("Adding domain to control with id:" + d.getUniqueId());
-    controller.getControl().addDockable(d.getUniqueId(), d);
-    this.showDomain(d);
   }
 
   private DefaultSingleCDockable createTreeCanvas(TreeLayout layout) {

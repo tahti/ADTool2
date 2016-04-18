@@ -4,7 +4,7 @@
   
   <groupId>lu.uni.adtool</groupId>
   <artifactId>ADTool</artifactId>
-  <version>2.0.3</version>
+  <version>2.1.0</version>
   
   <packaging>jar</packaging>
   
@@ -163,7 +163,7 @@
             <manifest>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-              <mainClass>lu.uni.adtool.Main</mainClass>
+              <mainClass>lu.uni.adtool.ADToolMain</mainClass>
             </manifest>
             <!-- will put the entries into META-INF/MANIFEST.MF file -->
             <manifestEntries>

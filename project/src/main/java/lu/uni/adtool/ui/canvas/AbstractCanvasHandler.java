@@ -1,6 +1,8 @@
 package lu.uni.adtool.ui.canvas;
 
+import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
+import lu.uni.adtool.ui.InfoBalloon;
 
 import java.awt.Cursor;
 import java.awt.Point;
@@ -15,6 +17,10 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BoundedRangeModel;
 import javax.swing.JPopupMenu;
@@ -37,7 +43,7 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
   public AbstractCanvasHandler(final AbstractTreeCanvas canvas) {
     this.canvas = canvas;
     this.dragStart = null;
-    this.dragScroll = false;
+    // this.dragScroll = false;
   }
 
   /**
@@ -109,7 +115,7 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
    */
   public void keyPressed(KeyEvent e) {
     final Node node = this.canvas.getFocused();
-    if (e.isControlDown() && node != null) {
+    if (e.isControlDown()) {
       switch (e.getKeyCode()) {
       case KeyEvent.VK_T:
         // expand node
@@ -171,14 +177,15 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
    */
   public void mousePressed(MouseEvent e) {
     dragStart = new Point(e.getX(), e.getY());
-    if (this.canvas.getNode(e.getX(), e.getY()) != null) {
-      this.canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-      dragScroll = false;
-    }
-    else {
-      this.canvas.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
-      dragScroll = true;
-    }
+    this.canvas.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+    // if (this.canvas.getNode(e.getX(), e.getY()) != null) {
+    // this.canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    // dragScroll = false;
+    // }
+    // else {
+    // this.canvas.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+    // dragScroll = true;
+    // }
   }
 
   /**
@@ -188,18 +195,19 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
    */
   public void mouseDragged(MouseEvent e) {
     if (dragStart != null) {
-      if (dragScroll) {
-        Point p = this.canvas.scrollTo(e.getX() - dragStart.getX(), (e.getY() - dragStart.getY()));
-        dragStart = new Point(e.getX(), e.getY());
-        ((Point) dragStart).translate((int) -p.getX(), (int) -p.getY());
-      }
-      else {
-        Point2D p = new Point(e.getX(), e.getY());
-        p = this.canvas.transform(p);
-        Point2D p2 = this.canvas.transform(dragStart);
-        this.canvas.moveTree(p.getX() - p2.getX(), p.getY() - p2.getY());
-        dragStart = new Point(e.getX(), e.getY());
-      }
+      // if (dragScroll) {
+      // Point p = this.canvas.scrollTo(e.getX() - dragStart.getX(), (e.getY() -
+      // dragStart.getY()));
+      // dragStart = new Point(e.getX(), e.getY());
+      // ((Point) dragStart).translate((int) -p.getX(), (int) -p.getY());
+      // }
+      // else {
+      Point2D p = new Point(e.getX(), e.getY());
+      p = this.canvas.transform(p);
+      Point2D p2 = this.canvas.transform(dragStart);
+      this.canvas.moveTree(p.getX() - p2.getX(), p.getY() - p2.getY());
+      dragStart = new Point(e.getX(), e.getY());
+      // }
     }
   }
 
@@ -210,7 +218,7 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
    */
   public void mouseReleased(final MouseEvent e) {
     dragStart = null;
-    dragScroll = true;
+    // dragScroll = true;
     this.canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     this.canvas.repaint();
   }
@@ -248,6 +256,27 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
    * @see MouseListener#mouseEntered(MouseEvent)
    */
   public void mouseEntered(final MouseEvent e) {
+    final Runnable tooltipShower = new Runnable() {
+      public void run() {
+        Node node = canvas.getNode(mouseX, mouseY);
+        if (node != null && node.getComment().equals("") ){
+          node = null;
+        }
+        if (node != null )  {
+          if (balloon.isVisible()) {
+            balloon.setText(node.getComment());
+          }
+          else {
+            balloon.showBalloon(canvas.getController().getFrame(), node.getComment());
+          }
+        }
+        else if (node == null) {
+          balloon.hideBalloon();
+        }
+      }
+    };
+    balloonHandler = scheduler.scheduleAtFixedRate(tooltipShower, Options.canv_tooltipTime,
+        Options.canv_tooltipTime, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -256,6 +285,10 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
    * @see MouseListener#mouseExited(MouseEvent)
    */
   public void mouseExited(final MouseEvent e) {
+    if (balloon.isVisible()) {
+      balloon.hideBalloon();
+    }
+    balloonHandler.cancel(true);
   }
 
   /**
@@ -264,6 +297,8 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
    * @see java.awt.event.MouseMotionListener#mouseMoved(MouseEvent)
    */
   public void mouseMoved(final MouseEvent e) {
+    mouseX = e.getX();
+    mouseY = e.getY();
   }
 
   public void componentHidden(ComponentEvent e) {
@@ -279,11 +314,19 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
   public void componentShown(ComponentEvent e) {
   }
 
-  protected AbstractTreeCanvas canvas;
+  protected AbstractTreeCanvas           canvas;
 
-  protected Node               menuNode;
-  protected JPopupMenu         pmenu;
-  private Point2D              dragStart;
-  private boolean              dragScroll;
+  protected Node                         menuNode;
+  protected JPopupMenu                   pmenu;
+  private Point2D                        dragStart;
+//   protected Node                         hoverNode   = null;
+//   public boolean                      windowShown = false;
+  protected InfoBalloon                  balloon     = new InfoBalloon();
+  private final ScheduledExecutorService scheduler   = Executors.newScheduledThreadPool(1);
+  protected Future<?>                    balloonHandler;
+  protected double                       mouseX, mouseY;
+  
+  protected boolean                      ping;
+  // private boolean dragScroll;
 
 }

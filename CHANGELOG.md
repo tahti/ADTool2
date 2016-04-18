@@ -1,5 +1,10 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
+## Unreleased
+  - changed behaviour of drag to be independend of whether tree or background is dragged
+  - added zoom in, zoom out to view menu
+  - added comments field to nodes
+  - fixed issue that it was possibile to add sibling to counter node
 ## [2.0.3] - 2016-03-31 ##
   - added command line examples
   - fixed regression bug when exporting ranking from command line

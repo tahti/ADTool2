@@ -1,5 +1,6 @@
 package lu.uni.adtool.ui.canvas;
 
+import lu.uni.adtool.adtree.ADTreeNode;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.NodeRanker;
@@ -14,6 +15,7 @@ import lu.uni.adtool.domains.rings.RealZeroOne;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tools.undo.SetValuation;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.DomainFactory;
 import lu.uni.adtool.tree.Node;
@@ -37,7 +39,8 @@ import javax.swing.JScrollPane;
 
 import org.abego.treelayout.util.DefaultConfiguration;
 
-public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas implements NodeRanker {
+public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
+    implements NodeRanker {
 
   public AbstractDomainCanvas(MainController mc, ValuationDomain values) {
     super(null, mc);
@@ -56,6 +59,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     this.values = values;
     this.marked = new HashMap<Node, Color>();
     this.markEditable = true;
+    this.history = null;
   }
 
   /**
@@ -70,7 +74,8 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     this.marked = new HashMap<Node, Color>();
     this.markEditable = false;
   }
-@SuppressWarnings("unchecked")
+
+  @SuppressWarnings("unchecked")
   public Domain<Type> getDomain() {
     return (Domain<Type>) this.values.getDomain();
   }
@@ -149,6 +154,8 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
         }
         if (value != null) {
           String key = node.getName();
+          getTreeCanvas().addEditAction(
+              new SetValuation(value, this.values.getValue(node), key, true, getDomainId()));
           this.values.setValue(true, key, value);
           this.valuesUpdated();
         }
@@ -192,10 +199,33 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
         }
         if (value != null) {
           String key = node.getName();
+          getTreeCanvas().addEditAction(new SetValuation(value, this.values.getValue(node), key,
+              node.getRole() == ADTNode.Role.PROPONENT, getDomainId()));
           this.values.setValue(node.getRole() == ADTNode.Role.PROPONENT, key, value);
           this.valuesUpdated();
         }
       }
+    }
+  }
+
+  public void undo() {
+    AbstractTreeCanvas canvas = this.getTreeCanvas();
+    if (canvas != null) {
+      canvas.undo();
+    }
+  }
+
+  public void redo() {
+    AbstractTreeCanvas canvas = this.getTreeCanvas();
+    if (canvas != null) {
+      canvas.redo();
+    }
+  }
+
+  public void updateUndoRedoItems() {
+    AbstractTreeCanvas canvas = this.getTreeCanvas();
+    if (canvas != null) {
+      canvas.updateUndoRedoItems();
     }
   }
 
@@ -302,7 +332,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
           try {
             result += Options.canv_precision.format(Double.parseDouble(value.toUnicode()));
           }
-          catch(NumberFormatException e) {
+          catch (NumberFormatException e) {
             result += value.toUnicode();
           }
         }
@@ -311,17 +341,17 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
         }
       }
       else {
-        if (((ADTNode)n).hasDefault() && ((ADTNode)n).isCountered()) {
+        if (((ADTNode) n).hasDefault() && ((ADTNode) n).isCountered()) {
           if (values.isShowAllLabels()) {
             value = this.values.getTermValue((ADTNode) n);
-            result +=  value.toUnicode() + "\n" ;
+            result += value.toUnicode() + "\n";
           }
-          value = values.getValue((ADTNode)n);
-          result +=  value.toUnicode();
+          value = values.getValue((ADTNode) n);
+          result += value.toUnicode();
         }
         else {
           value = this.values.getTermValue((ADTNode) n);
-          result +=  value.toUnicode();
+          result += value.toUnicode();
         }
       }
     }
@@ -453,10 +483,19 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
     }
   }
 
+  private AbstractTreeCanvas getTreeCanvas() {
+    TreeDockable currentTree = (TreeDockable) getController().getControl()
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(getId()));
+    if (currentTree != null) {
+      return currentTree.getCanvas();
+    }
+    return null;
+  }
+
   protected AbstractCanvasHandler listener;
   protected ValuationDomain       values;
   private HashMap<Node, Color>    marked;
   private boolean                 markEditable;
   private boolean                 showLabels;
-  private static final long serialVersionUID = -2360795431357785877L;
+  private static final long       serialVersionUID = -2360795431357785877L;
 }

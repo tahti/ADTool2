@@ -7,10 +7,14 @@ public abstract class Node implements Serializable{
 
   public Node() {
     this.name = "root";
+    this.parent = null;
+    this.comment = "";
   }
 
   public Node(String name) {
+    this.parent = null;
     this.name = name;
+    this.comment = "";
   }
 
   public abstract String toString();
@@ -21,6 +25,14 @@ public abstract class Node implements Serializable{
 
   public String getName() {
     return this.name;
+  }
+
+  public String getComment() {
+    return this.comment;
+  }
+
+  public void setComment(String comment) {
+    this.comment = comment;
   }
 
   public final void setParent(final Node p) {
@@ -48,6 +60,31 @@ public abstract class Node implements Serializable{
 
   public ArrayList<Node> getChildren() {
     return this.children;
+  }
+
+  public ArrayList<Integer> toPath() {
+    if (parent == null ) {
+      return new ArrayList<Integer>();
+    }
+    else {
+      ArrayList<Integer> result = parent.toPath();
+      final int index = parent.getChildren().indexOf(this);
+      result.add(new Integer(index));
+      return result;
+    }
+  }
+
+  public Node fromPath(ArrayList<Integer> path, int index) {
+    if (path.size() == 0) {
+      return this;
+    }
+    if (path.size() == index + 1) {
+      return children.get(path.get(index));
+    }
+    else {
+      Node child = children.get(path.get(index));
+      return child.fromPath(path, index + 1);
+    }
   }
 
   public ArrayList<Node> getNotNullChildren() {
@@ -110,27 +147,18 @@ public abstract class Node implements Serializable{
    *          number of children to be transfered.
    */
 
-  public final void addChildAt(Node child, final int indexAt, final int noChildren) {
+  public final void addChildAt(Node child, final int indexAt) {
     // final Node child = new Node();
     // child.setType(type);
     // child.setName(name);
-    ArrayList<Node> newChildren = null;
-    if (noChildren > 0) {
-      newChildren = new ArrayList<Node>(children.subList(indexAt, indexAt + noChildren));
-      this.children.removeAll(newChildren);
-      for (Node n : newChildren) {
-        if (n != null) {
-          n.setParent(child);
-        }
-      }
-    }
     this.children.add(indexAt, child);
     child.setParent(this);
-    child.setChildren(newChildren);
+//     child.setChildren(newChildren);
   }
 
   protected ArrayList<Node> children;
   private String            name;
+  private String            comment;
   private Node              parent;
   private static final long serialVersionUID = -983678473499189388L;
 }

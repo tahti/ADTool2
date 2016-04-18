@@ -1,5 +1,6 @@
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.adtree.ADTreeNode;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Parametrized;
 import lu.uni.adtool.domains.SandDomain;
@@ -10,8 +11,11 @@ import lu.uni.adtool.tools.Options;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Map;
 
 import bibliothek.gui.dock.common.MultipleCDockableLayout;
 import bibliothek.util.xml.XElement;
@@ -161,6 +165,34 @@ public class TreeLayout implements MultipleCDockableLayout {
     }
   }
 
+  public void importAdt(ADTreeNode root, Map<ADTreeNode, ArrayList<ADTreeNode>> childrenMap,
+                   Map<ADTreeNode, ADTreeNode> parents) {
+    ADTNode current = new ADTNode(root);
+//     if ( current.getRole() = ADTNode.Role.OPPONENT) {
+//       this.switchRole = true;
+//     }
+//     else {
+//       this.switchRole = false;
+//     }
+    ADTreeNode current2 = root;
+    this.treeRoot  = current;
+    Deque<ADTNode> stack = new ArrayDeque<ADTNode>();
+    stack.addFirst(current);
+    Deque<ADTreeNode> stack2 = new ArrayDeque<ADTreeNode>();
+    stack2.addFirst(current2);
+    while (stack.peek() != null) {
+      current = stack.removeLast();
+      current2 = stack2.removeLast();
+      ArrayList<ADTreeNode> children = childrenMap.get(current2);
+      for (ADTreeNode n:children) {
+        ADTNode node = new ADTNode(n);
+        stack.addFirst(node);
+        stack2.addFirst(n);
+        current.addChild(node);
+      }
+    }
+  }
+
   public void importXml(XElement e, int treeId) throws IllegalArgumentException {
     XElement root;
     root = e.getElement("node");
@@ -302,8 +334,8 @@ public class TreeLayout implements MultipleCDockableLayout {
     }
   }
 
-  public void removeValuation(ValuationDomain values) {
-    domains.remove(values);
+  public boolean removeValuation(ValuationDomain values) {
+    return domains.remove(values);
   }
 
   public int getId() {

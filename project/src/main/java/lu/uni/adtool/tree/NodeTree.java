@@ -225,7 +225,7 @@ public class NodeTree {
     List<Node> siblings = getChildrenList(parentNode, true);
     int index = siblings.indexOf(node);
     if (!onLeft) {
-      index++;
+      ++index;
     }
     sibling.setParent(parentNode);
     siblings.add(index, sibling);

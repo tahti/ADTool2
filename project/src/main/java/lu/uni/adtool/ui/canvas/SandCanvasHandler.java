@@ -397,7 +397,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
     if (menuNode != null) {
       String s =
           (String) MultiLineInput.showInputDialog(Options.getMsg("handler.dialog.newlabel.txt"),
-              Options.getMsg("handler.dialog.newlabel.title"), menuNode.getName());
+                                                  Options.getMsg("handler.dialog.newlabel.title"), menuNode.getName(), menuNode.getComment());
       if (s == null) {
         return;
       }
@@ -406,7 +406,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
         s = (String) MultiLineInput.showInputDialog(
             "<html><body><font color=\"red\">" + Options.getMsg("handler.dialog.newlabel.invalid")
                 + ".</font> " + Options.getMsg("handler.dialog.newlabel.txt") + "</body></html>",
-            Options.getMsg("handler.dialog.newlabel.title"), s.trim());
+            Options.getMsg("handler.dialog.newlabel.title"), s.trim(), MultiLineInput.getComment());
         if (s == null) {
           return;
         }
@@ -416,7 +416,7 @@ public class SandCanvasHandler extends AbstractCanvasHandler {
                                                               // "").replaceAll("^
                                                               // +| +$| +\n|(
                                                               // )+","$1");
-      ((SandTreeCanvas<?>) canvas).setLabel(menuNode, s);
+      ((SandTreeCanvas<?>) canvas).setLabel(menuNode, s, MultiLineInput.getComment());
       ((SandTreeCanvas<?>) canvas).setFocus(menuNode);
     }
   }

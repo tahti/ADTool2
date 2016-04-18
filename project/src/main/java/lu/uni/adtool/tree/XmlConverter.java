@@ -43,7 +43,8 @@ public class XmlConverter {
         for (int i = 0; i <layout.getDomains().size(); i++) {
           ValuationDomain values = layout.getDomains().get(i);
           rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
-                                       new Ranker<Ring>((SandDomain<Ring>)values.getDomain()), Options.rank_noRanked));
+                                       new Ranker<Ring>((SandDomain<Ring>)values.getDomain()),
+                                       Options.rank_noRanked));
         }
       }
       rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains(), rankers));

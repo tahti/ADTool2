@@ -1,9 +1,22 @@
 package lu.uni.adtool.ui.canvas;
 
 import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.Domain;
+import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tools.undo.AddDomain;
+import lu.uni.adtool.tools.undo.EditAction;
+import lu.uni.adtool.tools.undo.FoldAction;
+import lu.uni.adtool.tools.undo.History;
+import lu.uni.adtool.tools.undo.RemoveChildren;
+import lu.uni.adtool.tools.undo.RemoveDomain;
+import lu.uni.adtool.tools.undo.RemoveTree;
 import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.DomainFactory;
 import lu.uni.adtool.tree.GuiNode;
 import lu.uni.adtool.tree.LocalExtentProvider;
 import lu.uni.adtool.tree.Node;
@@ -12,7 +25,11 @@ import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.tree.SharedExtentProvider;
 import lu.uni.adtool.tree.TreeChangeListener;
 import lu.uni.adtool.tree.XmlConverter;
+import lu.uni.adtool.ui.ADAction;
+import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.MainController;
+import lu.uni.adtool.ui.TermView;
+import lu.uni.adtool.ui.TreeDockable;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -80,6 +97,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     this.printAttr = new HashPrintRequestAttributeSet();
     this.printAttr.add(MediaSizeName.ISO_A4);
     this.pageFormat = new PageFormat();
+    this.history = new History();
   }
 
   /**
@@ -123,6 +141,21 @@ public abstract class AbstractTreeCanvas extends JPanel
    */
   public JScrollPane getScrollPane() {
     return this.scrollPane;
+  }
+
+  public void addEditAction(EditAction a){
+    history.addAction(a);
+    updateUndoRedoItems();
+  }
+
+  public void undo() {
+    history.undo(this);
+    updateUndoRedoItems();
+  }
+
+  public void redo() {
+    history.redo(this);
+    updateUndoRedoItems();
   }
 
   public abstract void setScrollPane(JScrollPane pane);
@@ -394,6 +427,39 @@ public abstract class AbstractTreeCanvas extends JPanel
     return p;
   }
 
+  /**
+   * Removes the subtree with node as root.
+   *
+   * @param node
+   *          root of a subtree.
+   */
+  public void removeTree(Node node) {
+    if (!node.equals(tree.getRoot(true))) {
+      this.addEditAction(new RemoveTree(node));
+      if (lastFocused.equals(node)) {
+        lastFocused = ((GuiNode) node).getParent(true);
+        if (lastFocused == null) {
+          lastFocused = (GuiNode) tree.getRoot(true);
+        }
+      }
+      if (focused != null) {
+        if (focused.equals(node)) {
+          setFocus(((GuiNode) node).getParent(true));
+        }
+      }
+      tree.removeTree(node);
+      this.notifyAllTreeChanged();
+      this.terms.updateTerms();
+    }
+  }
+
+  public void removeChildren(Node node) {
+    this.addEditAction(new RemoveChildren(node));
+    tree.removeAllChildren(node);
+    this.notifyAllTreeChanged();
+    terms.updateTerms();
+  }
+
   public Point2D transform(Point2D point) {
     try {
       return viewTransform.inverseTransform(point, null);
@@ -412,7 +478,7 @@ public abstract class AbstractTreeCanvas extends JPanel
   public void setViewPortSize(Dimension viewPortSize) {
     this.viewPortSize = viewPortSize;
     // make up for dissapearing scrollbars
-    if(this.scrollPane != null) {
+    if (this.scrollPane != null) {
       if (this.scrollPane.getHorizontalScrollBar().isVisible()) {
         this.viewPortSize.height +=
             this.scrollPane.getHorizontalScrollBar().getPreferredSize().height;
@@ -553,13 +619,17 @@ public abstract class AbstractTreeCanvas extends JPanel
   }
 
   public void toggleFold(Node node) {
+    this.addEditAction(new FoldAction(node, false));
     if (node != null && node.getChildren().size() > 0) {
       tree.toggleFold(node, true);
       notifyAllTreeChanged();
     }
   }
 
+
+
   public void toggleAboveFold(Node node) {
+    this.addEditAction(new FoldAction(node, true));
     if (node.getParent() != null) {
       tree.toggleAboveFold(node, true);
       notifyAllTreeChanged();
@@ -603,7 +673,7 @@ public abstract class AbstractTreeCanvas extends JPanel
    */
   public void createImage(FileOutputStream fileStream, String formatName) {
     Dimension dim = getPreferredSize();
-    Debug.log("dim:"+ dim);
+    Debug.log("dim:" + dim);
     BufferedImage bufferedImage =
         new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = bufferedImage.createGraphics();
@@ -764,6 +834,10 @@ public abstract class AbstractTreeCanvas extends JPanel
     }
   }
 
+  public void updateTerms() {
+    terms.updateTerms();
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -786,6 +860,67 @@ public abstract class AbstractTreeCanvas extends JPanel
     if (tree != null) {
       paintComponent(g2, tree.getRoot(false));
     }
+  }
+
+  public void undoGetNewLabel() {
+    labelCounter = labelCounter - 1;
+  }
+
+  public void updateUndoRedoItems() {
+    ADAction undo = controller.getUndoItem();
+    String text = history.getUndoText();
+    if (text != null) {
+      undo.setEnabled(true);
+      undo.setName(text);
+    }
+    else {
+      undo.setEnabled(false);
+      undo.setName(Options.getMsg("edit.undo.txt"));
+    }
+    ADAction redo = controller.getRedoItem();
+    text = history.getRedoText();
+    if (text != null) {
+      redo.setEnabled(true);
+      redo.setName(text);
+    }
+    else {
+      redo.setEnabled(false);
+      redo.setName(Options.getMsg("edit.redo.txt"));
+    }
+  }
+
+  public void addDomain(Domain<Ring> domain) {
+    TreeDockable currentTree = (TreeDockable) this.controller.getControl()
+      .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getId()));
+    if (currentTree != null) {
+      DomainFactory factory = controller.getFrame().getDomainFactory();
+      int domainId = factory.getNewUniqueId(new Integer(this.getId()));
+      this.addEditAction(new AddDomain(domainId, domain));
+      DomainDockable d = null;
+      if (domain instanceof SandDomain) {
+        d = factory.read(new ValuationDomain(this.getId(),
+            domainId, (SandDomain) domain));
+      }
+      else {
+        d = factory.read(new ValuationDomain(this.getId(),
+            domainId, (AdtDomain) domain));
+      }
+      Debug.log("Adding domain to control with id:" + d.getUniqueId());
+      controller.getControl().addDockable(d.getUniqueId(), d);
+      currentTree.showDomain(d);
+    }
+  }
+
+  public void removeDomain(DomainDockable dockable) {
+    if (this.getTree().getLayout().removeValuation(dockable.getCanvas().getValues())) {
+      this.addEditAction(new RemoveDomain(dockable.getCanvas().getValues()));
+      this.controller.getFrame().getDomainFactory().removeDomain(dockable);
+    }
+  }
+
+  protected String getNewLabel() {
+    labelCounter = labelCounter + 1;
+    return LABEL_PREFIX + labelCounter;
   }
 
   /* * * * print functions * * * * * * * * * * * * * * * * * * * */
@@ -1220,7 +1355,12 @@ public abstract class AbstractTreeCanvas extends JPanel
   private final BasicStroke               counterStroke    = new BasicStroke(Options.canv_LineWidth,
       BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] {0, 6}, 0);
   protected MainController                controller;
+  protected History                       history;
 
   static final long                       serialVersionUID = 158222312311522883L;
+  protected TermView                      terms;
+  protected int                           labelCounter;
+
+  protected static final String           LABEL_PREFIX     = "N_";
 
 }
