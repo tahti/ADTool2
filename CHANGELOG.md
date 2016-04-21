@@ -1,10 +1,12 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
-## Unreleased
+## [2.1.0] - 2016-04-16 ##
   - changed behaviour of drag to be independend of whether tree or background is dragged
   - added zoom in, zoom out to view menu
   - added comments field to nodes
   - fixed issue that it was possibile to add sibling to counter node
+  - added possibility to import adt files
+  - added redo undo operations
 ## [2.0.3] - 2016-03-31 ##
   - added command line examples
   - fixed regression bug when exporting ranking from command line

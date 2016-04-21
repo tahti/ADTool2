@@ -202,7 +202,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
   }
 
   public ArrayList<String> sandKeySet() {
-    ArrayList<String> r = new ArrayList(valuesMap.keySet(true));
+    ArrayList<String> r = new ArrayList<String>(valuesMap.keySet(true));
     java.util.Collections.sort(r);
     return r;
   }

@@ -166,16 +166,16 @@ public class TreeLayout implements MultipleCDockableLayout {
   }
 
   public void importAdt(ADTreeNode root, Map<ADTreeNode, ArrayList<ADTreeNode>> childrenMap,
-                   Map<ADTreeNode, ADTreeNode> parents) {
+      Map<ADTreeNode, ADTreeNode> parents) {
     ADTNode current = new ADTNode(root);
-//     if ( current.getRole() = ADTNode.Role.OPPONENT) {
-//       this.switchRole = true;
-//     }
-//     else {
-//       this.switchRole = false;
-//     }
+    // if ( current.getRole() = ADTNode.Role.OPPONENT) {
+    // this.switchRole = true;
+    // }
+    // else {
+    // this.switchRole = false;
+    // }
     ADTreeNode current2 = root;
-    this.treeRoot  = current;
+    this.treeRoot = current;
     Deque<ADTNode> stack = new ArrayDeque<ADTNode>();
     stack.addFirst(current);
     Deque<ADTreeNode> stack2 = new ArrayDeque<ADTreeNode>();
@@ -184,13 +184,25 @@ public class TreeLayout implements MultipleCDockableLayout {
       current = stack.removeLast();
       current2 = stack2.removeLast();
       ArrayList<ADTreeNode> children = childrenMap.get(current2);
-      for (ADTreeNode n:children) {
+      for (ADTreeNode n : children) {
         ADTNode node = new ADTNode(n);
         stack.addFirst(node);
         stack2.addFirst(n);
         current.addChild(node);
       }
     }
+  }
+
+  public void addAdtDomain(AdtDomain<Ring> domain, lu.uni.adtool.adtree.ValueAssignement<Ring> v1,
+                           lu.uni.adtool.adtree.ValueAssignement<Ring> v2, int treeId, int id) {
+    ValuationDomain values = new ValuationDomain(treeId, id, domain);
+    for(String s: v1.keySet()) {
+      values.setValue(true, s, v1.get(s));
+    }
+    for(String s: v2.keySet()) {
+      values.setValue(false, s, v2.get(s));
+    }
+    domains.add(values);
   }
 
   public void importXml(XElement e, int treeId) throws IllegalArgumentException {
@@ -302,7 +314,9 @@ public class TreeLayout implements MultipleCDockableLayout {
       values.setDefaultValue(node);
     }
   }
-  /**Recalculates values - does not remove old uneccesary values
+
+  /**
+   * Recalculates values - does not remove old uneccesary values
    */
   public void recalculateValues() {
     for (ValuationDomain values : domains) {
@@ -314,6 +328,7 @@ public class TreeLayout implements MultipleCDockableLayout {
       }
     }
   }
+
   /**
    * Recalculates values and removes unnecesary values
    */

@@ -37,6 +37,9 @@ public class ImportExport {
     this.viewPortSize = null;
   }
 
+  /**
+   * Function used to import from command line only - no GUI window created
+   */
   public boolean doImport(String fileName) {
     InputStream fileStream = null;
     try {

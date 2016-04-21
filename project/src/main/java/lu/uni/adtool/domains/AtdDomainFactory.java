@@ -14,6 +14,7 @@ import lu.uni.adtool.domains.adtpredefined.SatOpp;
 import lu.uni.adtool.domains.adtpredefined.SatProp;
 import lu.uni.adtool.domains.adtpredefined.SatScenario;
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 
 import java.lang.reflect.Constructor;
@@ -37,7 +38,7 @@ public abstract class AtdDomainFactory {
   public AtdDomainFactory() {
   }
 
-  public static Boolean isObsolete(AdtDomain<Ring> domain) {
+  public static Boolean isObsolete(Object domain) {
     return isObsolete(domain.getClass().getSimpleName());
   }
 
@@ -50,13 +51,13 @@ public abstract class AtdDomainFactory {
     }
   }
 
-  public static AdtDomain<Ring> updateAtdDomain(AdtDomain<Ring> d) {
-    if (isObsolete(d)) {
-      String newName = updateAtdDomainName(d.getClass().getSimpleName());
-      return createFromString(updateAtdDomainName(newName));
+  public static AdtDomain<Ring> updateDomain(lu.uni.adtool.domains.predefined.Domain<Ring> d) {
+    String newName = updateAtdDomainName(d.getClass().getSimpleName());
+    AdtDomain<Ring> domain = createFromString(updateAtdDomainName(newName));
+    if (domain instanceof Parametrized) {
+      ((Parametrized)domain).setParameter(((Parametrized)d).getParameter());
     }
-    else
-      return d;
+    return domain;
   }
 
   public static String updateAtdDomainName(String name) {
@@ -76,17 +77,22 @@ public abstract class AtdDomainFactory {
    */
   @SuppressWarnings("unchecked")
   public static AdtDomain<Ring> createFromString(String domainName) {
-    String name = domainName;
+    Debug.log("create for string" +domainName);
     if (!domainName.startsWith(domainsPrefix)) {
-      name = domainsPrefix + "." + domainName;
+      domainName = domainName.replace("predefined", "adtpredefined");
+      Debug.log("n:" + domainName);
+      if (!domainName.startsWith(domainsPrefix)) {
+        domainName = domainsPrefix + "." + domainName;
+        Debug.log("name:" + domainName);
+      }
     }
     Constructor<AdtDomain<Ring>>[] ct = null;
     try {
-      final Class<?> c = Class.forName(name);
+      final Class<?> c = Class.forName(domainName);
       ct = (Constructor<AdtDomain<Ring>>[]) c.getDeclaredConstructors();
     }
     catch (ClassNotFoundException e) {
-      System.err.println(Options.getMsg("error.class.notfound") + " " + name);
+      System.err.println(Options.getMsg("error.class.notfound") + " " + domainName);
       return null;
     }
     AdtDomain<Ring> d = null;
@@ -117,7 +123,7 @@ public abstract class AtdDomainFactory {
    *          domain.
    * @return domain class name.
    */
-  public static String getClassName(AdtDomain<Ring> d) {
+  public static String getClassName(Object d) {
     return d.getClass().getSimpleName();
   }
 

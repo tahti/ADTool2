@@ -2,7 +2,9 @@ package lu.uni.adtool.tree;
 
 import lu.uni.adtool.adtree.ADTreeNode;
 import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.AtdDomainFactory;
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TreeDockable;
@@ -51,22 +53,25 @@ public class AdtImporter {
 //     readDomains(fileStream, treeLayout, controller);
 //
       this.ignoreSomeOptions(in);
-      in.readObject();//boolean
+      in.readObject();//boolean indicating saved layout - ignored
       Integer noDomains = (Integer)in.readObject();
-      System.out.println("OK no domains:" + noDomains);
+      Debug.log("OK no domains:" + noDomains);
       for(int i = 0; i < noDomains; i++) {
-        AdtDomain<Ring> d;
+        AdtDomain<Ring> d = null;
         try {
-//           DomainFactory.updateDomain((lu.uni.adtool.domains.predefined.Domain<Ring>) in.readObject())
-          in.readObject();
+          d = AtdDomainFactory.updateDomain((lu.uni.adtool.domains.predefined.Domain<Ring>) in.readObject());
         }
         catch (ClassNotFoundException e) {
-          System.out.println(e.getMessage());
-//           AdtDomain<Ring> d = ;
-          
+          Debug.log(e.getMessage());
+          d = AtdDomainFactory.createFromString(e.getMessage());
+        }
+        if (d == null) {
+          controller.report(Options.getMsg("error.wrongadtformat"));
+          return;
         }
         lu.uni.adtool.adtree.ValueAssignement<Ring> vass = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
         lu.uni.adtool.adtree.ValueAssignement<Ring> vass2 = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
+        treeLayout.addAdtDomain(d, vass, vass2, treeLayout.getId(), i);
       }
       TreeFactory treeFactory = controller.getFrame().getTreeFactory();
       TreeDockable treeDockable = treeFactory.load(treeLayout);
