@@ -3,10 +3,7 @@ package lu.uni.adtool.tools.undo;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.NodeTree;
-import lu.uni.adtool.tree.SandNode;
-import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
-import lu.uni.adtool.ui.canvas.SandTreeCanvas;
 
 import java.util.ArrayList;
 

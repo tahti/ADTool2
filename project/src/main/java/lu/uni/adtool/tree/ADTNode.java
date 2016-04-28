@@ -1,11 +1,11 @@
 package lu.uni.adtool.tree;
 
 import lu.uni.adtool.adtree.ADTreeNode;
-import lu.uni.adtool.adtree.ADTreeNode.RefinementType;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.RankExporter;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 
 import java.io.DataInputStream;
@@ -141,7 +141,7 @@ public class ADTNode extends GuiNode {
       result.addString("switchRole", "yes");
     }
     result.addElement("label").setString(getName());
-    if (getComment()!= null && (!getComment().equals(""))) {
+    if (getComment() != null && (!getComment().equals(""))) {
       result.addElement("comment").setString(getComment());
     }
     if (domains != null && Options.main_saveDomains) {
@@ -173,9 +173,9 @@ public class ADTNode extends GuiNode {
           }
         }
         if (rankers != null && rankers.size() > i) {
-          for (int j=0; j < Options.rank_noRanked; j++) {
+          for (int j = 0; j < Options.rank_noRanked; j++) {
             Ring value = rankers.get(i).getValue(this, j);
-            if(value != null) {
+            if (value != null) {
               XElement rank = result.addElement("ranking");
               rank.addInt("rank", j + 1);
               rank.setString(value.toString());
@@ -207,7 +207,7 @@ public class ADTNode extends GuiNode {
     typeAttribute.setString(typeToString(type));
     result.addAttribute(typeAttribute);
     result.addElement("label").setString(getName());
-    if (getComment()!= null && (!getComment().equals(""))) {
+    if (getComment() != null && (!getComment().equals(""))) {
       result.addElement("comment").setString(getComment());
     }
     if (this.getChildren() != null) {
@@ -275,7 +275,7 @@ public class ADTNode extends GuiNode {
     SandNode result = new SandNode();
     result.setName(getName());
     result.setComment(getComment());
-    if (type == Type.OR_PRO ||type == Type.OR_OPP) {
+    if (type == Type.OR_PRO || type == Type.OR_OPP) {
       result.setType(SandNode.Type.OR);
     }
     else {
@@ -403,8 +403,8 @@ public class ADTNode extends GuiNode {
     }
   }
 
-  public void importXml(XElement e, HashMap<String, ValuationDomain> domains)
-      throws IllegalArgumentException {
+  public void importXml(XElement e, HashMap<String, ValuationDomain> domains, int treeId)
+      throws IllegalArgumentException, XException {
     setName(e.getElement("label").getString());
     XElement commentXml = e.getElement("comment");
     if (commentXml != null) {
@@ -427,24 +427,86 @@ public class ADTNode extends GuiNode {
     if (switchRole) {
       this.toggleRole();
     }
-    for (XElement parameter : e.getElements("parameter")) {
-      String category = parameter.getString("category");
-      if (category == null) {
-        throw new IllegalArgumentException(Options.getMsg("exception.wrongxml"));
+    XElement[] parameters = e.getElements("parameter");
+    boolean fromTreemaker = false;
+    try {
+      if (parameters.length > 0 && parameters[0].getString("class") != null) {
+        fromTreemaker = true;
       }
-      if (category.equals("basic")) {
-        ValuationDomain d = domains.get(parameter.getString("domainId"));
-        if (d != null) {
-          Ring r = d.getDomain().getDefaultValue(this);
-          r.updateFromString(parameter.getString());
-          d.setValue(this.getRole() == ADTNode.Role.PROPONENT, getName(), r);
+    }
+    catch (XException e1) {
+    }
+    if (fromTreemaker) {
+      int i = 0;
+      for (XElement parameter : parameters) {
+        ++i;
+        try {
+          String name = null;
+          name = parameter.getString("name");
+          ValuationDomain vd = null;
+          if (name.equals("cost")) {
+            // check if we have domain
+            name = "MinCost";
+          }
+          else if (name.equals("likelihood")) {
+            name = "ProbSucc";
+          }
+          else if (name.equals("difficulty")) {
+            name = "DiffLMHE";
+          }
+          else {// if (name.equals("time")) {
+            name = null;
+          }
+          if (name != null ) {
+            if (domains.size() >= i) {
+              vd = domains.get(Integer.toString(i));
+            }
+            else {
+              AdtDomain<Ring> domain = (AdtDomain<Ring>) DomainFactory.createFromString(name);
+              if (domain == null) {
+                throw new IllegalArgumentException(
+                    Options.getMsg("exception.nodomain") + name);
+              }
+              vd = new ValuationDomain(treeId, i, domain);
+              domains.put(Integer.toString(i), vd);
+            }
+            if (vd != null) {
+              Ring r = vd.getDomain().getDefaultValue(this);
+              r.updateFromString(parameter.getString());
+              vd.setValue(this.getRole() == ADTNode.Role.PROPONENT, getName(), r);
+            }
+          }
+        }
+        catch (XException e1) {
+          throw new IllegalArgumentException(Options.getMsg("exception.wrongxml"));
+        }
+      }
+    }
+    else {
+      for (XElement parameter : parameters) {
+        String category = null;
+        String name = null;
+        try {
+          category = parameter.getString("category");
+        }
+        catch (XException e1) {
+          // "basic" was default category in older versions of ADTool
+          category = "basic";
+        }
+        if (category.equals("basic")) {
+          ValuationDomain d = domains.get(parameter.getString("domainId"));
+          if (d != null) {
+            Ring r = d.getDomain().getDefaultValue(this);
+            r.updateFromString(parameter.getString());
+            d.setValue(this.getRole() == ADTNode.Role.PROPONENT, getName(), r);
+          }
         }
       }
     }
     for (XElement child : e.getElements("node")) {
       ADTNode ch = new ADTNode();
       this.addChild(ch);
-      ch.importXml(child, domains);
+      ch.importXml(child, domains, treeId);
     }
   }
 
@@ -509,10 +571,10 @@ public class ADTNode extends GuiNode {
     }
   }
 
-  private static final String C_PRO = "cp";
-  private static final String C_OPP = "co";
+  private static final String C_PRO            = "cp";
+  private static final String C_OPP            = "co";
 
   private Type                type;
-  private static final long serialVersionUID = -8433351516296617004L;
+  private static final long   serialVersionUID = -8433351516296617004L;
 
 }

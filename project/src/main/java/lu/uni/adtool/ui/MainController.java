@@ -3,8 +3,11 @@ package lu.uni.adtool.ui;
 import lu.uni.adtool.ADToolMain;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
+import lu.uni.adtool.domains.Parametrized;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.adtpredefined.MinSkill;
+import lu.uni.adtool.domains.rings.BoundedInteger;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
@@ -20,6 +23,7 @@ import lu.uni.adtool.tree.XmlConverter;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
+import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
 import lu.uni.adtool.ui.printview.JPrintPreviewDialog;
 
 import java.awt.event.ActionEvent;
@@ -135,6 +139,7 @@ public final class MainController implements CControlListener, CFocusListener {
   public ADAction getUndoItem() {
     return editUndo;
   }
+
   /**
    * Called when <code>dockable</code> has been removed.
    *
@@ -861,14 +866,39 @@ public final class MainController implements CControlListener, CFocusListener {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(false);
         Debug.log(" domains size:" + domains.size());
         AddAdtDomainDialog addDialog = new AddAdtDomainDialog(this.frame);
-        AdtDomain<Ring> d = addDialog.showDomainDialog(domains);
+        AdtDomain<?> d = addDialog.showDomainDialog(domains);
         if (d == null) {
           return;
+        }
+        if (d instanceof Parametrized) {
+          if (((Parametrized) d).getParameter() instanceof Integer) {
+            Integer value = (Integer) ((Parametrized) d).getParameter();
+            BoundedIntegerDialog dialog;
+            if (d instanceof lu.uni.adtool.domains.adtpredefined.MinSkill) {
+              dialog = new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosemaxskill.txt"));
+            }
+            else {
+              dialog = new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosek.txt"));
+            }
+            BoundedInteger result = (BoundedInteger) (dialog
+                .showInputDialog(new BoundedInteger(value, Integer.MAX_VALUE), false));
+            if (result != null) {
+              value = new Integer(result.getValue());
+              if (value == BoundedInteger.INF) {
+                value = Integer.MAX_VALUE;
+              }
+              ((Parametrized) d).setParameter(value);
+            }
+            else {
+              return;
+            }
+          }
+
         }
         TreeDockable currentTree = (TreeDockable) this.control
             .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(lastFocusedTree.getId()));
         if (currentTree != null) {
-          currentTree.getCanvas().addDomain(d);
+          currentTree.getCanvas().addDomain((AdtDomain<Ring>)d);
           this.report(Options.getMsg("status.newdomain") + " " + d.getName());
         }
       }

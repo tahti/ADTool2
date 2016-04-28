@@ -1,5 +1,6 @@
 package lu.uni.adtool.tools.undo;
 
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
@@ -20,11 +21,11 @@ public class AddCounter extends EditAction {
 
   public void redo(AbstractTreeCanvas canvas) {
     Node parent = canvas.getTree().getRoot(true).fromPath(parentPath, 0);
-    ((ADTreeCanvas)canvas).addCounter(parent);
+    ((ADTreeCanvas<Ring>)canvas).addCounter(parent);
   }
 
   public String getName(){
-    return Options.getMsg("action.counter");
+    return Options.getMsg("action.addcounter");
   }
 
   private ArrayList<Integer> parentPath;

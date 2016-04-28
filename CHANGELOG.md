@@ -1,5 +1,11 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
+## [2.1.1] - 2016-04-28 ##
+  - fixed not unfolding with space
+  - fixed adding countermeasure not working
+  - fixed not showing up dialog to input k for domains with parameter
+  - fixed issue with opening some xml files form older versions of ADTool and
+    improved import of xml files from TreeMaker
 ## [2.1.0] - 2016-04-16 ##
   - changed behaviour of drag to be independend of whether tree or background is dragged
   - added zoom in, zoom out to view menu

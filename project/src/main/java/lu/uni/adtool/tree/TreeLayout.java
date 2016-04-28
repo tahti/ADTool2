@@ -39,12 +39,6 @@ public class TreeLayout implements MultipleCDockableLayout {
     this.switchRole = false;
   }
 
-  // public SandTreeLayout() {
-  // this.id = -1;
-  // this.treeRoot = new SandNode(SandNode.Type.AND);
-  // this.treeRoot.setName("Root");
-  // this.domains = new ArrayList<ValuationDomain>();
-  // }
   public boolean isSand() {
     if (this.treeRoot instanceof SandNode) {
       return true;
@@ -205,7 +199,7 @@ public class TreeLayout implements MultipleCDockableLayout {
     domains.add(values);
   }
 
-  public void importXml(XElement e, int treeId) throws IllegalArgumentException {
+  public void importXml(XElement e, int treeId) throws IllegalArgumentException, XException {
     XElement root;
     root = e.getElement("node");
     // map from domainid to domain
@@ -213,7 +207,7 @@ public class TreeLayout implements MultipleCDockableLayout {
     int i = 0;
     if (e.getName().equals("sandtree")) {
       for (XElement domain : e.getElements("domain")) {
-        i++;
+        ++i;
         String domainName = domain.getElement("class").getString();
         SandDomain<Ring> d = (SandDomain<Ring>) DomainFactory.createFromString(domainName);
         if (d == null) {
@@ -232,7 +226,7 @@ public class TreeLayout implements MultipleCDockableLayout {
     }
     else if (e.getName().equals("adtree")) {
       for (XElement domain : e.getElements("domain")) {
-        i++;
+        ++i;
         String domainName = domain.getElement("class").getString();
         AdtDomain<Ring> d = (AdtDomain<Ring>) DomainFactory.createFromString(domainName);
         if (d == null) {
@@ -281,7 +275,7 @@ public class TreeLayout implements MultipleCDockableLayout {
       for (XElement child : root.getElements("node")) {
         ADTNode ch = new ADTNode();
         this.treeRoot.addChild(ch);
-        ch.importXml(child, domainsHash);
+        ch.importXml(child, domainsHash, treeId);
       }
       this.domains = new ArrayList<ValuationDomain>(domainsHash.values());
     }

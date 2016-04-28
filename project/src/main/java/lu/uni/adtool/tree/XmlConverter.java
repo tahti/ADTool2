@@ -6,6 +6,7 @@ import lu.uni.adtool.domains.Ranker;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TreeDockable;
@@ -18,6 +19,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import bibliothek.util.xml.XElement;
+import bibliothek.util.xml.XException;
 import bibliothek.util.xml.XIO;
 
 public class XmlConverter {
@@ -90,12 +92,14 @@ public class XmlConverter {
     TreeLayout treeLayout = new TreeLayout(treeId);
     try {
       treeLayout.importXml(element, treeId);
+      TreeDockable treeDockable = treeFactory.load(treeLayout);
+      controller.addTreeDockable(treeDockable);
     }
     catch (IllegalArgumentException e) {
       controller.report(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
     }
-    TreeDockable treeDockable = treeFactory.load(treeLayout);
-    controller.addTreeDockable(treeDockable);
-
+    catch (XException e) {
+      controller.report(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
+    }
   }
 }

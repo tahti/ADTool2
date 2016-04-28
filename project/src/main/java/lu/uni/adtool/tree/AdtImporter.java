@@ -47,11 +47,6 @@ public class AdtImporter {
         controller.report(Options.getMsg("error.wrongadtformat"));
         return;
       }
-    // long pos = fileStream.getChannel().position();
-    // System.out.println("pos:"+pos);
-    // try {
-//     readDomains(fileStream, treeLayout, controller);
-//
       this.ignoreSomeOptions(in);
       in.readObject();//boolean indicating saved layout - ignored
       Integer noDomains = (Integer)in.readObject();
@@ -161,37 +156,6 @@ public class AdtImporter {
     return -1;
   }
 
-//   private boolean readDomains(FileInputStream in, TreeLayout treeLayout, MainController controller) {
-//     FileChannel channel = in.getChannel();
-//     long position = 0;
-//     try {
-//       final Byte[] b = {115, 114, 0, 17, 106, 97, 118, 97, 46, 108, 97, 110, 103, 46, 66, 111, 111, 108,
-//           101, 97, 110};
-//       long boolPos = this.find(0 ,channel, new ArrayList(Arrays.asList(b)));
-//       if (boolPos < 1) {
-//         controller.report(Options.getMsg("error.wrongadtformat"));
-//         return false;
-//       }
-//       final Byte[] b2 = {115, 113, 0, 126, 0, 0};
-// 
-//       boolPos = this.find(boolPos + 13 ,channel, new ArrayList(Arrays.asList(b2)));
-//       if (boolPos < 1) {
-//         controller.report(Options.getMsg("error.wrongadtformat"));
-//         return false;
-//       }
-//       MappedByteBuffer buf = channel.map(MapMode.READ_ONLY, boolPos + 4, 4);
-//       int noDomains = 1;
-//       position = boolPos + 8;
-//       for (int i = 0; i <noDomains; i++ ){
-//       }
-//       buf = channel.map(MapMode.READ_ONLY, boolPos + 8, 100);
-//       print(buf);
-//     }
-//     catch (IOException e) {
-//     }
-//     return true;
-//   }
-
   private void ignoreSomeOptions(ObjectInputStream in) throws IOException, ClassNotFoundException {
     // Options.canv_BackgroundColor =
     in.readObject();
@@ -226,7 +190,7 @@ public class AdtImporter {
     // Options.canv_Font = (Font)
     in.readObject();
     // ADTreeNode.Type rootRole = (ADTreeNode.Type)
-    in.readObject();
+    ADTreeNode.Type role = (ADTreeNode.Type)in.readObject();
     // Options.canv_ArcSize = (Integer)
     in.readObject();
     // Options.canv_ArcPadding = (Integer)
