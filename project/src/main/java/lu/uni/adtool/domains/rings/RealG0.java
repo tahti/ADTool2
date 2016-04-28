@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Set of real numbers with maximum value.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class RealG0 implements Serializable, Ring {
 

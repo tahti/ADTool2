@@ -24,7 +24,7 @@ import bibliothek.gui.dock.common.SingleCDockable;
 /**
  * Class to store program options.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  * @version
  */
 

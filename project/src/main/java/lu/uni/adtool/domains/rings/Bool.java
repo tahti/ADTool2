@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Boolean class with html representation.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class Bool implements Serializable, Ring {
 

@@ -23,7 +23,7 @@ import bibliothek.util.Path;
 /**
  * Class showing the window with the log of messages.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class LogDockable extends PermaDockable {
   public static final String ID_LOGVIEW = "log_view";

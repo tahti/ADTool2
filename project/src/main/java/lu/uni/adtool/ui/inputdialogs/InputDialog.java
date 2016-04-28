@@ -33,7 +33,7 @@ import javax.swing.SwingUtilities;
  * Dialog to edit values for the attribute domains. It varies depending on the
  * type of attribute domain.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public abstract class InputDialog extends JDialog
     implements ActionListener, PropertyChangeListener, KeyListener {

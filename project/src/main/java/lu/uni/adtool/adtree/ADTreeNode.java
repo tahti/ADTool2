@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Represents a node in the Atack Defense Tree. Used to import old adtfiles only.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class ADTreeNode implements Serializable {
   static final long         serialVersionUID = 19696324774341496L;

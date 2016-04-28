@@ -37,7 +37,7 @@ import javax.swing.WindowConstants;
 /**
  * Prieview pane for pageable component.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class JPrintPreviewPane extends JPanel
     implements MouseWheelListener, KeyListener, MouseMotionListener, MouseListener {

@@ -3,7 +3,7 @@ package lu.uni.adtool.domains.predefined;
 /**
  * If domain takes parameter to constructor it should implement this interface. - Obsolete - used to import adt only.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public interface Parametrized {
   /**

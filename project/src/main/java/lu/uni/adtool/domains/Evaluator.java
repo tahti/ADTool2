@@ -12,7 +12,7 @@ import java.util.HashMap;
  * Evaluate value of each node for given domain and value assignement map. Works
  * with both SandDomain and AtdDomain
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class Evaluator<Type extends Ring> {
   /**

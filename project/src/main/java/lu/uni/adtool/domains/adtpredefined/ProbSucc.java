@@ -9,7 +9,7 @@ import lu.uni.adtool.tree.Node;
 /**
  * A AtdDomain defined on booleans.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class ProbSucc implements AdtDomain<RealZeroOne> {
 

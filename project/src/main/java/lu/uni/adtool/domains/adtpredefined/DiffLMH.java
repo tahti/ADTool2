@@ -9,7 +9,7 @@ import lu.uni.adtool.tree.Node;
 /**
  * A domain to calculate minimal skill level needed for the proponent.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class DiffLMH  extends RankingDomain<LMHValue> {
   /**

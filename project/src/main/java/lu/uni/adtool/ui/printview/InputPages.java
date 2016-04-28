@@ -14,7 +14,7 @@ import javax.swing.JTextField;
 /**
  * Prieview pane for pageable component.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class InputPages extends JTextField implements MouseListener, FocusListener, KeyListener {
 

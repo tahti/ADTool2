@@ -8,7 +8,7 @@ import java.util.Set;
  * Assignment map that associates labels of the nodes with domain valuations.
  * <T> is valuation type
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  * @version
  */
 public class ValueAssignement<T> implements Serializable {

@@ -20,7 +20,7 @@ import javax.swing.JPanel;
  * Dialog to edit values for the attribute domains of values from the set
  * {L,M,H}
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class LMHDialog extends InputDialog {
 

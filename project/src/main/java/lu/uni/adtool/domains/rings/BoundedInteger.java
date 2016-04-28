@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Class representing bounded integers.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class BoundedInteger implements Serializable, Ring {
 

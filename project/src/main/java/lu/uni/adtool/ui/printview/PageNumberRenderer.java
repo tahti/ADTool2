@@ -5,7 +5,7 @@ import java.awt.Component;
 /**
  * PageNumberRenderer public interface.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public interface PageNumberRenderer {
   /**

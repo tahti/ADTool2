@@ -22,7 +22,7 @@ import javax.swing.KeyStroke;
 /**
  * A mouse handler for AdtDomainCanvas.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class AdtDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
   public AdtDomainHandler(final AbstractDomainCanvas<Type> canvas) {

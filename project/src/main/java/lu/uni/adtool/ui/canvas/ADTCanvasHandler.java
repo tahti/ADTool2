@@ -22,7 +22,7 @@ import javax.swing.KeyStroke;
 /**
  * A handler for ADTreeCanvas.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class ADTCanvasHandler extends AbstractCanvasHandler {
   /**

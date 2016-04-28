@@ -7,7 +7,7 @@ import java.util.ArrayList;
 /**
  * An interface for domains.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  * @version
  * @param <Type>
  *          type of data

@@ -6,7 +6,7 @@ import lu.uni.adtool.domains.rings.BoundedInteger;
 /**
  * A domain to calculate minimal skill level needed for the proponent. - Obsolete - used to import adt only.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class MinSkill implements Domain<BoundedInteger>, Parametrized {
 

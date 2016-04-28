@@ -13,7 +13,7 @@ import org.abego.treelayout.NodeExtentProvider;
  * <p>
  * As one would expect this NodeExtentProvider returns the width and height.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public abstract class AbstractExtentProvider implements NodeExtentProvider<Node> {
   /**

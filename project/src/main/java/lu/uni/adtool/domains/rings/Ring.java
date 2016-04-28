@@ -3,7 +3,7 @@ package lu.uni.adtool.domains.rings;
 /**
  * Interface representing abstract ring.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  * @version
  */
 public interface Ring extends Comparable<Object> {

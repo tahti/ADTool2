@@ -24,7 +24,7 @@ import javax.swing.event.ChangeListener;
 /**
  * Dialog to edit values for the attribute domains of real numbers from 0 to 1.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class RealZeroOneDialog extends InputDialog implements ChangeListener {
 

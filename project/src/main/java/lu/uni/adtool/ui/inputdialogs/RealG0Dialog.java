@@ -19,7 +19,7 @@ import javax.swing.JPanel;
  * Dialog to edit values for the attribute domains of real numbers greater than
  * 0..
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class RealG0Dialog extends InputDialog {
 

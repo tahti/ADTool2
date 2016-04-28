@@ -6,7 +6,7 @@ import lu.uni.adtool.tools.Options;
 /**
  * A AtdDomain defined on booleans.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class MinCost extends MinTimeSeq {
   // number 6

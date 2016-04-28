@@ -3,7 +3,7 @@ package lu.uni.adtool.domains;
 /**
  * If domain takes parameter to constructor it should implement this interface.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public interface Parametrized {
   /**

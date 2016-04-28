@@ -9,7 +9,7 @@ import lu.uni.adtool.tree.Node;
 /**
  * A AtdDomain defined on booleans.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class MinTimePar extends RankingDomain<RealG0> {
   // number 5

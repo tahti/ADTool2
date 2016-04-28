@@ -5,7 +5,7 @@ import lu.uni.adtool.domains.rings.BoundedInteger;
 /**
  * A domain to calculate minimal skill level needed for the proponent.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class IntMinSum implements Domain<BoundedInteger>, Parametrized {
   /**

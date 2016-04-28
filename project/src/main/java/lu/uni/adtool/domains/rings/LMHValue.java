@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Class representing values in the domain {L,M,H, Infinity} L=Low M=Medium
  * H=High.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class LMHValue implements Serializable, Ring {
 

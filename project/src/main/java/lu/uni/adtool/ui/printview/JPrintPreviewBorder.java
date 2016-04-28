@@ -11,7 +11,7 @@ import javax.swing.border.AbstractBorder;
 /**
  * A border with shadow effect.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class JPrintPreviewBorder extends AbstractBorder {
 

@@ -19,7 +19,7 @@ import javax.swing.border.Border;
 /**
  * Renderer for a printable component.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class JPrintPreviewPage extends JComponent {
   /**

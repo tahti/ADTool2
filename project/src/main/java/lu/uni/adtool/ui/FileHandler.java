@@ -26,7 +26,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 /**
  * Provides static methods for choosing file to open or save.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class FileHandler {
 

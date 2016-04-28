@@ -4,7 +4,7 @@ package lu.uni.adtool.tree;
  * The class should implement this interface if it want to be notified about
  * the need to recalculate shared tree layout/node sizes.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public interface TreeChangeListener {
 

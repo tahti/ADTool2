@@ -28,7 +28,7 @@ import org.reflections.Reflections;
 /**
  * Creates AtdDomains.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public abstract class AtdDomainFactory {
 

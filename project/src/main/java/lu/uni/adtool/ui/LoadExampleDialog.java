@@ -31,7 +31,7 @@ import javax.swing.event.ListSelectionListener;
 /**
  * Dialog with list of all examples.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class LoadExampleDialog extends JDialog implements ActionListener, ListSelectionListener {
   private static final long serialVersionUID = 1223325877545646416L;

@@ -21,7 +21,7 @@ import javax.swing.KeyStroke;
 /**
  * A mouse handler for SandDomainCanvas.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class SandDomainHandler<Type extends Ring> extends AbstractCanvasHandler {
   public SandDomainHandler(final AbstractDomainCanvas<Type> canvas) {

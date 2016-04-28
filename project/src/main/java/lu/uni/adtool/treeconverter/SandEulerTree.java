@@ -9,7 +9,7 @@ import java.util.Vector;
 /**
  * A tree node to calculate approximate minimal tree edit distance in n^2 time
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class SandEulerTree {
 

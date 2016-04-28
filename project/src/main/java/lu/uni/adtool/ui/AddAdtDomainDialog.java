@@ -40,7 +40,7 @@ import javax.swing.event.ListSelectionListener;
 /**
  * Dialog for adding new attribute domain.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 @SuppressWarnings("rawtypes")
 public class AddAdtDomainDialog extends JDialog

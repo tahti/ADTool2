@@ -10,7 +10,7 @@ import javax.swing.JLabel;
 /**
  * Default implementation of the PageNumberRenderer interface.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class DefaultPageNumberRenderer extends JLabel implements PageNumberRenderer {
 

@@ -20,7 +20,7 @@ import javax.swing.KeyStroke;
 /**
  * A handler for SandTreeCanvas.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class SandCanvasHandler extends AbstractCanvasHandler {
   /**

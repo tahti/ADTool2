@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * An interface for domains. Obsolete - used just to import adt file.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  * @version
  * @param <Type>
  *          type of data

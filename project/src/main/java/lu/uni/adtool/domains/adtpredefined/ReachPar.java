@@ -10,7 +10,7 @@ import lu.uni.adtool.tree.Node;
 /**
  * A domain to calculate minimal skill level needed for the proponent.
  *
- * @author Piot Kordy
+ * @author Piotr Kordy
  */
 public class ReachPar extends RankingDomain<BoundedInteger> implements Parametrized {
   static final long serialVersionUID = 154666564465361444L;
