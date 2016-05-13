@@ -1,3 +1,20 @@
+/**
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>) Date:
+ * 10/12/2015 Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty
+ * of Science, Technology and Communication FSTC All rights reserved. Licensed
+ * under GNU Affero General Public License 3.0; This program is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package lu.uni.adtool.ui;
 
 import lu.uni.adtool.ADToolMain;
@@ -6,7 +23,7 @@ import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.Parametrized;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.adtpredefined.MinSkill;
+import lu.uni.adtool.domains.custom.AdtBoolDomain;
 import lu.uni.adtool.domains.rings.BoundedInteger;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
@@ -870,35 +887,48 @@ public final class MainController implements CControlListener, CFocusListener {
         if (d == null) {
           return;
         }
-        if (d instanceof Parametrized) {
-          if (((Parametrized) d).getParameter() instanceof Integer) {
-            Integer value = (Integer) ((Parametrized) d).getParameter();
-            BoundedIntegerDialog dialog;
-            if (d instanceof lu.uni.adtool.domains.adtpredefined.MinSkill) {
-              dialog = new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosemaxskill.txt"));
-            }
-            else {
-              dialog = new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosek.txt"));
-            }
-            BoundedInteger result = (BoundedInteger) (dialog
-                .showInputDialog(new BoundedInteger(value, Integer.MAX_VALUE), false));
-            if (result != null) {
-              value = new Integer(result.getValue());
-              if (value == BoundedInteger.INF) {
-                value = Integer.MAX_VALUE;
-              }
-              ((Parametrized) d).setParameter(value);
-            }
-            else {
-              return;
-            }
+        if (d instanceof AdtBoolDomain) {
+          // LoadExampleDialog dialog = new LoadExampleDialog(getFrame());
+          // dialog.showDialog();
+          AddBoolDomainDialog boolDialog = new AddBoolDomainDialog(this.frame, (AdtBoolDomain) d);
+          if (boolDialog.showDialog() == null) {
+            Debug.log("cancel pressed");
+            return;
           }
+        }
+        else {
+          if (d instanceof Parametrized) {
+            if (((Parametrized) d).getParameter() instanceof Integer) {
+              Integer value = (Integer) ((Parametrized) d).getParameter();
+              BoundedIntegerDialog dialog;
+              if (d instanceof lu.uni.adtool.domains.adtpredefined.MinSkill) {
+                dialog = new BoundedIntegerDialog(this.frame,
+                    Options.getMsg("adtdomain.choosemaxskill.txt"));
+              }
+              else {
+                dialog =
+                    new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosek.txt"));
+              }
+              BoundedInteger result = (BoundedInteger) (dialog
+                  .showInputDialog(new BoundedInteger(value, Integer.MAX_VALUE), false));
+              if (result != null) {
+                value = new Integer(result.getValue());
+                if (value == BoundedInteger.INF) {
+                  value = Integer.MAX_VALUE;
+                }
+                ((Parametrized) d).setParameter(value);
+              }
+              else {
+                return;
+              }
+            }
 
+          }
         }
         TreeDockable currentTree = (TreeDockable) this.control
             .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(lastFocusedTree.getId()));
         if (currentTree != null) {
-          currentTree.getCanvas().addDomain((AdtDomain<Ring>)d);
+          currentTree.getCanvas().addDomain((AdtDomain<Ring>) d);
           this.report(Options.getMsg("status.newdomain") + " " + d.getName());
         }
       }

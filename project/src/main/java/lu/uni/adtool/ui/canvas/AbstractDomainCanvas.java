@@ -1,3 +1,23 @@
+/**
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>)
+ * Date:   10/12/2015
+ * Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty of Science,
+ *     Technology and Communication FSTC
+ * All rights reserved.
+ * Licensed under GNU Affero General Public License 3.0;
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU Affero General Public License as
+ *    published by the Free Software Foundation, either version 3 of the
+ *    License, or (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package lu.uni.adtool.ui.canvas;
 
 import lu.uni.adtool.adtree.ADTreeNode;
@@ -327,31 +347,17 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     Ring value = null;
     if (this.values.hasEvaluator()) {
       if (this.isSand()) {
-        value = this.values.getTermValue((SandNode) n);
-        if (value instanceof RealG0 || value instanceof RealZeroOne) {
-          try {
-            result += Options.canv_precision.format(Double.parseDouble(value.toUnicode()));
-          }
-          catch (NumberFormatException e) {
-            result += value.toUnicode();
-          }
-        }
-        else {
-          result += value.toUnicode();
-        }
+        result = result + this.valueToStr(this.values.getTermValue((SandNode) n));
       }
       else {
         if (((ADTNode) n).hasDefault() && ((ADTNode) n).isCountered()) {
           if (values.isShowAllLabels()) {
-            value = this.values.getTermValue((ADTNode) n);
-            result += value.toUnicode() + "\n";
+            result =  result + this.valueToStr(this.values.getTermValue((ADTNode) n)) + "\n";
           }
-          value = values.getValue((ADTNode) n);
-          result += value.toUnicode();
+          result = result +  this.valueToStr(values.getValue((ADTNode) n));
         }
         else {
-          value = this.values.getTermValue((ADTNode) n);
-          result += value.toUnicode();
+          result = result + this.valueToStr(this.values.getTermValue((ADTNode) n));
         }
       }
     }
@@ -490,6 +496,20 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
       return currentTree.getCanvas();
     }
     return null;
+  }
+
+  private String valueToStr(Ring value) {
+    if (value instanceof RealG0 || value instanceof RealZeroOne) {
+      try {
+        return Options.canv_precision.format(Double.parseDouble(value.toUnicode()));
+      }
+      catch (NumberFormatException e) {
+        return value.toUnicode();
+      }
+    }
+    else {
+      return value.toUnicode();
+    }
   }
 
   protected AbstractCanvasHandler listener;

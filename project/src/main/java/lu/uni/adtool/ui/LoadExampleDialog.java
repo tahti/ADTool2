@@ -1,3 +1,20 @@
+/**
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>) Date:
+ * 10/12/2015 Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty
+ * of Science, Technology and Communication FSTC All rights reserved. Licensed
+ * under GNU Affero General Public License 3.0; This program is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package lu.uni.adtool.ui;
 
 import lu.uni.adtool.ADToolMain;
@@ -11,6 +28,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -18,11 +36,14 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -34,28 +55,6 @@ import javax.swing.event.ListSelectionListener;
  * @author Piotr Kordy
  */
 public class LoadExampleDialog extends JDialog implements ActionListener, ListSelectionListener {
-  private static final long serialVersionUID = 1223325877545646416L;
-  private ADToolMain        frame;
-  private JButton           setButton;
-  private JList<String>     list;
-  private JLabel            description;
-  private final String[]    examplesList     = {Options.getMsg("example.auctionfraud.txt"),
-      Options.getMsg("example.rfiddos.txt"), Options.getMsg("example.rfidblock.txt"),
-      Options.getMsg("example.breakwarehouse.txt"), Options.getMsg("example.rfidwarehouse.txt"),
-      Options.getMsg("example.data.txt"), Options.getMsg("example.bankaccount.txt")};
-
-  // "Breaking into a Warehouse",
-  // "RFID Dos Attack in Warehouse", "Data Confidentiality", "Bank Account"};
-  private final String[]    examplesFileName =
-      {"/examples/AuctionFraud.xml", "/examples/RFIDDos.xml", "/examples/RFIDBlock.xml",
-          "/examples/BreakingWarehouse.xml", "/examples/RFIDWarehouse.xml",
-          "/examples/DataConfidentiality.xml", "/examples/BankAccount.xml"};
-
-  private final String[]    examplesDesc     = {Options.getMsg("example.auctionfraud.desc"),
-      Options.getMsg("example.rfiddos.desc"), Options.getMsg("example.rfidblock.desc"),
-      Options.getMsg("example.breakwarehouse.desc"), Options.getMsg("example.rfidwarehouse.desc"),
-      Options.getMsg("example.data.desc"), Options.getMsg("example.bankaccount.desc")};
-  private String            result;
 
   /**
    * Constructs a new instance.
@@ -75,10 +74,31 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
    *
    */
   public String showDialog() {
-    createLayout();
+    this.createLayout();
     this.setVisible(true);
     return result;
     // return chosenDomain;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see JDialog#createRootPane()
+   */
+  protected JRootPane createRootPane() {
+    KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    ActionListener actionListener = new ActionListener() {
+      public void actionPerformed(ActionEvent actionEvent) {
+        setValue(-1);
+        dispose();
+      }
+    };
+    JRootPane rootPane = new JRootPane();
+    rootPane.registerKeyboardAction(actionListener, stroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+    // rootPane.registerKeyboardAction(new EnterListener(), strokeEnter,
+    // JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+    return rootPane;
   }
 
   /**
@@ -96,10 +116,10 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
   private void createLayout() {
     JButton cancelButton = new JButton(Options.getMsg("button.cancel"));
     cancelButton.addActionListener(this);
-    setButton = new JButton(Options.getMsg("button.load"));
-    setButton.setActionCommand(Options.getMsg("button.load"));
-    setButton.addActionListener(this);
-    getRootPane().setDefaultButton(setButton);
+    this.setButton = new JButton(Options.getMsg("button.load"));
+    this.setButton.setActionCommand(Options.getMsg("button.load"));
+    this.setButton.addActionListener(this);
+    getRootPane().setDefaultButton(this.setButton);
     list = new JList<String>(examplesList) {
       // Subclass JList to workaround bug 4832765, which can cause the
       // scroll pane to not let the user easily scroll up to the beginning
@@ -167,6 +187,7 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
       public Dimension getMaximumSize() {
         return new Dimension(400, 300);
       }
+
       private static final long serialVersionUID = -6683205667737229246L;
     };
     description.setVerticalAlignment(SwingConstants.TOP);
@@ -183,10 +204,11 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
     buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
     buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
     buttonPane.add(Box.createHorizontalGlue());
-//     buttonPane.add(new JLabel("<html><b>Warning! Current tree will be discarded!</b></html>"));
+    // buttonPane.add(new JLabel("<html><b>Warning! Current tree will be
+    // discarded!</b></html>"));
     buttonPane.add(cancelButton);
     buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
-    buttonPane.add(setButton);
+    buttonPane.add(this.setButton);
     // Put everything together, using the content pane's BorderLayout.
     Container contentPane = getContentPane();
     JPanel content = new JPanel();
@@ -238,4 +260,28 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
       description.setText(Options.getMsg("example.noexample"));
     }
   }
+
+  private static final long serialVersionUID = 1223325877545646416L;
+  private ADToolMain        frame;
+  private JButton           setButton;
+  private JList<String>     list;
+  private JLabel            description;
+  private final String[]    examplesList     = {Options.getMsg("example.auctionfraud.txt"),
+      Options.getMsg("example.rfiddos.txt"), Options.getMsg("example.rfidblock.txt"),
+      Options.getMsg("example.breakwarehouse.txt"), Options.getMsg("example.rfidwarehouse.txt"),
+      Options.getMsg("example.data.txt"), Options.getMsg("example.bankaccount.txt")};
+
+  // "Breaking into a Warehouse",
+  // "RFID Dos Attack in Warehouse", "Data Confidentiality", "Bank Account"};
+  private final String[]    examplesFileName =
+      {"/examples/AuctionFraud.xml", "/examples/RFIDDos.xml", "/examples/RFIDBlock.xml",
+          "/examples/BreakingWarehouse.xml", "/examples/RFIDWarehouse.xml",
+          "/examples/DataConfidentiality.xml", "/examples/BankAccount.xml"};
+
+  private final String[]    examplesDesc     = {Options.getMsg("example.auctionfraud.desc"),
+      Options.getMsg("example.rfiddos.desc"), Options.getMsg("example.rfidblock.desc"),
+      Options.getMsg("example.breakwarehouse.desc"), Options.getMsg("example.rfidwarehouse.desc"),
+      Options.getMsg("example.data.desc"), Options.getMsg("example.bankaccount.desc")};
+  private String            result;
+
 }

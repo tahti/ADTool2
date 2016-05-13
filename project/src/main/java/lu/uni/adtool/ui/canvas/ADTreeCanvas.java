@@ -1,9 +1,31 @@
+/**
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>)
+ * Date:   10/12/2015
+ * Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty of Science,
+ *     Technology and Communication FSTC
+ * All rights reserved.
+ * Licensed under GNU Affero General Public License 3.0;
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU Affero General Public License as
+ *    published by the Free Software Foundation, either version 3 of the
+ *    License, or (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package lu.uni.adtool.ui.canvas;
 
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tools.undo.AddChild;
 import lu.uni.adtool.tools.undo.AddCounter;
 import lu.uni.adtool.tools.undo.AddSibling;
+import lu.uni.adtool.tools.undo.FromTermsTree;
+import lu.uni.adtool.tools.undo.PasteNode;
 import lu.uni.adtool.tools.undo.SetLabel;
 import lu.uni.adtool.tools.undo.SwitchAttacker;
 import lu.uni.adtool.tools.undo.SwitchSibling;
@@ -65,9 +87,11 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
       if (tree.getLayout().getSwitchRole()) {
         n.toggleRoleRecursive();
       }
-      tree.addSubtree(this.focused, n);
-      this.notifyAllTreeChanged();
-      terms.updateTerms();
+      if(tree.addSubtree(this.focused, n)) {
+        this.addEditAction(new PasteNode(this.focused, n));
+        this.notifyAllTreeChanged();
+        terms.updateTerms();
+      }
     }
   }
 
@@ -210,6 +234,7 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
    * Returns the root of a tree associated with this canvas
    */
   public void setRoot(ADTNode root) { // TODO - update all listeners etc
+    this.addEditAction(new FromTermsTree(this.tree.getRoot(true)));
     this.tree.setRoot(root);
     this.notifyAllTreeChanged();
     this.terms.updateTerms();

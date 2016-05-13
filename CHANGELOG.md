@@ -1,11 +1,16 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
+
+## Unreleased
+  - fixed missing undo/redo for copy/pasting nodes
+
 ## [2.1.1] - 2016-04-28 ##
   - fixed not unfolding with space
   - fixed adding countermeasure not working
   - fixed not showing up dialog to input k for domains with parameter
   - fixed issue with opening some xml files form older versions of ADTool and
     improved import of xml files from TreeMaker
+
 ## [2.1.0] - 2016-04-16 ##
   - changed behaviour of drag to be independend of whether tree or background is dragged
   - added zoom in, zoom out to view menu
@@ -13,11 +18,13 @@ All notable changes to the ADTool will be documented in this file.
   - fixed issue that it was possibile to add sibling to counter node
   - added possibility to import adt files
   - added redo undo operations
+
 ## [2.0.3] - 2016-03-31 ##
   - added command line examples
   - fixed regression bug when exporting ranking from command line
   - renaming node now perserves the node value in domains
   - added rounding of real numbers to three digits in display
+
 ## [2.0.2] - 2016-03-21 ##
   - added copy/paste of values in Domain View
   - fixed not updating node size after checking "Computed Values" checkbox

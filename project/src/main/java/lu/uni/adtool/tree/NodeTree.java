@@ -1,3 +1,23 @@
+/**
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>)
+ * Date:   10/12/2015
+ * Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty of Science,
+ *     Technology and Communication FSTC
+ * All rights reserved.
+ * Licensed under GNU Affero General Public License 3.0;
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU Affero General Public License as
+ *    published by the Free Software Foundation, either version 3 of the
+ *    License, or (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package lu.uni.adtool.tree;
 
 import lu.uni.adtool.tools.Debug;
@@ -80,7 +100,7 @@ public class NodeTree {
   }
 
   public void setName(Node node, String label) {
-    Debug.log("setName ****"+ node.getName() + " to "+ label);
+    Debug.log("setName ****" + node.getName() + " to " + label);
     this.layout.rename(node, label);
     node.setName(label);
     this.layout.refreshValues();
@@ -157,7 +177,7 @@ public class NodeTree {
   public void switchSibling(Node node, Node newPos) {
     if (node != null && node.getParent() != null && newPos != null && newPos.getParent() != null) {
       if (node instanceof ADTNode) {
-        if (((ADTNode)node).getRole() != ((ADTNode)newPos).getRole()) return;
+        if (((ADTNode) node).getRole() != ((ADTNode) newPos).getRole()) return;
       }
       int ni = node.getParent().getChildren().indexOf(node);
       int wi = newPos.getParent().getChildren().indexOf(newPos);
@@ -170,14 +190,20 @@ public class NodeTree {
     }
   }
 
-  public void addSubtree(Node parent, Node subtree) {
-    if(parent instanceof SandNode){
+  /**
+   * Returns true if subtree was added, false otherwise
+   */
+  public boolean addSubtree(Node parent, Node subtree) {
+    if (parent instanceof SandNode) {
       parent.addChild(subtree);
     }
     else {
-      if (((ADTNode) parent).getRole() != ((ADTNode)subtree).getRole()) {
+      if (((ADTNode) parent).getRole() != ((ADTNode) subtree).getRole()) {
         if (!((ADTNode) parent).isCountered()) {
-          ((ADTNode)parent).addCounter((ADTNode)subtree);
+          ((ADTNode) parent).addCounter((ADTNode) subtree);
+        }
+        else {
+          return false;
         }
       }
       else {
@@ -187,6 +213,7 @@ public class NodeTree {
     recalculateSiblings();
     this.sharedExtentProvider.updateTreeSize(parent);
     this.layout.refreshValues();
+    return true;
   }
 
   public void addCounter(ADTNode parentNode, ADTNode node) {
