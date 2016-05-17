@@ -507,8 +507,11 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
         return value.toUnicode();
       }
     }
-    else {
+    else if (value != null) {
       return value.toUnicode();
+    }
+    else {
+      return "null";
     }
   }
 
