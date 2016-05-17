@@ -18,10 +18,10 @@ public class BoolExpression {
     this.tokens.add(token);
   }
 
-  public String toUnicode() {
+  public String toString(boolean useUnicode) {
     String result = "";
-    Stack<String > stack = new Stack<String>();
-    Stack<Token> precStack= new Stack<Token>();
+    Stack<String> stack = new Stack<String>();
+    Stack<Token> precStack = new Stack<Token>();
     String x = "";
     String y = "";
     int precX;
@@ -31,17 +31,17 @@ public class BoolExpression {
       case FALSE:
       case X:
       case Y:
-        stack.push(tokenToUnicode(token));
+        stack.push(tokenToString(token, useUnicode));
         precStack.push(token);
         break;
       case NEG:
         x = stack.pop();
         precX = getPrecedence(precStack.pop());
         if (precX <= getPrecedence(token)) {
-          x = tokenToUnicode(Token.LPAREN) + x + tokenToUnicode(Token.RPAREN);
+          x = tokenToString(Token.LPAREN, useUnicode) + x + tokenToString(Token.RPAREN, useUnicode);
         }
 
-        stack.push(tokenToUnicode(token) + " " + x);
+        stack.push(tokenToString(token, useUnicode) + " " + x);
         precStack.push(token);
         break;
       case OR:
@@ -58,12 +58,12 @@ public class BoolExpression {
         precX = getPrecedence(precStack.pop());
         int precY = getPrecedence(precStack.pop());
         if (precX <= getPrecedence(token)) {
-          x = tokenToUnicode(Token.LPAREN) + x + tokenToUnicode(Token.RPAREN);
+          x = tokenToString(Token.LPAREN, useUnicode) + x + tokenToString(Token.RPAREN, useUnicode);
         }
         if (precY <= getPrecedence(token)) {
-          y = tokenToUnicode(Token.LPAREN) + y + tokenToUnicode(Token.RPAREN);
+          y = tokenToString(Token.LPAREN, useUnicode) + y + tokenToString(Token.RPAREN, useUnicode);
         }
-        stack.push( x + " " + tokenToUnicode(token) + " " + y);
+        stack.push(x + " " + tokenToString(token, useUnicode) + " " + y);
         precStack.push(token);
         break;
       case LPAREN:
@@ -177,6 +177,10 @@ public class BoolExpression {
     }
   }
 
+  public int size() {
+    return tokens.size();
+  }
+
   public static Token getToken(String token) {
     if (token.toUpperCase().equals("X")) {
       return Token.X;
@@ -230,81 +234,83 @@ public class BoolExpression {
     return null;
   }
 
-  private String tokenToUnicode(Token token) {
-    switch (token) {
-    case X:
-      return "x";
-    case Y:
-      return "y";
-    case TRUE:
-      return "true";
-    case FALSE:
-      return "false";
-    case NEG:
-      return "\u00AC";
-    case OR:
-      return "\u2228";
-    case NOR:
-      return "\u22BC";
-    case AND:
-      return "\u2227";
-    case NAND:
-      return "\u22BC";
-    case XOR:
-      return "\u2295";
-    case EQ:
-      return "\u21D4";
-    case NEQ:
-      return "\u21CE";
-    case IMP:
-      return "\u21D2";
-    case CIMP:
-      return "\u21D0";
-    case LPAREN:
-      return "(";
-    case RPAREN:
-      return ")";
-    default:
-      return "";
+  public static String tokenToString(Token token, boolean useUnicode) {
+    if (token == null) return "";
+    if (useUnicode) {
+      switch (token) {
+      case X:
+        return "x";
+      case Y:
+        return "y";
+      case TRUE:
+        return "true";
+      case FALSE:
+        return "false";
+      case NEG:
+        return "\u00AC";
+      case OR:
+        return "\u2228";
+      case NOR:
+        return "\u22BC";
+      case AND:
+        return "\u2227";
+      case NAND:
+        return "\u22BC";
+      case XOR:
+        return "\u2295";
+      case EQ:
+        return "\u21D4";
+      case NEQ:
+        return "\u21CE";
+      case IMP:
+        return "\u21D2";
+      case CIMP:
+        return "\u21D0";
+      case LPAREN:
+        return "(";
+      case RPAREN:
+        return ")";
+      default:
+        return "";
+      }
     }
-  }
-
-  private String tokenToString(Token token) {
-    switch (token) {
-    case X:
-      return "x";
-    case Y:
-      return "y";
-    case TRUE:
-      return "true";
-    case FALSE:
-      return "false";
-    case NEG:
-      return "not ";
-    case OR:
-      return " or ";
-    case NOR:
-      return " \u22BC ";
-    case AND:
-      return " \u2227 ";
-    case NAND:
-      return " \u22BC ";
-    case XOR:
-      return " \u2295 ";
-    case EQ:
-      return " \u21D4 ";
-    case NEQ:
-      return " \u21CE ";
-    case IMP:
-      return " \u21D2 ";
-    case CIMP:
-      return " \u21D0 ";
-    case LPAREN:
-      return "(";
-    case RPAREN:
-      return ")";
-    default:
-      return "";
+    else {
+      switch (token) {
+      case X:
+        return "x";
+      case Y:
+        return "y";
+      case TRUE:
+        return "true";
+      case FALSE:
+        return "false";
+      case NEG:
+        return "not";
+      case OR:
+        return "or";
+      case NOR:
+        return "nor";
+      case AND:
+        return "and";
+      case NAND:
+        return "nand";
+      case XOR:
+        return "xor";
+      case EQ:
+        return "==";
+      case NEQ:
+        return "!=";
+      case IMP:
+        return "=>";
+      case CIMP:
+        return "<=";
+      case LPAREN:
+        return "(";
+      case RPAREN:
+        return ")";
+      default:
+        return "";
+      }
     }
   }
 

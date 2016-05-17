@@ -223,6 +223,17 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     return result;
   }
 
+  public static boolean isCustom(String domainName) {
+    String name = domainName;
+    if (!domainName.startsWith(customDomainsPrefix)) {
+      name = customDomainsPrefix + "." + domainName;
+    }
+    if (name.equals(customDomainsPrefix + ".AdtBoolDomain")) {
+      return true;
+    }
+    return false;
+  }
+
 @SuppressWarnings("unchecked")
   public static boolean isSandDomain(String domainName) {
     String name = domainName;
@@ -285,12 +296,18 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       return d;
     }
     else {
-      if (domainName.startsWith(oldAdtDomainsPrefix)) {
-        name = adtDomainsPrefix + domainName.substring(oldAdtDomainsPrefix.length());
-        ;
-      }
-      else if (!domainName.startsWith(adtDomainsPrefix)) {
-        name = adtDomainsPrefix + "." + domainName;
+      if (isCustom(domainName)) {
+        if (!domainName.startsWith(customDomainsPrefix)) {
+          name = customDomainsPrefix + "." + domainName;
+        }
+      } else {
+        if (domainName.startsWith(oldAdtDomainsPrefix)) {
+          name = adtDomainsPrefix + domainName.substring(oldAdtDomainsPrefix.length());
+          ;
+        }
+        else if (!domainName.startsWith(adtDomainsPrefix)) {
+          name = adtDomainsPrefix + "." + domainName;
+        }
       }
       Constructor<AdtDomain<Ring>>[] ct = null;
       try {
@@ -371,6 +388,8 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       "lu.uni.adtool.domains.predefined";
   private static final String                         adtDomainsPrefix    =
       "lu.uni.adtool.domains.adtpredefined";
+  private static final String                         customDomainsPrefix   =
+      "lu.uni.adtool.domains.custom";
   private MainController                              controller;
   private HashMap<Integer, ArrayList<DomainDockable>> domainDockables;
   private HashMap<Integer, Integer>                   domainIdCount;

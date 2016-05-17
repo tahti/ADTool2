@@ -28,11 +28,13 @@ import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
 
-public class AdtBoolDomain implements AdtDomain<Bool> {
+public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
   public AdtBoolDomain () {
     name = Options.getMsg("adtdomain.custom.bool.name");
     description = Options.getMsg("adtdomain.custom.bool.description");
     this.parser = new BoolParser();
+    this.proDefault = new Bool(true);
+    this.oppDefault = new Bool(true);
   }
 
   public boolean isValueModifiable(ADTNode node) {
@@ -59,9 +61,6 @@ public class AdtBoolDomain implements AdtDomain<Bool> {
     }
   }
 
-  public String getName() {
-    return this.name;
-  }
 
   public boolean setName(String name) {
     this.name = name;
@@ -73,22 +72,12 @@ public class AdtBoolDomain implements AdtDomain<Bool> {
     return false;
   }
 
-  public String getDescription() {
-    return this.description;
-  }
 
   public boolean setDescription(String description) {
     if (description == null || (description.equals(""))) {
       return false;
     }
-    String[] operators = { this.op.toUnicode()
-                        , this.oo.toUnicode()
-                        , this.ap.toUnicode()
-                        , this.ao.toUnicode()
-                        , this.cp.toUnicode()
-                        , this.co.toUnicode()
-                         };
-    this.description =  DescriptionGenerator.generateDescription(this, description , "{true,&nbsp;false}", operators);
+    this.description =  description;
     return true;
   }
 
@@ -102,10 +91,10 @@ public class AdtBoolDomain implements AdtDomain<Bool> {
 
   public final Bool getDefaultValue(Node node) {
     if (((ADTNode) node).getRole() == ADTNode.Role.PROPONENT) {
-      return proDefValue;
+      return proDefault;
     }
     else {
-      return oppDefValue;
+      return oppDefault;
     }
   }
 
@@ -175,12 +164,68 @@ public class AdtBoolDomain implements AdtDomain<Bool> {
     return true;
   }
 
-  public void setOppDefValue(boolean value) {
-    this.oppDefValue = new Bool(value);
+  public String getCp() {
+    return this.cp.toString(false);
   }
 
-  public void setProDefValue(boolean value) {
-    this.proDefValue = new Bool(value);
+  public String getCo() {
+    return this.co.toString(false);
+  }
+
+  public String getAp() {
+    return this.ap.toString(false);
+  }
+
+  public String getAo() {
+    return this.ao.toString(false);
+  }
+
+  public String getOp() {
+    return this.op.toString(false);
+  }
+
+  public String getOo() {
+    return this.oo.toString(false);
+  }
+
+  public String getName() {
+    return this.name;
+  }
+
+  public String getShortDescription() {
+    return this.description;
+  }
+
+  public String getDescription() {
+    try {
+      String[] operators = { this.op.toString(true)
+                        , this.oo.toString(true)
+                        , this.ap.toString(true)
+                        , this.ao.toString(true)
+                        , this.cp.toString(true)
+                        , this.co.toString(true)
+                         };
+      return DescriptionGenerator.generateDescription(this, description , "{true,&nbsp;false}", operators);
+    }
+    catch (NullPointerException e) {
+      return this.description;
+    }
+  }
+
+  public void setOppDefault(String value) {
+    this.oppDefault.updateFromString(value);
+  }
+
+  public void setOppDefault(boolean value) {
+    this.oppDefault = new Bool(value);
+  }
+
+  public void setProDefault(boolean value) {
+    this.proDefault = new Bool(value);
+  }
+
+  public void setProDefault(String value) {
+    this.proDefault.updateFromString(value);
   }
 
   public void setOppModifiable(boolean value) {
@@ -190,9 +235,21 @@ public class AdtBoolDomain implements AdtDomain<Bool> {
   public void setProModifiable(boolean value) {
     this.proponentModifiable = value;
   }
+  public String getOppDefault() {
+    return oppDefault.toString();
+  }
+  public String getProDefault() {
+    return proDefault.toString();
+  }
 
-  private Bool oppDefValue;
-  private Bool proDefValue;
+  public boolean isOppModifiable() {
+    return this.opponnentModifiable;
+  }
+  public boolean isProModifiable() {
+    return this.proponentModifiable;
+  }
+  private Bool oppDefault;
+  private Bool proDefault;
   private boolean opponnentModifiable;
   private boolean proponentModifiable;
   private String name;
@@ -203,5 +260,5 @@ public class AdtBoolDomain implements AdtDomain<Bool> {
   private BoolExpression ap;
   private BoolExpression oo;
   private BoolExpression op;
-  private BoolParser parser;
+  private transient BoolParser parser;
 }

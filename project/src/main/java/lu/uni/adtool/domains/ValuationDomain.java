@@ -1,25 +1,23 @@
 /**
- * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>)
- * Date:   10/12/2015
- * Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty of Science,
- *     Technology and Communication FSTC
- * All rights reserved.
- * Licensed under GNU Affero General Public License 3.0;
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Affero General Public License as
- *    published by the Free Software Foundation, either version 3 of the
- *    License, or (at your option) any later version.
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>) Date:
+ * 10/12/2015 Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty
+ * of Science, Technology and Communication FSTC All rights reserved. Licensed
+ * under GNU Affero General Public License 3.0; This program is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- *    You should have received a copy of the GNU Affero General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package lu.uni.adtool.domains;
 
+import lu.uni.adtool.domains.custom.AdtCustomDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tree.ADTNode;
@@ -125,6 +123,23 @@ public class ValuationDomain implements MultipleCDockableLayout {
     this.treeId = element.getElement("treeId").getInt();
     this.domainId = element.getElement("domainId").getInt();
     Debug.log(" layout with treeId " + treeId + " domainId:" + domainId);
+    if (domain instanceof AdtCustomDomain) {
+      AdtCustomDomain custom = (AdtCustomDomain) domain;
+      custom.setName(element.getElement("name").getString());
+      custom.setDescription(element.getElement("description").getString());
+      custom.setOp(element.getElement("op").getString());
+      custom.setOo(element.getElement("oo").getString());
+      custom.setAp(element.getElement("ap").getString());
+      custom.setAo(element.getElement("ao").getString());
+      custom.setCp(element.getElement("cp").getString());
+      custom.setCo(element.getElement("co").getString());
+      custom.setOppDefault(element.getElement("opponentDefault").getString());
+      custom.setProDefault(element.getElement("proponentDefault").getString());
+      custom.setProModifiable(
+          !element.getElement("proModifiable").getString().toUpperCase().equals("FALSE"));
+      custom.setOppModifiable(
+          !element.getElement("oppModifiable").getString().toUpperCase().equals("FALSE"));
+    }
     XElement v = element.getElement("values");
     if (node != null && v != null) {
       this.valuesMap.clear();
@@ -181,16 +196,67 @@ public class ValuationDomain implements MultipleCDockableLayout {
     dElement.addString("id", getExportXmlId());
     dElement.addElement("class").setString(domain.getClass().getName());
     dElement.addElement("tool").setString("ADTool2");
-    if (domain instanceof Parametrized) {
+    if (domain instanceof AdtCustomDomain) {
+      AdtCustomDomain custom = (AdtCustomDomain) domain;
+      dElement.addElement("name").setString(custom.getName());
+      dElement.addElement("description").setString(custom.getShortDescription());
+      dElement.addElement("op").setString(custom.getOp());
+      dElement.addElement("oo").setString(custom.getOo());
+      dElement.addElement("ap").setString(custom.getAp());
+      dElement.addElement("ao").setString(custom.getAo());
+      dElement.addElement("cp").setString(custom.getCp());
+      dElement.addElement("co").setString(custom.getCo());
+      dElement.addElement("opponentDefault").setString(custom.getOppDefault());
+      dElement.addElement("proponentDefault").setString(custom.getProDefault());
+      if (custom.isOppModifiable()) {
+        dElement.addElement("oppModifiable").setString("true");
+      }
+      else {
+        dElement.addElement("oppModifiable").setString("false");
+      }
+      if (custom.isProModifiable()) {
+        dElement.addElement("proModifiable").setString("true");
+      }
+      else {
+        dElement.addElement("proModifiable").setString("false");
+      }
+    }
+    else if (domain instanceof Parametrized) {
       dElement.addElement("range").setString(((Parametrized) domain).getParameter().toString());
     }
 
   }
 
   public void writeXML(XElement element) {
-    element.addElement("domain").setString(domain.getClass().getSimpleName());
+    String domainName = domain.getClass().getSimpleName();
+    element.addElement("domain").setString(domainName);
     element.addElement("treeId").setInt(this.treeId);
     element.addElement("domainId").setInt(this.domainId);
+    if (domain instanceof AdtCustomDomain) {
+      AdtCustomDomain custom = (AdtCustomDomain) domain;
+      element.addElement("name").setString(custom.getName());
+      element.addElement("description").setString(custom.getShortDescription());
+      element.addElement("op").setString(custom.getOp());
+      element.addElement("oo").setString(custom.getOo());
+      element.addElement("ap").setString(custom.getAp());
+      element.addElement("ao").setString(custom.getAo());
+      element.addElement("cp").setString(custom.getCp());
+      element.addElement("co").setString(custom.getCo());
+      element.addElement("opponentDefault").setString(custom.getOppDefault());
+      element.addElement("proponentDefault").setString(custom.getProDefault());
+      if (custom.isOppModifiable()) {
+        element.addElement("oppModifiable").setString("true");
+      }
+      else {
+        element.addElement("oppModifiable").setString("false");
+      }
+      if (custom.isProModifiable()) {
+        element.addElement("proModifiable").setString("true");
+      }
+      else {
+        element.addElement("proModifiable").setString("false");
+      }
+    }
     XElement v = new XElement("values");
     Set<String> keys = valuesMap.keySet(true);
     for (String key : keys) {
@@ -292,7 +358,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
       if (value == null) {
         value = getDomain().getDefaultValue(node);
       }
-      if (toOverwriteValue == null || toOverwriteValue == getDomain().getDefaultValue(node)){
+      if (toOverwriteValue == null || toOverwriteValue == getDomain().getDefaultValue(node)) {
         valuesMap.put(true, name, value);
       }
     }
@@ -304,7 +370,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
       if (value == null) {
         value = getDomain().getDefaultValue(node);
       }
-      if (toOverwriteValue == null || toOverwriteValue == getDomain().getDefaultValue(node)){
+      if (toOverwriteValue == null || toOverwriteValue == getDomain().getDefaultValue(node)) {
         valuesMap.put(((ADTNode) node).getRole() == ADTNode.Role.PROPONENT, name, value);
       }
     }

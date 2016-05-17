@@ -37,13 +37,17 @@ public class BoolParser extends Parser {
     }
     BoolExpression expression = new BoolExpression();
     Stack<BoolExpression.Token> stack = new Stack<BoolExpression.Token>();
-    ;
+    int args = 0;
+    BoolExpression.Token last = null;
     for (BoolExpression.Token token : tokens) {
       switch (token) {
       case TRUE:
       case FALSE:
       case X:
       case Y:
+        args = args + 1;
+        expression.add(token);
+        break;
       case NEG:
         expression.add(token);
         break;
@@ -57,10 +61,11 @@ public class BoolParser extends Parser {
       case IMP:
       case CIMP:
         if (!stack.empty()) {
-          BoolExpression.Token last = stack.peek();
+          last = stack.peek();
           // assuming left-associativity
           if (BoolExpression.getPrecedence(token) <= BoolExpression.getPrecedence(last)) {
             expression.add(stack.pop());
+            args = args - 1;
           }
         }
         stack.push(token);
@@ -71,6 +76,7 @@ public class BoolParser extends Parser {
       case RPAREN:
         while (!stack.empty() && stack.peek() != BoolExpression.Token.LPAREN) {
           expression.add(stack.pop());
+          args = args - 1;
         }
         if (stack.empty()) {
           setError(1, "parser.unmatched");
@@ -85,11 +91,20 @@ public class BoolParser extends Parser {
       while (!stack.empty() && stack.peek() != BoolExpression.Token.LPAREN
           && stack.peek() != BoolExpression.Token.RPAREN) {
         expression.add(stack.pop());
+        args = args - 1;
       }
     }
     if (!stack.empty()) {
       setError(1, "parser.unmatched");
       Debug.log("unmatched parenthesis 2");
+      return null;
+    }
+    if (args != 1) {
+      setError(1, "parser.missingarg");
+      Debug.log("missing arg " + " arg:"+ Integer.toString(args));
+      return null;
+    }
+    if (expression.size() == 0) {
       return null;
     }
     return expression;

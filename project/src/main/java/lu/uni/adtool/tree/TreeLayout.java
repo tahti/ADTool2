@@ -1,22 +1,19 @@
 /**
- * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>)
- * Date:   10/12/2015
- * Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty of Science,
- *     Technology and Communication FSTC
- * All rights reserved.
- * Licensed under GNU Affero General Public License 3.0;
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Affero General Public License as
- *    published by the Free Software Foundation, either version 3 of the
- *    License, or (at your option) any later version.
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>) Date:
+ * 10/12/2015 Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty
+ * of Science, Technology and Communication FSTC All rights reserved. Licensed
+ * under GNU Affero General Public License 3.0; This program is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- *    You should have received a copy of the GNU Affero General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package lu.uni.adtool.tree;
 
@@ -25,6 +22,7 @@ import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Parametrized;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.custom.AdtCustomDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 
@@ -208,12 +206,12 @@ public class TreeLayout implements MultipleCDockableLayout {
   }
 
   public void addAdtDomain(AdtDomain<Ring> domain, lu.uni.adtool.adtree.ValueAssignement<Ring> v1,
-                           lu.uni.adtool.adtree.ValueAssignement<Ring> v2, int treeId, int id) {
+      lu.uni.adtool.adtree.ValueAssignement<Ring> v2, int treeId, int id) {
     ValuationDomain values = new ValuationDomain(treeId, id, domain);
-    for(String s: v1.keySet()) {
+    for (String s : v1.keySet()) {
       values.setValue(true, s, v1.get(s));
     }
-    for(String s: v2.keySet()) {
+    for (String s : v2.keySet()) {
       values.setValue(false, s, v2.get(s));
     }
     domains.add(values);
@@ -252,7 +250,24 @@ public class TreeLayout implements MultipleCDockableLayout {
         if (d == null) {
           throw new IllegalArgumentException(Options.getMsg("exception.nodomain") + domainName);
         }
-        if (d instanceof Parametrized) {
+        if (d instanceof AdtCustomDomain) {
+          AdtCustomDomain custom = (AdtCustomDomain) d;
+          custom.setName(domain.getElement("name").getString());
+          custom.setDescription(domain.getElement("description").getString());
+          custom.setOp(domain.getElement("op").getString());
+          custom.setOo(domain.getElement("oo").getString());
+          custom.setAp(domain.getElement("ap").getString());
+          custom.setAo(domain.getElement("ao").getString());
+          custom.setCp(domain.getElement("cp").getString());
+          custom.setCo(domain.getElement("co").getString());
+          custom.setOppDefault(domain.getElement("opponentDefault").getString());
+          custom.setProDefault(domain.getElement("proponentDefault").getString());
+          custom.setProModifiable(
+              !domain.getElement("proModifiable").getString().toUpperCase().equals("FALSE"));
+          custom.setOppModifiable(
+              !domain.getElement("oppModifiable").getString().toUpperCase().equals("FALSE"));
+        }
+        else if (d instanceof Parametrized) {
           String range = domain.getElement("range").getString();
           if (((Parametrized) d).getParameter() instanceof Integer) {
             if (range.equals(Options.getMsg("inputdialog.infinity"))) {
