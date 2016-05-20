@@ -21,16 +21,19 @@
 package lu.uni.adtool.tools.undo;
 
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.DomainFactory;
 import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.TreeDockable;
+import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 
 public class RemoveDomain extends EditAction {
 
-  public RemoveDomain(ValuationDomain values) {
+  public RemoveDomain(ValuationDomain values, boolean localExtentProvider) {
+    this.localExtentProvider = localExtentProvider;
     this.values = values;
   }
 
@@ -42,6 +45,10 @@ public class RemoveDomain extends EditAction {
       DomainFactory factory = canvas.getController().getFrame().getDomainFactory();
       DomainDockable d = factory.read(this.values);
       canvas.getController().getControl().addDockable(d.getUniqueId(), d);
+      AbstractDomainCanvas<Ring> dc = d.getCanvas();
+      if (dc.hasLocalExtentProvider() != this.localExtentProvider) {
+        dc.setLocalExtentProvider(this.localExtentProvider);
+      }
       currentTree.showDomain(d);
     }
     else {
@@ -71,4 +78,5 @@ public class RemoveDomain extends EditAction {
   }
 
   private ValuationDomain values;
+  private boolean localExtentProvider;
 }

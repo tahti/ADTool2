@@ -21,6 +21,7 @@
 package lu.uni.adtool.ui;
 
 import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 
 import java.awt.Color;
@@ -57,17 +58,6 @@ public class AboutDialog extends JDialog {
     initUI();
   }
 
-  /** Returns an ImageIcon, or null if the path was invalid. */
-  private ImageIcon createImageIcon(String path, String description) {
-    java.net.URL imgURL = getClass().getResource(path);
-    if (imgURL != null) {
-      return new ImageIcon(imgURL, description);
-    }
-    else {
-      System.err.println("Couldn't find file: " + path);
-      return null;
-    }
-  }
 
   public final void initUI() {
     JPanel mainPane = new JPanel();
@@ -84,7 +74,8 @@ public class AboutDialog extends JDialog {
     mainPane.add(name);
     mainPane.add(Box.createRigidArea(new Dimension(0, 10)));
     // ADTool icon
-    icon = createImageIcon("/icons/ADToolVer2.png", "ADTree Tool");
+    IconFactory iconFactory = new IconFactory();
+    icon = iconFactory.createImageIcon("/icons/ADToolVer2.png", Options.getMsg("aboutdialog.tool"));
     JLabel label = new JLabel(icon);
     label.setAlignmentX(0.5f);
     mainPane.add(label);
@@ -100,10 +91,10 @@ public class AboutDialog extends JDialog {
     BoxLayout b = new BoxLayout(p, BoxLayout.X_AXIS);
     p.setLayout(b);
     p.add(Box.createRigidArea(new Dimension(5, 0)));
-    icon = createImageIcon("/icons/fnr_logo.png", "FNR logo");
+    icon = iconFactory.createImageIcon("/icons/fnr_logo.png", Options.getMsg("aboutdialog.fnrlogo"));
     p.add(new JLabel(icon));
     p.add(Box.createRigidArea(new Dimension(25, 0)));
-    icon = createImageIcon("/icons/2eulogos.png", "EU logo");
+    icon = iconFactory.createImageIcon("/icons/2eulogos.png", Options.getMsg("aboutdialog.eulogo"));
     p.add(new JLabel(icon));
     p.add(Box.createRigidArea(new Dimension(5, 0)));
     p.setBackground(Color.white);
@@ -162,5 +153,18 @@ public class AboutDialog extends JDialog {
     }
     return result;
   }
+
+  /** Returns an ImageIcon, or null if the path was invalid. */
+  private ImageIcon createImageIcon(String path, String description) {
+    java.net.URL imgURL = getClass().getResource(path);
+    if (imgURL != null) {
+      return new ImageIcon(imgURL, description);
+    }
+    else {
+      System.err.println("Couldn't find file: " + path);
+      return null;
+    }
+  }
+
   private static final long serialVersionUID = 6478653678873713617L;
 }

@@ -76,7 +76,6 @@ public class BoolExpression {
 
   public Bool evaluate(Bool x, Bool y) {
     Stack<Bool> stack = new Stack<Bool>();
-    ;
     for (Token token : this.tokens) {
       switch (token) {
       case TRUE:
@@ -188,10 +187,10 @@ public class BoolExpression {
     if (token.toUpperCase().equals("Y")) {
       return Token.Y;
     }
-    if (token.toUpperCase().equals("(")) {
+    if (token.equals("(")) {
       return Token.LPAREN;
     }
-    if (token.toUpperCase().equals(")")) {
+    if (token.equals(")")) {
       return Token.RPAREN;
     }
     if (token.toUpperCase().equals("TRUE")) {

@@ -24,6 +24,7 @@ import lu.uni.adtool.domains.Parametrized;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.custom.AdtBoolDomain;
+import lu.uni.adtool.domains.custom.AdtIntDomain;
 import lu.uni.adtool.domains.rings.BoundedInteger;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
@@ -888,10 +889,15 @@ public final class MainController implements CControlListener, CFocusListener {
           return;
         }
         if (d instanceof AdtBoolDomain) {
-          // LoadExampleDialog dialog = new LoadExampleDialog(getFrame());
-          // dialog.showDialog();
           AddBoolDomainDialog boolDialog = new AddBoolDomainDialog(this.frame, (AdtBoolDomain) d);
           if (boolDialog.showDialog() == null) {
+            Debug.log("cancel pressed");
+            return;
+          }
+        }
+        else if (d instanceof AdtIntDomain) {
+          AddIntDomainDialog intDialog = new AddIntDomainDialog(this.frame, (AdtIntDomain) d);
+          if (intDialog.showDialog() == null) {
             Debug.log("cancel pressed");
             return;
           }

@@ -1,0 +1,13 @@
+<?xml version='1.0'?>
+<sandtree>
+	<node refinement="conjunctive">
+		<label>Root</label>
+		<comment>[Additional description
+]</comment>
+		<parameter domainId="MinTime1" category="basic">Infinity</parameter>
+	</node>
+	<domain id="MinTime1">
+		<class>lu.uni.adtool.domains.sandpredefined.MinTime</class>
+		<tool>ADTool2</tool>
+	</domain>
+</sandtree>

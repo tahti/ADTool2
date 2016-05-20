@@ -1,5 +1,7 @@
 package lu.uni.adtool.domains.custom;
+
 public interface AdtCustomDomain {
+
   public boolean setCp(String expr);
   public boolean setCo(String expr);
   public boolean setAp(String expr);
@@ -8,8 +10,8 @@ public interface AdtCustomDomain {
   public boolean setOo(String expr);
   public boolean setName(String name);
   public boolean setDescription(String description);
-  public void setProDefault(String value);
-  public void setOppDefault(String value);
+  public boolean setProDefault(String value);
+  public boolean setOppDefault(String value);
   public void setProModifiable(boolean value);
   public void setOppModifiable(boolean value);
 

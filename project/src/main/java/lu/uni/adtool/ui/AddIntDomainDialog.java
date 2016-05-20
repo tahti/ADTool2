@@ -1,8 +1,7 @@
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.domains.custom.AdtBoolDomain;
-import lu.uni.adtool.domains.custom.BoolParser;
-import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.domains.custom.AdtIntDomain;
+import lu.uni.adtool.domains.custom.IntParser;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 
@@ -40,12 +39,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-public class AddBoolDomainDialog extends JDialog implements ActionListener, DocumentListener {
+public class AddIntDomainDialog extends JDialog implements ActionListener, DocumentListener {
   public enum FieldType {
-    AP, AO, OP, OO, CP, CO, NAME, DESCR, NONE
+    AP, AO, OP, OO, CP, CO, NAME, DESCR, NONE, DEFAULTP, DEFAULTO
   }
 
-  public AddBoolDomainDialog(Frame frame, AdtBoolDomain domain) {
+  public AddIntDomainDialog(Frame frame, AdtIntDomain domain) {
     super(frame, Options.getMsg("adtdomain.custom.dialogtitle"), true);
     this.domain = domain;
     setAlwaysOnTop(true);
@@ -54,7 +53,7 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     setSize(800, 600);
   }
 
-  public AdtBoolDomain showDialog() {
+  public AdtIntDomain showDialog() {
     this.createLayout();
     this.setVisible(true);
     return this.domain;
@@ -87,9 +86,32 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     this.ao = new JTextField();
     this.op = new JTextField();
     this.oo = new JTextField();
-    String[] valueList = {"true", "false"};
-    this.defaulto = new JComboBox(valueList);
-    this.defaultp = new JComboBox(valueList);
+    this.defaulto = new JTextField("");
+    this.defaulto.getDocument().addDocumentListener(this);
+    this.defaulto.getDocument().putProperty("parent", defaulto);
+    this.defaulto.addFocusListener(new FocusListener() {
+      public void focusGained(FocusEvent e) {
+        setHelpContent(FieldType.DEFAULTO);
+      }
+
+      public void focusLost(FocusEvent e) {
+        setHelpContent(FieldType.NONE);
+      }
+    });
+
+    this.defaultp = new JTextField("");
+    this.defaultp.getDocument().putProperty("parent", defaultp);
+    this.defaultp.getDocument().addDocumentListener(this);
+    this.defaultp.addFocusListener(new FocusListener() {
+      public void focusGained(FocusEvent e) {
+        setHelpContent(FieldType.DEFAULTP);
+      }
+
+      public void focusLost(FocusEvent e) {
+        setHelpContent(FieldType.NONE);
+      }
+    });
+
     this.modifiableo = new JCheckBox(Options.getMsg("dialog.adddomain.modifiableo"));
     this.modifiableo.setSelected(true);
     this.modifiablep = new JCheckBox(Options.getMsg("dialog.adddomain.modifiablep"));
@@ -183,6 +205,8 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     this.op.getDocument().putProperty("parent", op);
     this.oo.getDocument().putProperty("parent", oo);
 
+    this.defaultp.setBackground(invalidColor);
+    this.defaulto.setBackground(invalidColor);
     this.name.setBackground(invalidColor);
     this.description.setBackground(invalidColor);
     this.cp.setBackground(invalidColor);
@@ -236,8 +260,9 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
 
   /**
    * {@inheritDoc}
-   * @see ActionListener#actionPerformed(ActionEvent)
-   * Handle clicks on the Set and Cancel buttons.
+   *
+   * @see ActionListener#actionPerformed(ActionEvent) Handle clicks on the Set
+   *      and Cancel buttons.
    */
   public void actionPerformed(ActionEvent e) {
     if (Options.getMsg("button.cancel").equals(e.getActionCommand())) {
@@ -270,16 +295,15 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     dispose();
   }
 
-
   public void enterPressed() {
-    domain.setProDefault(this.defaultp.getSelectedIndex() == 0);
-    domain.setOppDefault(this.defaulto.getSelectedIndex() == 0);
     domain.setProModifiable(this.modifiablep.isSelected());
     domain.setOppModifiable(this.modifiableo.isSelected());
     if ((!this.domain.setName(this.name.getText())) || (!this.domain.setCp(this.cp.getText()))
         || (!this.domain.setCo(this.co.getText())) || (!this.domain.setAp(this.ap.getText()))
         || (!this.domain.setAo(this.ao.getText())) || (!this.domain.setOp(this.op.getText()))
         || (!this.domain.setOo(this.oo.getText()))
+        || (!domain.setProDefault(this.defaultp.getText()))
+        || (!domain.setOppDefault(this.defaultp.getText()))
         || (!this.domain.setDescription(this.description.getText()))) {
       okButton.setEnabled(false);
     }
@@ -300,8 +324,18 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
         field.setBackground(invalidColor);
       }
     }
+    else if (field == this.defaulto || field == this.defaultp) {
+      try {
+        Integer.parseInt(field.getText());
+        field.setBackground(validColor);
+      }
+      catch (NumberFormatException e) {
+        field.setBackground(invalidColor);
+        this.errorLabel.setText(Options.getMsg("dialog.adddomain.wrongint"));
+      }
+    }
     else {
-      BoolParser parser = new BoolParser();
+      IntParser parser = new IntParser();
       if (field.getText().length() > 0 && parser.parseString(field.getText()) != null) {
         field.setBackground(validColor);
       }
@@ -310,14 +344,16 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
         field.setBackground(invalidColor);
       }
     }
-    if (this.name.getBackground() == AddBoolDomainDialog.validColor
-        && this.description.getBackground() == AddBoolDomainDialog.validColor
-        && this.ao.getBackground() == AddBoolDomainDialog.validColor
-        && this.ap.getBackground() == AddBoolDomainDialog.validColor
-        && this.oo.getBackground() == AddBoolDomainDialog.validColor
-        && this.op.getBackground() == AddBoolDomainDialog.validColor
-        && this.co.getBackground() == AddBoolDomainDialog.validColor
-        && this.cp.getBackground() == AddBoolDomainDialog.validColor) {
+    if (this.name.getBackground() == AddIntDomainDialog.validColor
+        && this.defaultp.getBackground() == AddIntDomainDialog.validColor
+        && this.defaulto.getBackground() == AddIntDomainDialog.validColor
+        && this.description.getBackground() == AddIntDomainDialog.validColor
+        && this.ao.getBackground() == AddIntDomainDialog.validColor
+        && this.ap.getBackground() == AddIntDomainDialog.validColor
+        && this.oo.getBackground() == AddIntDomainDialog.validColor
+        && this.op.getBackground() == AddIntDomainDialog.validColor
+        && this.co.getBackground() == AddIntDomainDialog.validColor
+        && this.cp.getBackground() == AddIntDomainDialog.validColor) {
       okButton.setEnabled(true);
       return true;
     }
@@ -406,7 +442,7 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
       }
     }
     else {
-      head = new JLabel(Options.getMsg("dialog.addbooldomain.syntax"));
+      head = new JLabel(Options.getMsg("dialog.addintdomain.syntax"));
       head.setFont(new Font("Serif", Font.PLAIN, 14));
       margin = new EmptyBorder(5, 10, 5, 5);
       head.setBorder(new CompoundBorder(border, margin));
@@ -416,23 +452,23 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     this.helpPane.repaint();
   }
 
-  private AdtBoolDomain domain;
-  private JTextField    name;
-  private JTextField    description;
-  private JTextField    ao;
-  private JTextField    ap;
-  private JTextField    oo;
-  private JTextField    op;
-  private JTextField    cp;
-  private JTextField    co;
-  private JComboBox     defaulto;
-  private JComboBox     defaultp;
-  private JCheckBox     modifiableo;
-  private JCheckBox     modifiablep;
-  private JButton       okButton;
-  private JLabel        errorLabel;
-  private JPanel        helpPane;
+  private AdtIntDomain domain;
+  private JTextField   name;
+  private JTextField   description;
+  private JTextField   ao;
+  private JTextField   ap;
+  private JTextField   oo;
+  private JTextField   op;
+  private JTextField   cp;
+  private JTextField   co;
+  private JTextField   defaulto;
+  private JTextField   defaultp;
+  private JCheckBox    modifiableo;
+  private JCheckBox    modifiablep;
+  private JButton      okButton;
+  private JLabel       errorLabel;
+  private JPanel       helpPane;
 
-  private static Color  validColor   = new Color(170, 255, 170);
-  private static Color  invalidColor = new Color(255, 170, 170);
+  private static Color validColor   = new Color(170, 255, 170);
+  private static Color invalidColor = new Color(255, 170, 170);
 }

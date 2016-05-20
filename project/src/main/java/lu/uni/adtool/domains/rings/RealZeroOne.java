@@ -20,14 +20,12 @@
  */
 package lu.uni.adtool.domains.rings;
 
-import java.io.Serializable;
-
 /**
  * Set of real numbers in between 0 and 1 (including 0 and 1).
  *
  * @author Piotr Kordy
  */
-public class RealZeroOne implements Serializable, Ring {
+public class RealZeroOne implements Ring {
 
   /**
    * Constructs a new instance.

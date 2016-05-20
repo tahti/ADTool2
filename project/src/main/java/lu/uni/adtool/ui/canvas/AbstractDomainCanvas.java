@@ -447,6 +447,10 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     tree.getSharedExtentProvider().notifyTreeChanged();
   }
 
+  public boolean hasLocalExtentProvider() {
+    return this.localExtentProvider;
+  }
+
   public boolean getShowLabels() {
     return this.showLabels;
   }

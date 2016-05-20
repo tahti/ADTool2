@@ -20,14 +20,12 @@
  */
 package lu.uni.adtool.domains.rings;
 
-import java.io.Serializable;
-
 /**
  * Class representing bounded integers.
  *
  * @author Piotr Kordy
  */
-public class BoundedInteger implements Serializable, Ring {
+public class BoundedInteger implements Ring {
 
   /**
    * Constructs a new instance.

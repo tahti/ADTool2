@@ -932,8 +932,12 @@ public abstract class AbstractTreeCanvas extends JPanel
   }
 
   public void removeDomain(DomainDockable dockable) {
+    boolean localExtentProvider = dockable.getCanvas().hasLocalExtentProvider();
+    if (!localExtentProvider) {
+      dockable.getCanvas().setLocalExtentProvider(true);
+    }
     if (this.getTree().getLayout().removeValuation(dockable.getCanvas().getValues())) {
-      this.addEditAction(new RemoveDomain(dockable.getCanvas().getValues()));
+      this.addEditAction(new RemoveDomain(dockable.getCanvas().getValues(), localExtentProvider));
       this.controller.getFrame().getDomainFactory().removeDomain(dockable);
     }
   }

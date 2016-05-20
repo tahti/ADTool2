@@ -1,0 +1,310 @@
+package lu.uni.adtool.domains.custom;
+
+import lu.uni.adtool.domains.rings.Int;
+
+import java.util.ArrayList;
+import java.util.Stack;
+
+public class IntExpression {
+  public enum Token {
+    Y, X, LPAREN, RPAREN, COMMA, PLUS, MINUS, MUL, DIV, MODULO, MAX, MIN, ABS, INTEGER, NEG
+  }
+
+  public void add(Term term) {
+    this.terms.add(term);
+  }
+
+  public Int evaluate(Int x, Int y) {
+    Stack<Int> stack = new Stack<Int>();
+    int args = 0;
+    Int result;
+    for (Term term : this.terms) {
+      switch (term.type) {
+      case X:
+        stack.push(x);
+        break;
+      case Y:
+        stack.push(y);
+        break;
+      case PLUS:
+        stack.push(new Int(stack.pop().getValue() + stack.pop().getValue()));
+        break;
+      case MINUS:
+        stack.push(new Int(stack.pop().getValue() - stack.pop().getValue()));
+        break;
+      case MUL:
+        stack.push(new Int(stack.pop().getValue() * stack.pop().getValue()));
+        break;
+      case DIV:
+        stack.push(new Int(stack.pop().getValue() / stack.pop().getValue()));
+        break;
+      case MODULO:
+        stack.push(new Int(stack.pop().getValue() % stack.pop().getValue()));
+        break;
+      case MAX:
+        args = term.value - 1;
+        result = stack.pop();
+        while (args > 0) {
+          result = new Int(Math.max(result.getValue(), stack.pop().getValue()));
+          args = args - 1;
+        }
+        stack.push(result);
+        break;
+      case MIN:
+        args = term.value - 1;
+        result = stack.pop();
+        while (args > 0) {
+          result = new Int(Math.min(result.getValue(), stack.pop().getValue()));
+          args = args - 1;
+        }
+        stack.push(result);
+        break;
+      case ABS:
+        stack.push(new Int(Math.abs(stack.pop().getValue())));
+        break;
+      case NEG:
+        stack.push(new Int(-1 * (stack.pop().getValue())));
+        break;
+      case INTEGER:
+        stack.push(new Int(term.value));
+        break;
+      }
+    }
+    if (stack.size() != 1) {
+      return null;
+    }
+    else {
+      return stack.pop();
+    }
+  }
+
+  public String toString() {
+    String result = "";
+    Stack<String> stack = new Stack<String>();
+    Stack<Token> precStack = new Stack<Token>();
+    String x = "";
+    String y = "";
+    int precX;
+    for (Term term : this.terms) {
+      switch (term.type) {
+      case X:
+      case Y:
+        stack.push(termToString(term));
+        precStack.push(term.type);
+        break;
+      case NEG:
+        x = stack.pop();
+        precX = getPrecedence(precStack.pop());
+        if (precX <= getPrecedence(term.type)) {
+          x = termToString(new Term(Token.LPAREN, 0)) + x + termToString(new Term(Token.RPAREN, 0));
+        }
+        stack.push(termToString(term) + x);
+        break;
+      case ABS:
+        x = stack.pop();
+        precX = getPrecedence(precStack.pop());
+        x = termToString(new Term(Token.LPAREN, 0)) + x + termToString(new Term(Token.RPAREN, 0));
+        stack.push(termToString(term) + x);
+        break;
+      case MIN:
+      case MAX:
+        int args = term.value - 1;
+        x = stack.pop();
+        precStack.pop();
+        while (args > 0) {
+          x = x + ", " + stack.pop();
+          precStack.pop();
+          args = args - 1;
+        }
+        stack.push(termToString(term) + termToString(new Term(Token.LPAREN, 0)) + x
+            + termToString(new Term(Token.RPAREN, 0)));
+        break;
+      case PLUS:
+      case MINUS:
+      case MUL:
+      case DIV:
+      case MODULO:
+        x = stack.pop();
+        y = stack.pop();
+        precX = getPrecedence(precStack.pop());
+        int precY = getPrecedence(precStack.pop());
+        if (precX <= getPrecedence(term.type)) {
+          x = termToString(new Term(Token.LPAREN, 0)) + x + termToString(new Term(Token.RPAREN, 0));
+        }
+        if (precY <= getPrecedence(term.type)) {
+          y = termToString(new Term(Token.LPAREN, 0)) + y + termToString(new Term(Token.RPAREN, 0));
+        }
+        stack.push(x + " " + termToString(term) + " " + y);
+        precStack.push(term.type);
+        break;
+      case LPAREN:
+      case RPAREN:
+      case COMMA:
+        break;
+      }
+    }
+    return stack.pop();
+  }
+
+  public static int getPrecedence(Token token) {
+    switch (token) {
+    case X:
+    case Y:
+    case ABS:
+    case MIN:
+    case MAX:
+    case INTEGER:
+      return 5;
+    case NEG:
+      return 4;
+    case MUL:
+    case DIV:
+      return 3;
+    case MINUS:
+    case PLUS:
+      return 2;
+    case COMMA:
+      return 1;
+    case LPAREN:
+    case RPAREN:
+    default:
+      return 0;
+    }
+  }
+
+  public int size() {
+    return terms.size();
+  }
+
+  public IntExpression() {
+    this.terms = new ArrayList<Term>();
+  }
+
+  public static boolean isFunction(Token token) {
+    switch (token) {
+    case ABS:
+    case MIN:
+    case MAX:
+      return true;
+    default:
+      return false;
+    }
+  }
+
+  public static boolean checkArgumentCount(Term term) {
+    switch (term.type) {
+    case ABS:
+    case NEG:
+      return term.value == 1;
+    case MIN:
+    case MAX:
+      return term.value > 0;
+    case PLUS:
+    case DIV:
+    case MUL:
+    case MODULO:
+    case MINUS:
+      return term.value == 2;
+    default:
+      return true;
+    }
+  }
+
+  public static String termToString(Term term) {
+    if (term == null) return "";
+    switch (term.type) {
+    case INTEGER:
+      return Integer.toString(term.value);
+    case X:
+      return "x";
+    case Y:
+      return "y";
+    case PLUS:
+      return "+";
+    case MINUS:
+      return "-";
+    case DIV:
+      return "/";
+    case MUL:
+      return "*";
+    case MODULO:
+      return "%";
+    case ABS:
+      return "abs";
+    case MIN:
+      return "min";
+    case MAX:
+      return "max";
+    case LPAREN:
+      return "(";
+    case RPAREN:
+      return ")";
+    case COMMA:
+      return ",";
+    default:
+      return "";
+    }
+  }
+//     Y, X, LPAREN, RPAREN, COMMA, PLUS, MINUS, MUL, DIV, MODULO, MAX, MIN, ABS, INTEGER, NEG
+
+  public static Term getTerm(String term) {
+    if (term.toUpperCase().equals("X")) {
+      return new Term(Token.X, 0);
+    }
+    if (term.toUpperCase().equals("Y")) {
+      return new Term(Token.Y, 0);
+    }
+    if (term.equals("(")) {
+      return new Term(Token.LPAREN, 0);
+    }
+    if (term.equals(")")) {
+      return new Term(Token.RPAREN, 0);
+    }
+    if (term.equals("+")) {
+      return new Term(Token.PLUS, 2);
+    }
+    if (term.equals("*")) {
+      return new Term(Token.MUL, 2);
+    }
+    if (term.equals(",")) {
+      return new Term(Token.COMMA, 0);
+    }
+    if (term.equals("/")) {
+      return new Term(Token.DIV, 2);
+    }
+    if (term.equals("%")) {
+      return new Term(Token.MODULO, 2);
+    }
+    if (term.equals("-")) {
+      return new Term(Token.MINUS, 2);
+    }
+    if (term.toUpperCase().equals("MAX")) {
+      return new Term(Token.MAX, 1);
+    }
+    if (term.toUpperCase().equals("MIN")) {
+      return new Term(Token.MIN, 1);
+    }
+    if (term.toUpperCase().equals("ABS")) {
+      return new Term(Token.ABS, 1);
+    }
+    try {
+      int value = Integer.parseInt(term);
+      return new Term(Token.INTEGER, value);
+    }
+    catch (NumberFormatException e) {
+    }
+    return null;
+  }
+
+  public static class Term {
+    public Term(Token type, int value) {
+      this.type = type;
+      this.value = value;
+    }
+
+    public Token type;
+    public int   value;
+  }
+
+  private ArrayList<Term> terms;
+}

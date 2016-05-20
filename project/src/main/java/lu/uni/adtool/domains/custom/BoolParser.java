@@ -60,12 +60,15 @@ public class BoolParser extends Parser {
       case NEQ:
       case IMP:
       case CIMP:
-        if (!stack.empty()) {
+        while (!stack.empty()) {
           last = stack.peek();
           // assuming left-associativity
           if (BoolExpression.getPrecedence(token) <= BoolExpression.getPrecedence(last)) {
             expression.add(stack.pop());
             args = args - 1;
+          }
+          else {
+            break;
           }
         }
         stack.push(token);
@@ -74,7 +77,7 @@ public class BoolParser extends Parser {
         stack.push(token);
         break;
       case RPAREN:
-        while (!stack.empty() && stack.peek() != BoolExpression.Token.LPAREN) {
+        while ((!stack.empty()) && (stack.peek() != BoolExpression.Token.LPAREN)) {
           expression.add(stack.pop());
           args = args - 1;
         }

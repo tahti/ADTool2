@@ -3,6 +3,7 @@ All notable changes to the ADTool will be documented in this file.
 
 ## Unreleased
   - fixed missing undo/redo for copy/pasting nodes
+  - fixed issue with wrong size of nodes when adding/removing domain
 
 ## [2.1.1] - 2016-04-28 ##
   - fixed not unfolding with space

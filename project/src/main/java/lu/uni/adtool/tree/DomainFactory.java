@@ -38,6 +38,7 @@ import lu.uni.adtool.domains.adtpredefined.SatOpp;
 import lu.uni.adtool.domains.adtpredefined.SatProp;
 import lu.uni.adtool.domains.adtpredefined.SatScenario;
 import lu.uni.adtool.domains.custom.AdtBoolDomain;
+import lu.uni.adtool.domains.custom.AdtIntDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.domains.sandpredefined.MinTime;
 import lu.uni.adtool.tools.Debug;
@@ -171,8 +172,10 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       }
     }
     else {
-      //add custom bool domain
+      //add custom domains first
       result.add(new AdtBoolDomain());
+      result.add(new AdtIntDomain());
+      //add other domains
       Reflections reflections = new Reflections(adtDomainsPrefix);
       Set<Class<? extends AdtDomain>> m = reflections.getSubTypesOf(AdtDomain.class);
       for (Class<? extends AdtDomain> c : m) {
@@ -228,7 +231,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     if (!domainName.startsWith(customDomainsPrefix)) {
       name = customDomainsPrefix + "." + domainName;
     }
-    if (name.equals(customDomainsPrefix + ".AdtBoolDomain")) {
+    if (name.equals(customDomainsPrefix + ".AdtBoolDomain") || name.equals(customDomainsPrefix + ".AdtIntDomain")) {
       return true;
     }
     return false;

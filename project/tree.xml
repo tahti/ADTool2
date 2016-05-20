@@ -1,0 +1,53 @@
+<?xml version='1.0'?>
+<adtree>
+	<node refinement="conjunctive">
+		<label>root</label>
+		<parameter domainId="DiffLMH1" category="derived">H</parameter>
+		<ranking rank="1">H</ranking>
+		<ranking rank="2">Infinity</ranking>
+		<node refinement="conjunctive">
+			<label>N_1</label>
+			<parameter domainId="DiffLMH1" category="basic">M</parameter>
+			<ranking rank="1">M</ranking>
+			<ranking rank="2">M</ranking>
+		</node>
+		<node refinement="disjunctive">
+			<label>N_2</label>
+			<parameter domainId="DiffLMH1" category="derived">M</parameter>
+			<ranking rank="1">M</ranking>
+			<ranking rank="2">Infinity</ranking>
+			<node refinement="conjunctive">
+				<label>N_5</label>
+				<parameter domainId="DiffLMH1" category="basic">M</parameter>
+				<ranking rank="1">M</ranking>
+			</node>
+			<node refinement="conjunctive">
+				<label>N_6</label>
+				<parameter domainId="DiffLMH1" category="basic">M</parameter>
+				<ranking rank="2">Infinity</ranking>
+				<node refinement="conjunctive" switchRole="yes">
+					<label>N_7</label>
+					<parameter domainId="DiffLMH1" category="default">Infinity</parameter>
+					<parameter domainId="DiffLMH1" category="derived">Infinity</parameter>
+					<ranking rank="2">Infinity</ranking>
+				</node>
+			</node>
+		</node>
+		<node refinement="conjunctive">
+			<label>N_3</label>
+			<parameter domainId="DiffLMH1" category="basic">H</parameter>
+			<ranking rank="1">H</ranking>
+			<ranking rank="2">H</ranking>
+		</node>
+		<node refinement="conjunctive">
+			<label>N_4</label>
+			<parameter domainId="DiffLMH1" category="basic">M</parameter>
+			<ranking rank="1">M</ranking>
+			<ranking rank="2">M</ranking>
+		</node>
+	</node>
+	<domain id="DiffLMH1">
+		<class>lu.uni.adtool.domains.adtpredefined.DiffLMH</class>
+		<tool>ADTool2</tool>
+	</domain>
+</adtree>
