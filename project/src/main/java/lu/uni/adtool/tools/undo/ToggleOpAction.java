@@ -20,14 +20,15 @@
  */
 package lu.uni.adtool.tools.undo;
 
+import java.util.ArrayList;
+
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 import lu.uni.adtool.ui.canvas.SandTreeCanvas;
-
-import java.util.ArrayList;
 
 public class ToggleOpAction extends EditAction {
 
@@ -36,24 +37,26 @@ public class ToggleOpAction extends EditAction {
     this.targetPath = target.toPath();
   }
 
+@SuppressWarnings("unchecked")
   public void undo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {
       ((SandNode) target).toggleOp();
-      ((SandTreeCanvas)canvas).toggleOp(target);
+      ((SandTreeCanvas<Ring>)canvas).toggleOp(target);
     }
     else {
-      ((ADTreeCanvas)canvas).toggleOp(target);
+      ((ADTreeCanvas<Ring>)canvas).toggleOp(target);
     }
   }
 
+@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {
-      ((SandTreeCanvas)canvas).toggleOp(target);
+      ((SandTreeCanvas<Ring>)canvas).toggleOp(target);
     }
     else {
-      ((ADTreeCanvas)canvas).toggleOp(target);
+      ((ADTreeCanvas<Ring>)canvas).toggleOp(target);
     }
   }
 

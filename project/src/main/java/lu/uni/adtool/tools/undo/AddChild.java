@@ -19,6 +19,9 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package lu.uni.adtool.tools.undo;
+import java.util.ArrayList;
+
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
@@ -26,8 +29,6 @@ import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 import lu.uni.adtool.ui.canvas.SandTreeCanvas;
-
-import java.util.ArrayList;
 
 public class AddChild extends EditAction {
 
@@ -56,13 +57,14 @@ public class AddChild extends EditAction {
     }
   }
 
+@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
     Node parent = canvas.getTree().getRoot(true).fromPath(parentPath, 0);
     if (parent instanceof SandNode) {
-      ((SandTreeCanvas)canvas).addChild(parent);
+      ((SandTreeCanvas<Ring>)canvas).addChild(parent);
     }
     else {
-      ((ADTreeCanvas)canvas).addChild(parent);
+      ((ADTreeCanvas<Ring>)canvas).addChild(parent);
     }
   }
 

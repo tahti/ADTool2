@@ -29,6 +29,7 @@ import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
 
 public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
+
   public AdtBoolDomain () {
     name = Options.getMsg("adtdomain.custom.bool.name");
     description = Options.getMsg("adtdomain.custom.bool.description");
@@ -193,8 +194,8 @@ public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
   public String getDescription() {
     try {
       String[] operators = { this.op.toString(true)
-                        , this.oo.toString(true)
                         , this.ap.toString(true)
+                        , this.oo.toString(true)
                         , this.ao.toString(true)
                         , this.cp.toString(true)
                         , this.co.toString(true)
@@ -255,4 +256,6 @@ public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
   private BoolExpression oo;
   private BoolExpression op;
   private transient BoolParser parser;
+
+  private static final long serialVersionUID = 8828321968670471286L;
 }

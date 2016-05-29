@@ -58,7 +58,6 @@ public class AboutDialog extends JDialog {
     initUI();
   }
 
-
   public final void initUI() {
     JPanel mainPane = new JPanel();
     ImageIcon icon;
@@ -118,10 +117,10 @@ public class AboutDialog extends JDialog {
   }
 
   private void initCloseListener() {
-    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close");
-    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-        .put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "close");
+    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+        "close");
+    getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+        "close");
     getRootPane().getActionMap().put("close", new AbstractAction() {
       private static final long serialVersionUID = 2143956335533214473L;
 
@@ -141,30 +140,17 @@ public class AboutDialog extends JDialog {
         // Class not from JAR
         return "No version info";
       }
-      String manifestPath =
-          classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
+      String manifestPath = classPath.substring(0, classPath.lastIndexOf("!") + 1) + "/META-INF/MANIFEST.MF";
       Manifest manifest = new Manifest(new URL(manifestPath).openStream());
       Attributes mainAttribs = manifest.getMainAttributes();
       result += " " + mainAttribs.getValue("Implementation-Version") + " (";
       result += mainAttribs.getValue("Date-Build") + " - ";
-      result += mainAttribs.getValue("Implementation-Build").substring(0,6) + ")";
-    }
-    catch (IOException e1) {
+      result += mainAttribs.getValue("Implementation-Build").substring(0, 6) + ")";
+    } catch (IOException e1) {
     }
     return result;
   }
 
-  /** Returns an ImageIcon, or null if the path was invalid. */
-  private ImageIcon createImageIcon(String path, String description) {
-    java.net.URL imgURL = getClass().getResource(path);
-    if (imgURL != null) {
-      return new ImageIcon(imgURL, description);
-    }
-    else {
-      System.err.println("Couldn't find file: " + path);
-      return null;
-    }
-  }
 
   private static final long serialVersionUID = 6478653678873713617L;
 }

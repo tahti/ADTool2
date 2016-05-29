@@ -27,6 +27,7 @@ import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.SandNode;
 
 public class DescriptionGenerator {
+
   public static String generateDescription(AdtDomain<?> d, String name, String valueDomain,
       String[] oper) {
     ADTNode node = new ADTNode();

@@ -1,11 +1,5 @@
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.domains.custom.AdtBoolDomain;
-import lu.uni.adtool.domains.custom.BoolParser;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Options;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -40,7 +34,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import lu.uni.adtool.domains.custom.AdtBoolDomain;
+import lu.uni.adtool.domains.custom.BoolParser;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Options;
+
 public class AddBoolDomainDialog extends JDialog implements ActionListener, DocumentListener {
+
+  private static final long serialVersionUID = 5279882898155421759L;
+
   public enum FieldType {
     AP, AO, OP, OO, CP, CO, NAME, DESCR, NONE
   }
@@ -87,9 +89,9 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     this.ao = new JTextField();
     this.op = new JTextField();
     this.oo = new JTextField();
-    String[] valueList = {"true", "false"};
-    this.defaulto = new JComboBox(valueList);
-    this.defaultp = new JComboBox(valueList);
+    String[] valueList = { "true", "false" };
+    this.defaulto = new JComboBox<String>(valueList);
+    this.defaultp = new JComboBox<String>(valueList);
     this.modifiableo = new JCheckBox(Options.getMsg("dialog.adddomain.modifiableo"));
     this.modifiableo.setSelected(true);
     this.modifiablep = new JCheckBox(Options.getMsg("dialog.adddomain.modifiablep"));
@@ -236,14 +238,14 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
 
   /**
    * {@inheritDoc}
-   * @see ActionListener#actionPerformed(ActionEvent)
-   * Handle clicks on the Set and Cancel buttons.
+   *
+   * @see ActionListener#actionPerformed(ActionEvent) Handle clicks on the Set
+   *      and Cancel buttons.
    */
   public void actionPerformed(ActionEvent e) {
     if (Options.getMsg("button.cancel").equals(e.getActionCommand())) {
       escPressed();
-    }
-    else if (Options.getMsg("button.ok").equals(e.getActionCommand())) {
+    } else if (Options.getMsg("button.ok").equals(e.getActionCommand())) {
       enterPressed();
     }
   }
@@ -270,7 +272,6 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     dispose();
   }
 
-
   public void enterPressed() {
     domain.setProDefault(this.defaultp.getSelectedIndex() == 0);
     domain.setOppDefault(this.defaulto.getSelectedIndex() == 0);
@@ -282,8 +283,7 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
         || (!this.domain.setOo(this.oo.getText()))
         || (!this.domain.setDescription(this.description.getText()))) {
       okButton.setEnabled(false);
-    }
-    else {
+    } else {
       setVisible(false);
       dispose();
     }
@@ -295,17 +295,14 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     if (field == this.name || field == this.description) {
       if (field.getText().length() > 0) {
         field.setBackground(validColor);
-      }
-      else {
+      } else {
         field.setBackground(invalidColor);
       }
-    }
-    else {
+    } else {
       BoolParser parser = new BoolParser();
       if (field.getText().length() > 0 && parser.parseString(field.getText()) != null) {
         field.setBackground(validColor);
-      }
-      else {
+      } else {
         this.errorLabel.setText(parser.getErrorMessage());
         field.setBackground(invalidColor);
       }
@@ -391,10 +388,8 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     this.helpPane.add(head);
     if (op.length() > 0) {
       if (op.equals("name")) {
-      }
-      else if (op.equals("desc")) {
-      }
-      else {
+      } else if (op.equals("desc")) {
+      } else {
         head = new JLabel(Options.getMsg("dialog.adddomain." + op + ".text"));
         head.setFont(new Font("Serif", Font.PLAIN, 14));
         margin = new EmptyBorder(5, 10, 5, 5);
@@ -404,8 +399,7 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
         ImageIcon icon = iconFactory.createImageIcon("/images/" + op + ".png");
         this.helpPane.add(new JLabel(icon));
       }
-    }
-    else {
+    } else {
       head = new JLabel(Options.getMsg("dialog.addbooldomain.syntax"));
       head.setFont(new Font("Serif", Font.PLAIN, 14));
       margin = new EmptyBorder(5, 10, 5, 5);
@@ -417,22 +411,22 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
   }
 
   private AdtBoolDomain domain;
-  private JTextField    name;
-  private JTextField    description;
-  private JTextField    ao;
-  private JTextField    ap;
-  private JTextField    oo;
-  private JTextField    op;
-  private JTextField    cp;
-  private JTextField    co;
-  private JComboBox     defaulto;
-  private JComboBox     defaultp;
-  private JCheckBox     modifiableo;
-  private JCheckBox     modifiablep;
-  private JButton       okButton;
-  private JLabel        errorLabel;
-  private JPanel        helpPane;
+  private JTextField name;
+  private JTextField description;
+  private JTextField ao;
+  private JTextField ap;
+  private JTextField oo;
+  private JTextField op;
+  private JTextField cp;
+  private JTextField co;
+  private JComboBox<String> defaulto;
+  private JComboBox<String> defaultp;
+  private JCheckBox modifiableo;
+  private JCheckBox modifiablep;
+  private JButton okButton;
+  private JLabel errorLabel;
+  private JPanel helpPane;
 
-  private static Color  validColor   = new Color(170, 255, 170);
-  private static Color  invalidColor = new Color(255, 170, 170);
+  private static Color validColor = new Color(170, 255, 170);
+  private static Color invalidColor = new Color(255, 170, 170);
 }

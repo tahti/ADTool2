@@ -20,6 +20,13 @@
  */
 package lu.uni.adtool.ui.canvas;
 
+import java.awt.Color;
+import java.util.HashMap;
+
+import javax.swing.JScrollPane;
+
+import org.abego.treelayout.util.DefaultConfiguration;
+
 import lu.uni.adtool.adtree.ADTreeNode;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
@@ -28,6 +35,7 @@ import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Bool;
 import lu.uni.adtool.domains.rings.BoundedInteger;
+import lu.uni.adtool.domains.rings.Int;
 import lu.uni.adtool.domains.rings.LMHEValue;
 import lu.uni.adtool.domains.rings.LMHValue;
 import lu.uni.adtool.domains.rings.RealG0;
@@ -47,34 +55,25 @@ import lu.uni.adtool.ui.TreeDockable;
 import lu.uni.adtool.ui.ValuationsDockable;
 import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
 import lu.uni.adtool.ui.inputdialogs.InputDialog;
+import lu.uni.adtool.ui.inputdialogs.IntDialog;
 import lu.uni.adtool.ui.inputdialogs.LMHDialog;
 import lu.uni.adtool.ui.inputdialogs.LMHEDialog;
 import lu.uni.adtool.ui.inputdialogs.RealG0Dialog;
 import lu.uni.adtool.ui.inputdialogs.RealZeroOneDialog;
 
-import java.awt.Color;
-import java.util.HashMap;
-
-import javax.swing.JScrollPane;
-
-import org.abego.treelayout.util.DefaultConfiguration;
-
-public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
-    implements NodeRanker {
+public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas implements NodeRanker {
 
   public AbstractDomainCanvas(MainController mc, ValuationDomain values) {
     super(null, mc);
     if (values.getDomain() instanceof SandDomain) {
       this.listener = new SandDomainHandler<Type>(this);
-    }
-    else {
+    } else {
       this.listener = new AdtDomainHandler<Type>(this);
     }
     this.addMouseListener(listener);
     this.addMouseMotionListener(listener);
     this.addKeyListener(listener);
-    this.configuration =
-        new DefaultConfiguration<Node>(Options.canv_gapBetweenLevels, Options.canv_gapBetweenNodes);
+    this.configuration = new DefaultConfiguration<Node>(Options.canv_gapBetweenLevels, Options.canv_gapBetweenNodes);
     this.setFocus(null);
     this.values = values;
     this.marked = new HashMap<Node, Color>();
@@ -87,8 +86,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
    */
   public AbstractDomainCanvas(ValuationDomain values) {
     super(null);
-    this.configuration =
-        new DefaultConfiguration<Node>(Options.canv_gapBetweenLevels, Options.canv_gapBetweenNodes);
+    this.configuration = new DefaultConfiguration<Node>(Options.canv_gapBetweenLevels, Options.canv_gapBetweenNodes);
     this.setFocus(null);
     this.values = values;
     this.marked = new HashMap<Node, Color>();
@@ -108,16 +106,14 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     this.values.setTreeId(tree.getLayout().getId());
     if (this.isSand()) {
       this.values.treeChanged((SandNode) tree.getRoot(true));
-    }
-    else {
+    } else {
       this.values.treeChanged((ADTNode) tree.getRoot(true));
     }
     if (!this.localExtentProvider) {
       Debug.log("before updateTreeSize");
       this.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
       this.getSharedExtentProvider().notifyTreeChanged();
-    }
-    else {
+    } else {
       this.treeChanged();
     }
   }
@@ -143,109 +139,70 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
         Ring value = (Ring) this.values.getValue(node);
         if (value instanceof Bool) {
           value = (Ring) Bool.not((Bool) value);
-        }
-        else if (value instanceof RealG0) {
+        } else if (value instanceof RealG0) {
           dialog = new RealG0Dialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof RealZeroOne) {
+        } else if (value instanceof RealZeroOne) {
           dialog = new RealZeroOneDialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof LMHValue) {
+        } else if (value instanceof LMHValue) {
           dialog = new LMHDialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof LMHEValue) {
+        } else if (value instanceof LMHEValue) {
           dialog = new LMHEDialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof BoundedInteger) {
-          // if(getDomain() instanceof MinSkill){
-          // dialog = new BoundedIntegerInfDialog(getMainWindow());
-          // }
-          // else{
+        } else if (value instanceof BoundedInteger) {
           dialog = new BoundedIntegerDialog(controller.getFrame());
-          // }
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else {
+        } else if (value instanceof Int) {
+          dialog = new IntDialog(controller.getFrame());
+          value = (Ring) (dialog.showInputDialog(value));
+        } else {
           Debug.log("Unknown value type " + value);
         }
         if (value != null) {
           String key = node.getName();
-          getTreeCanvas().addEditAction(
-              new SetValuation(value, this.values.getValue(node), key, true, getDomainId()));
+          addEditAction(new SetValuation(value, this.values.getValue(node), key, true, getDomainId()));
           this.values.setValue(true, key, value);
           this.valuesUpdated();
         }
       }
-    }
-    else if (n instanceof ADTNode) {
+    } else if (n instanceof ADTNode) {
       ADTNode node = (ADTNode) n;
       if (node.isEditable((AdtDomain<Ring>) values.getDomain())) {
         InputDialog dialog;
         Ring value = (Ring) this.values.getValue(node);
         if (value instanceof Bool) {
           value = (Ring) Bool.not((Bool) value);
-        }
-        else if (value instanceof RealG0) {
+        } else if (value instanceof RealG0) {
           dialog = new RealG0Dialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof RealZeroOne) {
+        } else if (value instanceof RealZeroOne) {
           dialog = new RealZeroOneDialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof LMHValue) {
+        } else if (value instanceof LMHValue) {
           dialog = new LMHDialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof LMHEValue) {
+        } else if (value instanceof LMHEValue) {
           dialog = new LMHEDialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else if (value instanceof BoundedInteger) {
-          // if(getDomain() instanceof MinSkill){
-          // dialog = new BoundedIntegerInfDialog(getMainWindow());
-          // }
-          // else{
+        } else if (value instanceof BoundedInteger) {
           dialog = new BoundedIntegerDialog(controller.getFrame());
-          // }
           value = (Ring) (dialog.showInputDialog(value));
-        }
-        else {
+        } else if (value instanceof Int) {
+          dialog = new IntDialog(controller.getFrame());
+          value = (Ring) (dialog.showInputDialog(value));
+        } else {
           Debug.log("Unknown value type " + value);
         }
         if (value != null) {
           String key = node.getName();
-          getTreeCanvas().addEditAction(new SetValuation(value, this.values.getValue(node), key,
+          addEditAction(new SetValuation(value, this.values.getValue(node), key,
               node.getRole() == ADTNode.Role.PROPONENT, getDomainId()));
           this.values.setValue(node.getRole() == ADTNode.Role.PROPONENT, key, value);
           this.valuesUpdated();
         }
       }
-    }
-  }
-
-  public void undo() {
-    AbstractTreeCanvas canvas = this.getTreeCanvas();
-    if (canvas != null) {
-      canvas.undo();
-    }
-  }
-
-  public void redo() {
-    AbstractTreeCanvas canvas = this.getTreeCanvas();
-    if (canvas != null) {
-      canvas.redo();
-    }
-  }
-
-  public void updateUndoRedoItems() {
-    AbstractTreeCanvas canvas = this.getTreeCanvas();
-    if (canvas != null) {
-      canvas.updateUndoRedoItems();
     }
   }
 
@@ -264,8 +221,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
   public void rankNode(Node node, Ring value) {
     if (node.hasDefault()) {
       this.markNode(node, Options.canv_rankLeafMark);
-    }
-    else {
+    } else {
       this.markNode(node, Options.canv_rankNodeMark);
     }
   }
@@ -273,15 +229,6 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
   public void markNode(Node node, Color color) {
     marked.put(node, color);
   }
-
-  // /**
-  // * Assigns a new value to a node.
-  // *
-  // * @param key
-  // */
-  // public void putNewValue(String key, Ring value) {
-  // this.values.setValue(key, value);
-  // }
 
   /**
    * Determines if this instance is markEditable.
@@ -318,8 +265,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
         if (((SandNode) node).isEditable()) {
           return Options.canv_EditableColor;
         }
-      }
-      else {
+      } else {
         if (((ADTNode) node).isEditable((AdtDomain<Ring>) values.getDomain())) {
           return Options.canv_EditableColor;
         }
@@ -340,23 +286,19 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     }
     if (showLabels) {
       result = n.getName() + "\n";
-    }
-    else {
+    } else {
       result = "";
     }
-    Ring value = null;
     if (this.values.hasEvaluator()) {
       if (this.isSand()) {
         result = result + this.valueToStr(this.values.getTermValue((SandNode) n));
-      }
-      else {
+      } else {
         if (((ADTNode) n).hasDefault() && ((ADTNode) n).isCountered()) {
           if (values.isShowAllLabels()) {
-            result =  result + this.valueToStr(this.values.getTermValue((ADTNode) n)) + "\n";
+            result = result + this.valueToStr(this.values.getTermValue((ADTNode) n)) + "\n";
           }
-          result = result +  this.valueToStr(values.getValue((ADTNode) n));
-        }
-        else {
+          result = result + this.valueToStr(values.getValue((ADTNode) n));
+        } else {
           result = result + this.valueToStr(this.values.getTermValue((ADTNode) n));
         }
       }
@@ -370,8 +312,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
   public void valuesUpdated() {
     if (this.isSand()) {
       this.values.valuesUpdated((SandNode) tree.getRoot(true));
-    }
-    else {
+    } else {
       this.values.valuesUpdated((ADTNode) tree.getRoot(true));
     }
     if (controller != null) {
@@ -389,8 +330,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     tree.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
     if (!this.localExtentProvider) {
       tree.getSharedExtentProvider().notifyTreeChanged();
-    }
-    else {
+    } else {
       this.treeChanged();
     }
   }
@@ -404,8 +344,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     if (notify && tree != null) {
       if (this.localExtentProvider) {
         this.treeChanged();
-      }
-      else {
+      } else {
         getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
         tree.getSharedExtentProvider().notifyTreeChanged();
       }
@@ -423,8 +362,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
   public void repaintAll() {
     DomainFactory factory = getController().getFrame().getDomainFactory();
     factory.repaintAllDomains(new Integer(getId()));
-    TreeDockable d = (TreeDockable) getController().getControl()
-        .getMultipleDockable(TreeDockable.TREE_ID + getId());
+    TreeDockable d = (TreeDockable) getController().getControl().getMultipleDockable(TreeDockable.TREE_ID + getId());
     d.getCanvas().repaint();
   }
 
@@ -439,8 +377,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     if (localExtentProvider) {
       tree.getSharedExtentProvider().deregisterCanvas(this);
       this.treeChanged();
-    }
-    else {
+    } else {
       tree.getSharedExtentProvider().registerCanvas(this);
     }
     getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
@@ -477,8 +414,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
       if (node.getName().equals(label) && ((SandNode) node).isLeaf()) {
         doMark = true;
       }
-    }
-    else {
+    } else {
       if (node.getName().equals(label) && ((ADTNode) node).hasDefault()) {
         doMark = true;
       }
@@ -493,7 +429,14 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     }
   }
 
-  private AbstractTreeCanvas getTreeCanvas() {
+  /**
+   * {@inheritDoc}
+   *
+   * Used by addEditAction - overriden so edit actions are shared by tree canvas
+   * and domain canvases.
+   *
+   */
+  protected AbstractTreeCanvas getTreeCanvas() {
     TreeDockable currentTree = (TreeDockable) getController().getControl()
         .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(getId()));
     if (currentTree != null) {
@@ -506,15 +449,12 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas
     if (value instanceof RealG0 || value instanceof RealZeroOne) {
       try {
         return Options.canv_precision.format(Double.parseDouble(value.toUnicode()));
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         return value.toUnicode();
       }
-    }
-    else if (value != null) {
+    } else if (value != null) {
       return value.toUnicode();
-    }
-    else {
+    } else {
       return "null";
     }
   }

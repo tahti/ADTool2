@@ -92,10 +92,10 @@ public class RealG0Dialog extends InputDialog {
     else if ("x1000".equals(e.getActionCommand())) {
       times(1000);
     }
-    else if ("Infinity".equals(e.getActionCommand())) {
+    else if (Options.getMsg("inputdialog.infinity").equals(e.getActionCommand())) {
       setValue(Double.POSITIVE_INFINITY);
     }
-    else if ("Zero".equals(e.getActionCommand())) {
+    else if (Options.getMsg("inputdialog.zero").equals(e.getActionCommand())) {
       setValue(0);
     }
     else {

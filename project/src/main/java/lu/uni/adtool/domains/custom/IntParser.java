@@ -12,9 +12,8 @@ public class IntParser extends Parser {
 
   public IntExpression parseString(String toParse) {
     Debug.log("parsing:" + toParse);
-    ArrayList<IntExpression.Term> tokens = tokenize(toParse);
-    if (tokens == null || tokens.size() == 0) {
-      Debug.log("tokens zero or null");
+    ArrayList<IntExpression.Term> terms = tokenize(toParse);
+    if (terms == null || terms.size() == 0) {
       return null;
     }
     IntExpression expression = new IntExpression();
@@ -22,8 +21,7 @@ public class IntParser extends Parser {
     Stack<Integer> arg = new Stack<Integer>();
     arg.push(new Integer(0));
     IntExpression.Term last = null;
-    int args = 0;
-    for (IntExpression.Term term : tokens) {
+    for (IntExpression.Term term : terms) {
       switch (term.type) {
       case X:
       case Y:
@@ -45,6 +43,7 @@ public class IntParser extends Parser {
       case DIV:
       case MINUS:
       case PLUS:
+      case MODULO:
         while (!stack.empty()) {
           last = stack.peek();
           if (IntExpression.getPrecedence(term.type) <= IntExpression.getPrecedence(last.type)) {
@@ -60,6 +59,7 @@ public class IntParser extends Parser {
 
       case LPAREN:
         stack.push(term);
+        break;
 
       case RPAREN:
         while ((!stack.empty()) && (stack.peek().type != IntExpression.Token.LPAREN)) {
@@ -68,13 +68,11 @@ public class IntParser extends Parser {
         }
         if (stack.empty()) {
           setError(1, "parser.unmatched");
-          Debug.log("unmatched parenthesis");
           return null;
         }
         stack.pop();
         if (arg.peek().intValue() != 1) {
           setError(1, "parser.missingarg");
-          Debug.log("missing arg 2" + " arg:" + Integer.toString(args));
           return null;
         }
         if (!stack.empty() && IntExpression.isFunction(stack.peek().type)) {
@@ -86,10 +84,10 @@ public class IntParser extends Parser {
           }
           else {
             setError(1, "parser.missingarg");
-            Debug.log("missing arg 4a" + " arg:" + Integer.toString(t.value));
             return null;
           }
         }
+        arg.push(new Integer(arg.pop().intValue() + 1));
         break;
 
       case COMMA:
@@ -99,19 +97,16 @@ public class IntParser extends Parser {
         }
         if (stack.empty()) {
           setError(1, "parser.misplaced");
-          Debug.log("misplaced comma");
           return null;
         }
         if (arg.peek().intValue() != 1) {
           setError(1, "parser.missingarg");
-          Debug.log("missing arg 4" + " arg:" + Integer.toString(args));
           return null;
         }
         else {
           stack.pop();
           if (!IntExpression.isFunction(stack.peek().type)) {
             setError(1, "parser.misplaced");
-            Debug.log("misplaced comma 2");
             return null;
           }
           stack.peek().value = stack.peek().value + 1;
@@ -131,20 +126,24 @@ public class IntParser extends Parser {
     }
     if (!stack.empty()) {
       setError(1, "parser.unmatched");
-      Debug.log("unmatched parenthesis 2");
       return null;
     }
-    if (arg.size() != 1 || arg.pop().intValue() != 1) {
+    if (arg.size() != 1) {
       setError(1, "parser.missingarg");
-      Debug.log("missing arg ");
       return null;
+    }
+    else {
+      Integer i = arg.pop();
+      if (i.intValue() != 1) {
+        setError(1, "parser.missingarg");
+        return null;
+      }
     }
     return expression;
   }
 
   private ArrayList<IntExpression.Term> tokenize(String toParse) {
     ArrayList<IntExpression.Term> terms = new ArrayList<IntExpression.Term>();
-    IntExpression.Term term = null;
     String name = "";
     for (position = 0; position < toParse.length(); position++) {
       char ch = toParse.charAt(position);
@@ -196,7 +195,6 @@ public class IntParser extends Parser {
     IntExpression.Term t = IntExpression.getTerm(term.trim());
     if (t == null) {
       setError(term.trim().length(), "parser.nokeyword", term.trim());
-      Debug.log("No token:" + term.trim());
       return false;
     }
     // chaneg binary minus to unary minus operator in some cases

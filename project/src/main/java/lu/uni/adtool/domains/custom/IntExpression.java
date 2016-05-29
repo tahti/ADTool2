@@ -1,9 +1,10 @@
 package lu.uni.adtool.domains.custom;
 
-import lu.uni.adtool.domains.rings.Int;
-
 import java.util.ArrayList;
 import java.util.Stack;
+
+import lu.uni.adtool.domains.rings.Int;
+import lu.uni.adtool.tools.Debug;
 
 public class IntExpression {
   public enum Token {
@@ -68,18 +69,28 @@ public class IntExpression {
       case INTEGER:
         stack.push(new Int(term.value));
         break;
+      case COMMA:
+      case LPAREN:
+      case RPAREN:
+        Debug.log("Bad expression");
+        break;
       }
     }
     if (stack.size() != 1) {
       return null;
     }
     else {
-      return stack.pop();
+      Int r = stack.pop();
+      return r;
     }
   }
 
   public String toString() {
-    String result = "";
+//     String todebug = "";
+//     for (Term term: this.terms) {
+//       todebug = todebug + term.type + "("+ term.value+ "), ";
+//     }
+//     Debug.log(todebug);
     Stack<String> stack = new Stack<String>();
     Stack<Token> precStack = new Stack<Token>();
     String x = "";
@@ -87,6 +98,7 @@ public class IntExpression {
     int precX;
     for (Term term : this.terms) {
       switch (term.type) {
+      case INTEGER:
       case X:
       case Y:
         stack.push(termToString(term));
@@ -99,12 +111,14 @@ public class IntExpression {
           x = termToString(new Term(Token.LPAREN, 0)) + x + termToString(new Term(Token.RPAREN, 0));
         }
         stack.push(termToString(term) + x);
+        precStack.push(term.type);
         break;
       case ABS:
         x = stack.pop();
         precX = getPrecedence(precStack.pop());
         x = termToString(new Term(Token.LPAREN, 0)) + x + termToString(new Term(Token.RPAREN, 0));
         stack.push(termToString(term) + x);
+        precStack.push(term.type);
         break;
       case MIN:
       case MAX:
@@ -118,6 +132,7 @@ public class IntExpression {
         }
         stack.push(termToString(term) + termToString(new Term(Token.LPAREN, 0)) + x
             + termToString(new Term(Token.RPAREN, 0)));
+        precStack.push(term.type);
         break;
       case PLUS:
       case MINUS:
@@ -140,6 +155,7 @@ public class IntExpression {
       case LPAREN:
       case RPAREN:
       case COMMA:
+        //those should not be in the term
         break;
       }
     }
@@ -248,10 +264,10 @@ public class IntExpression {
 //     Y, X, LPAREN, RPAREN, COMMA, PLUS, MINUS, MUL, DIV, MODULO, MAX, MIN, ABS, INTEGER, NEG
 
   public static Term getTerm(String term) {
-    if (term.toUpperCase().equals("X")) {
+    if (term.toLowerCase().equals("x")) {
       return new Term(Token.X, 0);
     }
-    if (term.toUpperCase().equals("Y")) {
+    if (term.toLowerCase().equals("y")) {
       return new Term(Token.Y, 0);
     }
     if (term.equals("(")) {
@@ -278,13 +294,13 @@ public class IntExpression {
     if (term.equals("-")) {
       return new Term(Token.MINUS, 2);
     }
-    if (term.toUpperCase().equals("MAX")) {
+    if (term.toLowerCase().equals("max")) {
       return new Term(Token.MAX, 1);
     }
-    if (term.toUpperCase().equals("MIN")) {
+    if (term.toLowerCase().equals("min")) {
       return new Term(Token.MIN, 1);
     }
-    if (term.toUpperCase().equals("ABS")) {
+    if (term.toLowerCase().equals("abs")) {
       return new Term(Token.ABS, 1);
     }
     try {

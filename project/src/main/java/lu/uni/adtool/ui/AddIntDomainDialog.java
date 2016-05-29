@@ -1,10 +1,5 @@
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.domains.custom.AdtIntDomain;
-import lu.uni.adtool.domains.custom.IntParser;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Options;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -24,7 +19,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -39,7 +33,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import lu.uni.adtool.domains.custom.AdtIntDomain;
+import lu.uni.adtool.domains.custom.IntParser;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Options;
+
 public class AddIntDomainDialog extends JDialog implements ActionListener, DocumentListener {
+
   public enum FieldType {
     AP, AO, OP, OO, CP, CO, NAME, DESCR, NONE, DEFAULTP, DEFAULTO
   }
@@ -267,8 +267,7 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
   public void actionPerformed(ActionEvent e) {
     if (Options.getMsg("button.cancel").equals(e.getActionCommand())) {
       escPressed();
-    }
-    else if (Options.getMsg("button.ok").equals(e.getActionCommand())) {
+    } else if (Options.getMsg("button.ok").equals(e.getActionCommand())) {
       enterPressed();
     }
   }
@@ -301,13 +300,11 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     if ((!this.domain.setName(this.name.getText())) || (!this.domain.setCp(this.cp.getText()))
         || (!this.domain.setCo(this.co.getText())) || (!this.domain.setAp(this.ap.getText()))
         || (!this.domain.setAo(this.ao.getText())) || (!this.domain.setOp(this.op.getText()))
-        || (!this.domain.setOo(this.oo.getText()))
-        || (!domain.setProDefault(this.defaultp.getText()))
-        || (!domain.setOppDefault(this.defaultp.getText()))
+        || (!this.domain.setOo(this.oo.getText())) || (!domain.setProDefault(this.defaultp.getText()))
+        || (!this.domain.setOppDefault(this.defaulto.getText()))
         || (!this.domain.setDescription(this.description.getText()))) {
       okButton.setEnabled(false);
-    }
-    else {
+    } else {
       setVisible(false);
       dispose();
     }
@@ -319,27 +316,22 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     if (field == this.name || field == this.description) {
       if (field.getText().length() > 0) {
         field.setBackground(validColor);
-      }
-      else {
+      } else {
         field.setBackground(invalidColor);
       }
-    }
-    else if (field == this.defaulto || field == this.defaultp) {
+    } else if (field == this.defaulto || field == this.defaultp) {
       try {
         Integer.parseInt(field.getText());
         field.setBackground(validColor);
-      }
-      catch (NumberFormatException e) {
+      } catch (NumberFormatException e) {
         field.setBackground(invalidColor);
         this.errorLabel.setText(Options.getMsg("dialog.adddomain.wrongint"));
       }
-    }
-    else {
+    } else {
       IntParser parser = new IntParser();
       if (field.getText().length() > 0 && parser.parseString(field.getText()) != null) {
         field.setBackground(validColor);
-      }
-      else {
+      } else {
         this.errorLabel.setText(parser.getErrorMessage());
         field.setBackground(invalidColor);
       }
@@ -411,6 +403,8 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     case DESCR:
       this.setHelpText("desc");
       break;
+    case DEFAULTP:
+    case DEFAULTO:
     case NONE:
       this.setHelpText("");
       break;
@@ -427,10 +421,8 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     this.helpPane.add(head);
     if (op.length() > 0) {
       if (op.equals("name")) {
-      }
-      else if (op.equals("desc")) {
-      }
-      else {
+      } else if (op.equals("desc")) {
+      } else {
         head = new JLabel(Options.getMsg("dialog.adddomain." + op + ".text"));
         head.setFont(new Font("Serif", Font.PLAIN, 14));
         margin = new EmptyBorder(5, 10, 5, 5);
@@ -440,8 +432,7 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
         ImageIcon icon = iconFactory.createImageIcon("/images/" + op + ".png");
         this.helpPane.add(new JLabel(icon));
       }
-    }
-    else {
+    } else {
       head = new JLabel(Options.getMsg("dialog.addintdomain.syntax"));
       head.setFont(new Font("Serif", Font.PLAIN, 14));
       margin = new EmptyBorder(5, 10, 5, 5);
@@ -453,22 +444,23 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
   }
 
   private AdtIntDomain domain;
-  private JTextField   name;
-  private JTextField   description;
-  private JTextField   ao;
-  private JTextField   ap;
-  private JTextField   oo;
-  private JTextField   op;
-  private JTextField   cp;
-  private JTextField   co;
-  private JTextField   defaulto;
-  private JTextField   defaultp;
-  private JCheckBox    modifiableo;
-  private JCheckBox    modifiablep;
-  private JButton      okButton;
-  private JLabel       errorLabel;
-  private JPanel       helpPane;
+  private JTextField name;
+  private JTextField description;
+  private JTextField ao;
+  private JTextField ap;
+  private JTextField oo;
+  private JTextField op;
+  private JTextField cp;
+  private JTextField co;
+  private JTextField defaulto;
+  private JTextField defaultp;
+  private JCheckBox modifiableo;
+  private JCheckBox modifiablep;
+  private JButton okButton;
+  private JLabel errorLabel;
+  private JPanel helpPane;
 
-  private static Color validColor   = new Color(170, 255, 170);
+  private static Color validColor = new Color(170, 255, 170);
   private static Color invalidColor = new Color(255, 170, 170);
+  private static final long serialVersionUID = 3852122176888687082L;
 }

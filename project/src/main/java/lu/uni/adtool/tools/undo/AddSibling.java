@@ -19,15 +19,16 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package lu.uni.adtool.tools.undo;
+import java.util.ArrayList;
+import java.util.List;
+
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 import lu.uni.adtool.ui.canvas.SandTreeCanvas;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class AddSibling extends EditAction {
 
@@ -37,6 +38,7 @@ public class AddSibling extends EditAction {
     this.onLeft = onLeft;
   }
 
+@SuppressWarnings("unchecked")
   public void undo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     Node parent = target.getParent();
@@ -47,21 +49,22 @@ public class AddSibling extends EditAction {
     }
     Node toRemove = parent.getNotNullChildren().get(index);
     if (target instanceof SandNode) {
-      ((SandTreeCanvas)canvas).removeTree(toRemove);
+      ((SandTreeCanvas<Ring>)canvas).removeTree(toRemove);
     }
     else {
-      ((ADTreeCanvas)canvas).removeTree(toRemove);
+      ((ADTreeCanvas<Ring>)canvas).removeTree(toRemove);
     }
     canvas.undoGetNewLabel();
   }
 
+@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {
-      ((SandTreeCanvas)canvas).addSibling(target, onLeft);
+      ((SandTreeCanvas<Ring>)canvas).addSibling(target, onLeft);
     }
     else {
-      ((ADTreeCanvas)canvas).addSibling(target, onLeft);
+      ((ADTreeCanvas<Ring>)canvas).addSibling(target, onLeft);
     }
   }
 

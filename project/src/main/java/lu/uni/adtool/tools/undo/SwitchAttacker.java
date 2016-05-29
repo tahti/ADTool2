@@ -20,6 +20,7 @@
  */
 package lu.uni.adtool.tools.undo;
 
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
@@ -27,11 +28,13 @@ import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 public class SwitchAttacker extends EditAction {
   public SwitchAttacker() {
   }
+@SuppressWarnings("unchecked")
   public void undo(AbstractTreeCanvas canvas) {
-    ((ADTreeCanvas)canvas).switchAttacker();
+    ((ADTreeCanvas<Ring>)canvas).switchAttacker();
   }
+@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
-    ((ADTreeCanvas)canvas).switchAttacker();
+    ((ADTreeCanvas<Ring>)canvas).switchAttacker();
   }
   public String getName(){
     return Options.getMsg("action.switchattacker");

@@ -19,14 +19,15 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package lu.uni.adtool.tools.undo;
+import java.util.ArrayList;
+
+import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 import lu.uni.adtool.ui.canvas.SandTreeCanvas;
-
-import java.util.ArrayList;
 
 public class SwitchSibling extends EditAction {
 
@@ -36,23 +37,25 @@ public class SwitchSibling extends EditAction {
     this.onLeft = onLeft;
   }
 
+@SuppressWarnings("unchecked")
   public void undo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {
-      ((SandTreeCanvas)canvas).switchSibling(target, !onLeft);
+      ((SandTreeCanvas<Ring>)canvas).switchSibling(target, !onLeft);
     }
     else {
-      ((ADTreeCanvas)canvas).switchSibling(target, !onLeft);
+      ((ADTreeCanvas<Ring>)canvas).switchSibling(target, !onLeft);
     }
   }
 
+@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {
-      ((SandTreeCanvas)canvas).switchSibling(target, onLeft);
+      ((SandTreeCanvas<Ring>)canvas).switchSibling(target, onLeft);
     }
     else {
-      ((ADTreeCanvas)canvas).switchSibling(target, onLeft);
+      ((ADTreeCanvas<Ring>)canvas).switchSibling(target, onLeft);
     }
   }
 

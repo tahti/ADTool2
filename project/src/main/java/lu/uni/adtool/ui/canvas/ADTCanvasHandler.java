@@ -20,13 +20,6 @@
  */
 package lu.uni.adtool.ui.canvas;
 
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tree.ADTNode;
-import lu.uni.adtool.tree.GuiNode;
-import lu.uni.adtool.tree.Node;
-import lu.uni.adtool.ui.MultiLineInput;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -38,6 +31,12 @@ import java.awt.event.MouseListener;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.GuiNode;
+import lu.uni.adtool.tree.Node;
+import lu.uni.adtool.ui.MultiLineInput;
 
 /**
  * A handler for ADTreeCanvas.

@@ -294,7 +294,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
   }
 
   public ArrayList<String> oppKeySet() {
-    ArrayList<String> r = new ArrayList(valuesMap.keySet(false));
+    ArrayList<String> r = new ArrayList<String>(valuesMap.keySet(false));
     java.util.Collections.sort(r);
     return r;
   }

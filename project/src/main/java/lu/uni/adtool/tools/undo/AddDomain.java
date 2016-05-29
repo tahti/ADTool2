@@ -63,11 +63,11 @@ public class AddDomain extends EditAction {
       DomainDockable d = null;
       if (domain instanceof SandDomain) {
         d = factory.read(new ValuationDomain(canvas.getId(),
-            this.domainId, (SandDomain) domain));
+            this.domainId, (SandDomain<Ring>) domain));
       }
       else {
         d = factory.read(new ValuationDomain(canvas.getId(),
-            this.domainId, (AdtDomain) domain));
+            this.domainId, (AdtDomain<Ring>) domain));
       }
       canvas.getController().getControl().addDockable(d.getUniqueId(), d);
       currentTree.showDomain(d);

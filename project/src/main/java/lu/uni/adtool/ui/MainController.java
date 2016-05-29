@@ -17,33 +17,6 @@
  */
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.ADToolMain;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.Domain;
-import lu.uni.adtool.domains.Parametrized;
-import lu.uni.adtool.domains.SandDomain;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.custom.AdtBoolDomain;
-import lu.uni.adtool.domains.custom.AdtIntDomain;
-import lu.uni.adtool.domains.rings.BoundedInteger;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tree.ADTNode;
-import lu.uni.adtool.tree.AdtImporter;
-import lu.uni.adtool.tree.CCP;
-import lu.uni.adtool.tree.DomainFactory;
-import lu.uni.adtool.tree.GuiNode;
-import lu.uni.adtool.tree.SandNode;
-import lu.uni.adtool.tree.TreeLayout;
-import lu.uni.adtool.tree.XmlConverter;
-import lu.uni.adtool.ui.canvas.ADTreeCanvas;
-import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
-import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
-import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
-import lu.uni.adtool.ui.printview.JPrintPreviewDialog;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -71,6 +44,33 @@ import bibliothek.gui.dock.common.event.CControlListener;
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.theme.ThemeMap;
+
+import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.Domain;
+import lu.uni.adtool.domains.Parametrized;
+import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.custom.AdtBoolDomain;
+import lu.uni.adtool.domains.custom.AdtIntDomain;
+import lu.uni.adtool.domains.rings.BoundedInteger;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.AdtImporter;
+import lu.uni.adtool.tree.CCP;
+import lu.uni.adtool.tree.DomainFactory;
+import lu.uni.adtool.tree.GuiNode;
+import lu.uni.adtool.tree.SandNode;
+import lu.uni.adtool.tree.TreeLayout;
+import lu.uni.adtool.tree.XmlConverter;
+import lu.uni.adtool.ui.canvas.ADTreeCanvas;
+import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
+import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
+import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
+import lu.uni.adtool.ui.printview.JPrintPreviewDialog;
 
 public final class MainController implements CControlListener, CFocusListener {
   public MainController(ADToolMain newFrame, CControl control) {
@@ -110,16 +110,13 @@ public final class MainController implements CControlListener, CFocusListener {
     this.getFrame().getValuationsView().setCanvas(lastFocusedTree);
     this.getFrame().getDetailsView().assignCanvas(lastFocusedTree);
     if (lastFocusedTree != null) {
-      this.getFrame().getRankingView().setFocus(lastFocusedTree, lastFocusedTree.getFocused(),
-          false);
-    }
-    else {
+      this.getFrame().getRankingView().setFocus(lastFocusedTree, lastFocusedTree.getFocused(), false);
+    } else {
       this.getFrame().getRankingView().setFocus(lastFocusedTree, null, false);
     }
     if (this.lastFocusedTree != null) {
       lastFocusedTree.updateUndoRedoItems();
-    }
-    else {
+    } else {
       editUndo.setEnabled(false);
       editUndo.setName(Options.getMsg("edit.undo.txt"));
       editRedo.setEnabled(false);
@@ -171,21 +168,17 @@ public final class MainController implements CControlListener, CFocusListener {
       if (((TreeDockable) dockable).getId() == lastFocusedTree.getId()) {
         setLastFocused(null);
       }
-    }
-    else if (dockable instanceof PermaDockable) {
+    } else if (dockable instanceof PermaDockable) {
       // LogView/ValuationsView - ignore
-    }
-    else if (dockable instanceof DomainDockable) {
+    } else if (dockable instanceof DomainDockable) {
       this.removeDomain((DomainDockable) dockable);
-    }
-    else if (dockable instanceof DefaultSingleCDockable) {
+    } else if (dockable instanceof DefaultSingleCDockable) {
       String uid = ((DefaultSingleCDockable) dockable).getUniqueId();
-      if (lastFocusedTree != null && uid.equals(TreeDockable.TREE_ID
-          + Integer.toString(lastFocusedTree.getId()) + TreeDockable.TREEVIEW_ID)) {
+      if (lastFocusedTree != null
+          && uid.equals(TreeDockable.TREE_ID + Integer.toString(lastFocusedTree.getId()) + TreeDockable.TREEVIEW_ID)) {
         setLastFocused(null);
       }
-    }
-    else if (dockable instanceof DefaultMultipleCDockable) {
+    } else if (dockable instanceof DefaultMultipleCDockable) {
       // TODO - handle domains
     }
   }
@@ -218,17 +211,14 @@ public final class MainController implements CControlListener, CFocusListener {
       if (((TreeDockable) dockable).getId() == lastFocusedTree.getId()) {
         setLastFocused(null);
       }
-    }
-    else if (dockable instanceof PermaDockable) {
+    } else if (dockable instanceof PermaDockable) {
       // LogView - ignore
-    }
-    else if (dockable instanceof DomainDockable) {
+    } else if (dockable instanceof DomainDockable) {
       this.removeDomain((DomainDockable) dockable);
-    }
-    else if (dockable instanceof DefaultSingleCDockable) {
+    } else if (dockable instanceof DefaultSingleCDockable) {
       String uid = ((DefaultSingleCDockable) dockable).getUniqueId();
-      if (lastFocusedTree != null && uid.equals(TreeDockable.TREE_ID
-          + Integer.toString(lastFocusedTree.getId()) + TreeDockable.TREEVIEW_ID)) {
+      if (lastFocusedTree != null
+          && uid.equals(TreeDockable.TREE_ID + Integer.toString(lastFocusedTree.getId()) + TreeDockable.TREEVIEW_ID)) {
         setLastFocused(null);
       }
     }
@@ -256,12 +246,11 @@ public final class MainController implements CControlListener, CFocusListener {
     control.addDockable(TreeDockable.getUniqueId(treeDockable.getId()), treeDockable);
     treeDockable.setWorkingArea(frame.getWorkArea());
     treeDockable.setVisible(true);
-    DefaultSingleCDockable dock = (DefaultSingleCDockable) control.getSingleDockable(
-        TreeDockable.getUniqueId(treeDockable.getId()) + TreeDockable.TREEVIEW_ID);
+    DefaultSingleCDockable dock = (DefaultSingleCDockable) control
+        .getSingleDockable(TreeDockable.getUniqueId(treeDockable.getId()) + TreeDockable.TREEVIEW_ID);
     if (dock != null) {
       dock.toFront();
-    }
-    else {
+    } else {
       treeDockable.toFront();
     }
     DomainFactory factory = getFrame().getDomainFactory();
@@ -445,13 +434,13 @@ public final class MainController implements CControlListener, CFocusListener {
     this.toDisableItems.add(menuItem);
     editMenu.add(menuItem);
     menuItem = new JMenuItem(Options.getMsg("edit.switchRole.txt"));
-    menuItem
-        .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.switchRole.key")).getKeyCode());
+    menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("edit.switchRole.key")).getKeyCode());
     menuItem.addActionListener(new ActionListener() {
 
+      @SuppressWarnings("unchecked")
       public void actionPerformed(ActionEvent e) {
         if (lastFocusedTree != null && lastFocusedTree instanceof ADTreeCanvas) {
-          ((ADTreeCanvas) lastFocusedTree).switchAttacker();
+          ((ADTreeCanvas<Ring>) lastFocusedTree).switchAttacker();
           report(Options.getMsg("edit.switchRole.report",
               (lastFocusedTree.getTree().getLayout().getSwitchRole()
                   ? Options.getMsg("tablemodel.opponent").toLowerCase()
@@ -490,22 +479,18 @@ public final class MainController implements CControlListener, CFocusListener {
     JMenu windowsMenu = new JMenu(Options.getMsg("windows.txt"));
     windowsMenu.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.key")).getKeyCode());
     JMenuItem menuItem = this.frame.getStatusBar().getLogViewDockable().createMenuItem();
-    menuItem
-        .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.messageLog.key")).getKeyCode());
+    menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.messageLog.key")).getKeyCode());
     windowsMenu.add(menuItem);
     menuItem = this.frame.getValuationsView().createMenuItem();
-    menuItem
-        .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.valuations.key")).getKeyCode());
+    menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.valuations.key")).getKeyCode());
     windowsMenu.add(menuItem);
 
     menuItem = this.frame.getRankingView().createMenuItem();
-    menuItem
-        .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.ranking.key")).getKeyCode());
+    menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.ranking.key")).getKeyCode());
     windowsMenu.add(menuItem);
 
     menuItem = this.frame.getDetailsView().createMenuItem();
-    menuItem
-        .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.details.key")).getKeyCode());
+    menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("windows.details.key")).getKeyCode());
     windowsMenu.add(menuItem);
 
     return windowsMenu;
@@ -550,8 +535,7 @@ public final class MainController implements CControlListener, CFocusListener {
     // viewMenu.add(layout.getMenu());
 
     ButtonGroup group = new ButtonGroup();
-    JRadioButtonMenuItem item =
-        new JRadioButtonMenuItem(Options.getMsg("view.themes.basicTheme.txt"));
+    JRadioButtonMenuItem item = new JRadioButtonMenuItem(Options.getMsg("view.themes.basicTheme.txt"));
     item.setSelected(false);
     themesMenu.add(item).addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -605,8 +589,7 @@ public final class MainController implements CControlListener, CFocusListener {
         }
       }
     });
-    menuItem
-        .setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.fitToWindow.key")).getKeyCode());
+    menuItem.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.fitToWindow.key")).getKeyCode());
     viewMenu.add(menuItem);
     menuItem = new JMenuItem(Options.getMsg("view.zoomin.txt"));
     menuItem.setIcon(iconFac.createImageIcon("/icons/toolbar/zoom_in_24x24.png"));
@@ -648,8 +631,7 @@ public final class MainController implements CControlListener, CFocusListener {
     IconFactory iconFac = new IconFactory();
     fileNewSand = new ADAction(Options.getMsg("file.newSand.txt")) {
       public void actionPerformed(final ActionEvent e) {
-        final TreeLayout layout =
-            new TreeLayout(frame.getTreeFactory().getNewUniqueId(), new SandNode());
+        final TreeLayout layout = new TreeLayout(frame.getTreeFactory().getNewUniqueId(), new SandNode());
         final TreeDockable treeDockable = new TreeDockable(frame.getTreeFactory(), layout, false);
         addTreeDockable(treeDockable);
         report(Options.getMsg("status.newSandTree"));
@@ -773,8 +755,7 @@ public final class MainController implements CControlListener, CFocusListener {
     };
     filePrintPreview.setSmallIcon(iconFac.createImageIcon("/icons/preview.png"));
     filePrintPreview.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.printPreview.key")));
-    filePrintPreview
-        .setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.printPreview.acc")));
+    filePrintPreview.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.printPreview.acc")));
 
     fileExit = new ADAction(Options.getMsg("file.exit.txt")) {
       public void actionPerformed(final ActionEvent e) {
@@ -823,6 +804,9 @@ public final class MainController implements CControlListener, CFocusListener {
     editCopy.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.copy.acc")));
     editCopy.setSmallIcon(iconFac.createImageIcon("/icons/copy.png"));
     editUndo = new ADAction(Options.getMsg("edit.undo.txt")) {
+
+      private static final long serialVersionUID = 2250038237606593189L;
+
       public void actionPerformed(final ActionEvent e) {
         if (lastFocusedTree != null) {
           lastFocusedTree.undo();
@@ -833,6 +817,9 @@ public final class MainController implements CControlListener, CFocusListener {
     editUndo.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("edit.undo.acc")));
     editUndo.setSmallIcon(iconFac.createImageIcon("/icons/undo_16x16.png"));
     editRedo = new ADAction(Options.getMsg("edit.redo.txt")) {
+
+      private static final long serialVersionUID = -4219335962479205379L;
+
       public void actionPerformed(final ActionEvent e) {
         if (lastFocusedTree != null) {
           lastFocusedTree.redo();
@@ -844,31 +831,29 @@ public final class MainController implements CControlListener, CFocusListener {
     editRedo.setSmallIcon(iconFac.createImageIcon("/icons/redo_16x16.png"));
   }
 
+  @SuppressWarnings("unchecked")
   private void removeDomain(DomainDockable dockable) {
     int id = dockable.getCanvas().getId();
     int domainId = dockable.getCanvas().getDomainId();
-    TreeDockable td =
-        (TreeDockable) control.getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(id));
+    TreeDockable td = (TreeDockable) control.getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(id));
     if (td != null) {
       if (lastFocusedTree instanceof AbstractDomainCanvas) {
-        if (id == lastFocusedTree.getId()
-            && ((AbstractDomainCanvas) lastFocusedTree).getDomainId() == domainId) {
+        if (id == lastFocusedTree.getId() && ((AbstractDomainCanvas<Ring>) lastFocusedTree).getDomainId() == domainId) {
           setLastFocused(td.getCanvas());
         }
       }
       td.getCanvas().removeDomain(dockable);
-    }
-    else {
+    } else {
       System.err.println("No window with id:" + id);
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void chooseDomain() {
     if (lastFocusedTree != null) {
       if (lastFocusedTree.isSand()) {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(true);
         AddSandDomainDialog addDialog = new AddSandDomainDialog(this.frame);
-        @SuppressWarnings("unchecked")
         SandDomain<Ring> d = addDialog.showDomainDialog(domains);
         if (d == null) {
           return;
@@ -879,8 +864,7 @@ public final class MainController implements CControlListener, CFocusListener {
           currentTree.getCanvas().addDomain(d);
           this.report(Options.getMsg("status.newdomain") + " " + d.getName());
         }
-      }
-      else {
+      } else {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(false);
         Debug.log(" domains size:" + domains.size());
         AddAdtDomainDialog addDialog = new AddAdtDomainDialog(this.frame);
@@ -894,26 +878,21 @@ public final class MainController implements CControlListener, CFocusListener {
             Debug.log("cancel pressed");
             return;
           }
-        }
-        else if (d instanceof AdtIntDomain) {
+        } else if (d instanceof AdtIntDomain) {
           AddIntDomainDialog intDialog = new AddIntDomainDialog(this.frame, (AdtIntDomain) d);
           if (intDialog.showDialog() == null) {
             Debug.log("cancel pressed");
             return;
           }
-        }
-        else {
+        } else {
           if (d instanceof Parametrized) {
             if (((Parametrized) d).getParameter() instanceof Integer) {
               Integer value = (Integer) ((Parametrized) d).getParameter();
               BoundedIntegerDialog dialog;
               if (d instanceof lu.uni.adtool.domains.adtpredefined.MinSkill) {
-                dialog = new BoundedIntegerDialog(this.frame,
-                    Options.getMsg("adtdomain.choosemaxskill.txt"));
-              }
-              else {
-                dialog =
-                    new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosek.txt"));
+                dialog = new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosemaxskill.txt"));
+              } else {
+                dialog = new BoundedIntegerDialog(this.frame, Options.getMsg("adtdomain.choosek.txt"));
               }
               BoundedInteger result = (BoundedInteger) (dialog
                   .showInputDialog(new BoundedInteger(value, Integer.MAX_VALUE), false));
@@ -923,8 +902,7 @@ public final class MainController implements CControlListener, CFocusListener {
                   value = Integer.MAX_VALUE;
                 }
                 ((Parametrized) d).setParameter(value);
-              }
-              else {
+              } else {
                 return;
               }
             }
@@ -938,8 +916,7 @@ public final class MainController implements CControlListener, CFocusListener {
           this.report(Options.getMsg("status.newdomain") + " " + d.getName());
         }
       }
-    }
-    else
+    } else
       return;
   }
 
@@ -959,20 +936,17 @@ public final class MainController implements CControlListener, CFocusListener {
       // }
       else if (type.equals("png") || type.equals("jpg")) {
         lastFocusedTree.createImage(out, type);
-      }
-      else if (type.equals("txt")) {
+      } else if (type.equals("txt")) {
         TreeDockable currentTree = (TreeDockable) this.control
             .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(lastFocusedTree.getId()));
         if (currentTree != null) {
           try {
             currentTree.getCanvas().createTxt(out);
-          }
-          catch (IOException e) {
+          } catch (IOException e) {
             reportError(e.getLocalizedMessage());
           }
         }
-      }
-      else if (type.equals("xml")) {
+      } else if (type.equals("xml")) {
         lastFocusedTree.createXml(out);
       }
       // }
@@ -987,21 +961,17 @@ public final class MainController implements CControlListener, CFocusListener {
         XmlConverter converter = new XmlConverter();
         try {
           converter.importFrom(in, this);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
         }
-      }
-      else if (type.equals("adt")) {
+      } else if (type.equals("adt")) {
         AdtImporter importer = new AdtImporter();
         try {
           importer.importFrom(in, this);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           e.printStackTrace();
         }
-      }
-      else if (type.equals("txt")) {
+      } else if (type.equals("txt")) {
       }
 
     }
@@ -1017,8 +987,7 @@ public final class MainController implements CControlListener, CFocusListener {
         XmlConverter converter = new XmlConverter();
         converter.importFrom(in, this);
         this.report(Options.getMsg("example.loaded"));
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
         this.reportError(e.getMessage());
       }
     }

@@ -9,7 +9,8 @@ import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
 
 public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
-  public AdtIntDomain () {
+
+  public AdtIntDomain() {
     name = Options.getMsg("adtdomain.custom.int.name");
     description = Options.getMsg("adtdomain.custom.int.description");
     this.parser = new IntParser();
@@ -18,10 +19,9 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   }
 
   public boolean isValueModifiable(ADTNode node) {
-    if(node.getRole() == ADTNode.Role.PROPONENT) {
+    if (node.getRole() == ADTNode.Role.PROPONENT) {
       return this.proponentModifiable;
-    }
-    else {
+    } else {
       return this.opponnentModifiable;
     }
   }
@@ -37,6 +37,7 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
     case AND_PRO:
       return ap.evaluate(a, b);
     default:
+      Debug.log("Wrong type:" + type);
       return oo.evaluate(a, b);
     }
   }
@@ -55,7 +56,7 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
     if (description == null || (description.equals(""))) {
       return false;
     }
-    this.description =  description;
+    this.description = description;
     return true;
   }
 
@@ -70,8 +71,7 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public final Int getDefaultValue(Node node) {
     if (((ADTNode) node).getRole() == ADTNode.Role.PROPONENT) {
       return proDefault;
-    }
-    else {
+    } else {
       return oppDefault;
     }
   }
@@ -83,6 +83,7 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
       return false;
     }
     Debug.log("ok");
+    this.cp.toString();
     return true;
   }
 
@@ -128,7 +129,7 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
 
   public boolean setOp(String expr) {
     this.op = this.parser.parseString(expr);
-    if (this.op == null){
+    if (this.op == null) {
       Debug.log("not ok");
       return false;
     }
@@ -170,16 +171,15 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
 
   public String getDescription() {
     try {
-      String[] operators = { this.op.toString()
-                        , this.oo.toString()
-                        , this.ap.toString()
-                        , this.ao.toString()
-                        , this.cp.toString()
-                        , this.co.toString()
-                         };
-      return DescriptionGenerator.generateDescription(this, description , "{true,&nbsp;false}", operators);
-    }
-    catch (NullPointerException e) {
+      String[] operators = { this.op.toString() // 0
+          , this.ap.toString() // 1
+          , this.oo.toString() // 2
+          , this.ao.toString() // 3
+          , this.cp.toString() // 4
+          , this.co.toString() // 5
+      };
+      return DescriptionGenerator.generateDescription(this, description, Options.getMsg("domain.integer"), operators);
+    } catch (NullPointerException e) {
       return this.description;
     }
   }
@@ -207,9 +207,11 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public void setProModifiable(boolean value) {
     this.proponentModifiable = value;
   }
+
   public String getOppDefault() {
     return oppDefault.toString();
   }
+
   public String getProDefault() {
     return proDefault.toString();
   }
@@ -217,21 +219,24 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public boolean isOppModifiable() {
     return this.opponnentModifiable;
   }
+
   public boolean isProModifiable() {
     return this.proponentModifiable;
   }
 
-  private Int oppDefault;
-  private Int proDefault;
-  private boolean opponnentModifiable;
-  private boolean proponentModifiable;
-  private String name;
-  private String description;
-  private IntExpression cp;
-  private IntExpression co;
-  private IntExpression ao;
-  private IntExpression ap;
-  private IntExpression oo;
-  private IntExpression op;
+  private Int                 oppDefault;
+  private Int                 proDefault;
+  private boolean             opponnentModifiable;
+  private boolean             proponentModifiable;
+  private String              name;
+  private String              description;
+  private IntExpression       cp;
+  private IntExpression       co;
+  private IntExpression       ao;
+  private IntExpression       ap;
+  private IntExpression       oo;
+  private IntExpression       op;
   private transient IntParser parser;
+
+  private static final long serialVersionUID = -7059248027203727886L;
 }

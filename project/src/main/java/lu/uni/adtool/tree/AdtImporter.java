@@ -20,15 +20,6 @@
  */
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.adtree.ADTreeNode;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.AtdDomainFactory;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.ui.MainController;
-import lu.uni.adtool.ui.TreeDockable;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,6 +32,16 @@ import java.nio.channels.FileChannel.MapMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+
+import lu.uni.adtool.adtree.ADTreeNode;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.AtdDomainFactory;
+import lu.uni.adtool.domains.predefined.Domain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.ui.MainController;
+import lu.uni.adtool.ui.TreeDockable;
 
 public class AdtImporter {
 
@@ -74,7 +75,9 @@ public class AdtImporter {
       for(int i = 0; i < noDomains; i++) {
         AdtDomain<Ring> d = null;
         try {
-          d = AtdDomainFactory.updateDomain((lu.uni.adtool.domains.predefined.Domain<Ring>) in.readObject());
+          @SuppressWarnings("unchecked")
+          Domain<Ring> d2 = (lu.uni.adtool.domains.predefined.Domain<Ring>) in.readObject();
+          d = AtdDomainFactory.updateDomain(d2);
         }
         catch (ClassNotFoundException e) {
           Debug.log(e.getMessage());
@@ -84,8 +87,10 @@ public class AdtImporter {
           controller.report(Options.getMsg("error.wrongadtformat"));
           return;
         }
-        lu.uni.adtool.adtree.ValueAssignement<Ring> vass = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
-        lu.uni.adtool.adtree.ValueAssignement<Ring> vass2 = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
+        @SuppressWarnings("unchecked")
+		lu.uni.adtool.adtree.ValueAssignement<Ring> vass = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
+        @SuppressWarnings("unchecked")
+		lu.uni.adtool.adtree.ValueAssignement<Ring> vass2 = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
         treeLayout.addAdtDomain(d, vass, vass2, treeLayout.getId(), i);
       }
       TreeFactory treeFactory = controller.getFrame().getTreeFactory();
@@ -112,6 +117,7 @@ public class AdtImporter {
     }
   }
 
+@SuppressWarnings("unchecked")
   public TreeLayout loadVer1(ADTreeNode root, ObjectInputStream in, MainController controller)
       throws IOException, ClassNotFoundException {
     Map<ADTreeNode, ArrayList<ADTreeNode>> childrenMap =
@@ -242,7 +248,7 @@ public class AdtImporter {
       long fileSize = channel.size();
       final Byte[] b = {115, 114, 0, 17, 106, 97, 118, 97, 46, 108, 97, 110, 103, 46, 66, 111, 111, 108,
             101, 97, 110};
-      long start = this.find(0 ,channel, new ArrayList(Arrays.asList(b)));
+      long start = this.find(0 ,channel, new ArrayList<Byte>(Arrays.asList(b)));
       if (start < 1) {
         return null;
       }
@@ -250,7 +256,7 @@ public class AdtImporter {
       MappedByteBuffer buf = channel.map(MapMode.READ_ONLY, start, 100);
       print(buf);
       final Byte[] b2 = {115, 113, 0, 126, 0, 0};
-      long end = this.find(start, channel, new ArrayList(Arrays.asList(b2)));
+      long end = this.find(start, channel, new ArrayList<Byte>(Arrays.asList(b2)));
       if (end < 1) {
         return null;
       }
@@ -264,12 +270,12 @@ public class AdtImporter {
       start = end;
       final Byte[] vp = {115, 114, 0, 38, 108, 117, 46, 117, 110, 105, 46, 97, 100, 116, 111, 111, 108, 46, 100, 111, 109, 97, 105, 110, 115, 46, 86, 97, 108, 117, 101, 65, 115, 115, 105, 103, 110, 101, 109, 101, 110, 116};
       final byte[] vr = {115, 114, 0, 37, 108, 117, 46, 117, 110, 105, 46, 97, 100, 116, 111, 111, 108, 46, 97, 100, 116, 114, 101, 101, 46, 86, 97, 108, 117, 101, 65, 115, 115, 105, 103, 110, 101, 109, 101, 110, 116};
-      end = find(start, channel, new ArrayList(Arrays.asList(vp)));
+      end = find(start, channel, new ArrayList<Byte>(Arrays.asList(vp)));
       while (end > 0) {
         if (!copy(channel, out, start, end - start) ) return null;
         out.write(vr);
         start = end + 42;
-        end = find(start, channel, new ArrayList(Arrays.asList(vp)));
+        end = find(start, channel, new ArrayList<Byte>(Arrays.asList(vp)));
       }
       if (!copy(channel, out, start, fileSize - start)) return null;
       out.close();

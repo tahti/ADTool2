@@ -20,14 +20,6 @@
  */
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tree.DomainFactory;
-import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
-
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -36,15 +28,20 @@ import java.awt.event.KeyEvent;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.event.CVetoClosingEvent;
-import bibliothek.gui.dock.common.event.CVetoClosingListener;
 import bibliothek.gui.dock.common.intern.CDockable;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tree.DomainFactory;
+import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 
 public class DomainDockable extends DefaultMultipleCDockable
     implements ItemListener {

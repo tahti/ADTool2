@@ -25,7 +25,6 @@ import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.RankExporter;
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 
 import java.io.DataInputStream;
@@ -505,7 +504,6 @@ public class ADTNode extends GuiNode {
     else {
       for (XElement parameter : parameters) {
         String category = null;
-        String name = null;
         try {
           category = parameter.getString("category");
         }

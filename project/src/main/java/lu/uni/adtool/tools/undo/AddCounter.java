@@ -39,6 +39,7 @@ public class AddCounter extends EditAction {
     canvas.undoGetNewLabel();
   }
 
+@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
     Node parent = canvas.getTree().getRoot(true).fromPath(parentPath, 0);
     ((ADTreeCanvas<Ring>)canvas).addCounter(parent);

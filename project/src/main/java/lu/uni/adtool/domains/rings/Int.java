@@ -3,6 +3,7 @@ package lu.uni.adtool.domains.rings;
 public class Int implements Ring {
 
   public Int(final int value) {
+    this.value = value;
   }
 
   public Object clone() {

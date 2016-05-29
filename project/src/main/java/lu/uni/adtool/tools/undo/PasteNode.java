@@ -20,14 +20,13 @@
  */
 package lu.uni.adtool.tools.undo;
 
-import lu.uni.adtool.tools.Debug;
+import java.util.ArrayList;
+
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.NodeTree;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
-
-import java.util.ArrayList;
 
 public class PasteNode extends EditAction {
   public PasteNode(Node target, Node subtree) {

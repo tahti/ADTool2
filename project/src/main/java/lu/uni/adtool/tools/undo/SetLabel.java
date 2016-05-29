@@ -40,6 +40,7 @@ public class SetLabel extends EditAction {
     this.newComment = newComment;
   }
 
+@SuppressWarnings("unchecked")
   public void undo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {
@@ -50,6 +51,7 @@ public class SetLabel extends EditAction {
     }
   }
 
+@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {

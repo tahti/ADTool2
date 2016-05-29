@@ -19,7 +19,6 @@ public class BoolExpression {
   }
 
   public String toString(boolean useUnicode) {
-    String result = "";
     Stack<String> stack = new Stack<String>();
     Stack<Token> precStack = new Stack<Token>();
     String x = "";
@@ -181,10 +180,10 @@ public class BoolExpression {
   }
 
   public static Token getToken(String token) {
-    if (token.toUpperCase().equals("X")) {
+    if (token.toLowerCase().equals("x")) {
       return Token.X;
     }
-    if (token.toUpperCase().equals("Y")) {
+    if (token.toLowerCase().equals("y")) {
       return Token.Y;
     }
     if (token.equals("(")) {
@@ -193,31 +192,31 @@ public class BoolExpression {
     if (token.equals(")")) {
       return Token.RPAREN;
     }
-    if (token.toUpperCase().equals("TRUE")) {
+    if (token.toLowerCase().equals("true")) {
       return Token.TRUE;
     }
-    if (token.toUpperCase().equals("FALSE")) {
+    if (token.toLowerCase().equals("false")) {
       return Token.FALSE;
     }
-    if (token.toUpperCase().equals("NOT") || token.equals("\u00AC")) {
+    if (token.toLowerCase().equals("not") || token.equals("\u00AC")) {
       return Token.NEG;
     }
-    if (token.toUpperCase().equals("OR") || token.equals("\u2228")) {
+    if (token.toLowerCase().equals("or") || token.equals("\u2228")) {
       return Token.OR;
     }
-    if (token.toUpperCase().equals("NOR") || token.equals("\u22BC")) {
+    if (token.toLowerCase().equals("nor") || token.equals("\u22BC")) {
       return Token.NOR;
     }
-    if (token.toUpperCase().equals("AND") || token.equals("\u2227")) {
+    if (token.toLowerCase().equals("and") || token.equals("\u2227")) {
       return Token.AND;
     }
-    if (token.toUpperCase().equals("NAND") || token.equals("\u22BC")) {
+    if (token.toLowerCase().equals("nand") || token.equals("\u22BC")) {
       return Token.NAND;
     }
-    if (token.toUpperCase().equals("XOR") || token.equals("\u2295")) {
+    if (token.toLowerCase().equals("xor") || token.equals("\u2295")) {
       return Token.XOR;
     }
-    if (token.toUpperCase().equals("==") || token.equals("\u21D4") || token.equals("<=>")
+    if (token.equals("==") || token.equals("\u21D4") || token.equals("<=>")
         || token.equals("=")) {
       return Token.EQ;
     }

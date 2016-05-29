@@ -101,8 +101,7 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 
-public abstract class AbstractTreeCanvas extends JPanel
-    implements Scrollable, TreeChangeListener, Printable, Pageable {
+public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, TreeChangeListener, Printable, Pageable {
 
   public AbstractTreeCanvas(NodeTree tree, MainController mc) {
     super(new BorderLayout());
@@ -133,13 +132,13 @@ public abstract class AbstractTreeCanvas extends JPanel
     this.printAttr = new HashPrintRequestAttributeSet();
     this.printAttr.add(MediaSizeName.ISO_A4);
     this.pageFormat = new PageFormat();
+    this.history = new History();
   }
 
   public boolean isSand() {
     if (tree != null) {
       return tree.getLayout().isSand();
-    }
-    else {
+    } else {
       return true;
     }
   }
@@ -163,19 +162,28 @@ public abstract class AbstractTreeCanvas extends JPanel
     return this.scrollPane;
   }
 
-  public void addEditAction(EditAction a){
-    history.addAction(a);
-    updateUndoRedoItems();
+  public void addEditAction(EditAction a) {
+    AbstractTreeCanvas canvas = this.getTreeCanvas();
+    if (canvas != null) {
+      canvas.history.addAction(a);
+      canvas.updateUndoRedoItems();
+    }
   }
 
   public void undo() {
-    history.undo(this);
-    updateUndoRedoItems();
+    AbstractTreeCanvas canvas = this.getTreeCanvas();
+    if (canvas != null) {
+      canvas.history.undo(this);
+      canvas.updateUndoRedoItems();
+    }
   }
 
   public void redo() {
-    history.redo(this);
-    updateUndoRedoItems();
+    AbstractTreeCanvas canvas = this.getTreeCanvas();
+    if (canvas != null) {
+      canvas.history.redo(this);
+      canvas.updateUndoRedoItems();
+    }
   }
 
   public abstract void setScrollPane(JScrollPane pane);
@@ -213,8 +221,7 @@ public abstract class AbstractTreeCanvas extends JPanel
         Point2D point = viewTransform.inverseTransform(new Point2D.Double(x, y), null);
         x = point.getX();
         y = point.getY();
-      }
-      catch (NoninvertibleTransformException e) {
+      } catch (NoninvertibleTransformException e) {
         System.err.println("Cannot translate click point!!");
       }
       if (x > sizeX || y > sizeY || x < 0 || y < 0) {
@@ -232,8 +239,8 @@ public abstract class AbstractTreeCanvas extends JPanel
           break;
         // case ROUNDRECT:
         default:
-          shape = new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(),
-              rect.getHeight(), Options.canv_ArcSize, Options.canv_ArcSize);
+          shape = new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(),
+              Options.canv_ArcSize, Options.canv_ArcSize);
           break;
         }
         if (shape.contains(x, y)) {
@@ -372,8 +379,7 @@ public abstract class AbstractTreeCanvas extends JPanel
         b2 = bufferedLayout.get(focused);
       }
       Point2D p1 = new Point2D.Double(b2.getX() - borderPad / 2, b2.getY() - borderPad / 2);
-      Point2D p2 = new Point2D.Double((b2.getWidth() + borderPad) * scale,
-          (b2.getHeight() + borderPad) * scale);
+      Point2D p2 = new Point2D.Double((b2.getWidth() + borderPad) * scale, (b2.getHeight() + borderPad) * scale);
       viewTransform.transform(p1, p1);
       if (p1.getX() < 0) {
         setMoveX(getMoveX() - p1.getX() / scale);
@@ -384,8 +390,7 @@ public abstract class AbstractTreeCanvas extends JPanel
         p1.setLocation(p1.getX(), 0);
       }
       this.updateSize();
-      scrollRectToVisible(
-          new Rectangle((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY()));
+      scrollRectToVisible(new Rectangle((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY()));
     }
     this.repaint();
     if (controller != null && this instanceof AbstractDomainCanvas) {
@@ -412,16 +417,14 @@ public abstract class AbstractTreeCanvas extends JPanel
             pjob.print();
             return true;
           }
-        }
-        else {
+        } else {
           PageFormat page = pjob.pageDialog(getPageFormat(0));
           if (page != getPageFormat(0)) {
             setPageFormat(page);
             return true;
           }
         }
-      }
-      catch (PrinterException exc) {
+      } catch (PrinterException exc) {
         reportError(exc.getLocalizedMessage());
       }
     }
@@ -483,8 +486,7 @@ public abstract class AbstractTreeCanvas extends JPanel
   public Point2D transform(Point2D point) {
     try {
       return viewTransform.inverseTransform(point, null);
-    }
-    catch (NoninvertibleTransformException e) {
+    } catch (NoninvertibleTransformException e) {
       return point;
     }
   }
@@ -500,8 +502,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     // make up for dissapearing scrollbars
     if (this.scrollPane != null) {
       if (this.scrollPane.getHorizontalScrollBar().isVisible()) {
-        this.viewPortSize.height +=
-            this.scrollPane.getHorizontalScrollBar().getPreferredSize().height;
+        this.viewPortSize.height += this.scrollPane.getHorizontalScrollBar().getPreferredSize().height;
       }
       if (this.scrollPane.getVerticalScrollBar().isVisible()) {
         this.viewPortSize.width += this.scrollPane.getVerticalScrollBar().getPreferredSize().width;
@@ -577,8 +578,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     NodeExtentProvider<Node> extentProvider;
     if (localExtentProvider) {
       extentProvider = new LocalExtentProvider(this);
-    }
-    else {
+    } else {
       Debug.log("tree:" + tree);
       extentProvider = tree.getSharedExtentProvider();
     }
@@ -646,8 +646,6 @@ public abstract class AbstractTreeCanvas extends JPanel
     }
   }
 
-
-
   public void toggleAboveFold(Node node) {
     this.addEditAction(new FoldAction(node, true));
     if (node.getParent() != null) {
@@ -673,11 +671,9 @@ public abstract class AbstractTreeCanvas extends JPanel
       g2.dispose();
       document.close();
       fileStream.close();
-    }
-    catch (DocumentException e) {
+    } catch (DocumentException e) {
       reportError(Options.getMsg("error.exportingpdf") + e);
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       reportError(Options.getMsg("error.exportingpdf") + e);
     }
     setScale(oldScale);
@@ -694,8 +690,7 @@ public abstract class AbstractTreeCanvas extends JPanel
   public void createImage(FileOutputStream fileStream, String formatName) {
     Dimension dim = getPreferredSize();
     Debug.log("dim:" + dim);
-    BufferedImage bufferedImage =
-        new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
+    BufferedImage bufferedImage = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = bufferedImage.createGraphics();
     g2d.setColor(Options.canv_BackgroundColor);
     Rectangle r = new Rectangle(dim);
@@ -707,8 +702,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     try {
       ImageIO.write(bufferedImage, formatName, fileStream);
       fileStream.close();
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       System.err.println("Error while exporting to image:" + e);
     }
   }
@@ -723,8 +717,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     XmlConverter converter = new XmlConverter();
     try {
       converter.exportTo(fileStream, tree.getLayout());
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
   }
@@ -735,8 +728,7 @@ public abstract class AbstractTreeCanvas extends JPanel
   public String getTermsString() {
     if (this.tree.getRoot(true) instanceof SandNode) {
       return ((SandNode) this.tree.getRoot(true)).toTerms();
-    }
-    else {
+    } else {
       return ((ADTNode) this.tree.getRoot(true)).toTerms();
     }
   }
@@ -745,8 +737,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     Node root = this.tree.getRoot(true);
     if (root instanceof SandNode) {
       fileStream.write(((SandNode) root).toTerms().getBytes(Charset.forName("UTF-8")));
-    }
-    else {
+    } else {
       fileStream.write(((ADTNode) root).toTerms().getBytes(Charset.forName("UTF-8")));
     }
     fileStream.close();
@@ -812,16 +803,14 @@ public abstract class AbstractTreeCanvas extends JPanel
     if (Options.print_perserveAspectRatio) {
       if (printScaleX < printScaleY) {
         printScaleY = printScaleX;
-      }
-      else {
+      } else {
         printScaleX = printScaleY;
       }
     }
     int shiftX = page % (int) p.getX();
     int shiftY = page / (int) p.getX();
     // align origin
-    g.translate((int) (pf.getImageableX() - (shiftX * pW)),
-        (int) (pf.getImageableY() - (shiftY * pH)));
+    g.translate((int) (pf.getImageableX() - (shiftX * pW)), (int) (pf.getImageableY() - (shiftY * pH)));
     ((Graphics2D) g).scale(printScaleX, printScaleY);
     g.translate(Options.canv_LineWidth, Options.canv_LineWidth);
     this.paintComponent((Graphics2D) g, tree.getRoot(false));
@@ -842,8 +831,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     g2.setStroke(basicStroke);
     if (Options.canv_DoAntialiasing) {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    }
-    else {
+    } else {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
     paintEdges(g2, startNode);
@@ -870,8 +858,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     Rectangle r = g2.getClipBounds();
     if (r != null) {
       g2.fillRect(r.x, r.y, r.width, r.height);
-    }
-    else {
+    } else {
       Debug.log("null clip bounds");
     }
     g2.transform(viewTransform);
@@ -888,42 +875,39 @@ public abstract class AbstractTreeCanvas extends JPanel
 
   public void updateUndoRedoItems() {
     ADAction undo = controller.getUndoItem();
-    String text = history.getUndoText();
+    AbstractTreeCanvas canvas = this.getTreeCanvas();
+    String text = canvas.history.getUndoText();
     if (text != null) {
       undo.setEnabled(true);
       undo.setName(text);
-    }
-    else {
+    } else {
       undo.setEnabled(false);
       undo.setName(Options.getMsg("edit.undo.txt"));
     }
     ADAction redo = controller.getRedoItem();
-    text = history.getRedoText();
+    text = canvas.history.getRedoText();
     if (text != null) {
       redo.setEnabled(true);
       redo.setName(text);
-    }
-    else {
+    } else {
       redo.setEnabled(false);
       redo.setName(Options.getMsg("edit.redo.txt"));
     }
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   public void addDomain(Domain<Ring> domain) {
     TreeDockable currentTree = (TreeDockable) this.controller.getControl()
-      .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getId()));
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getId()));
     if (currentTree != null) {
       DomainFactory factory = controller.getFrame().getDomainFactory();
       int domainId = factory.getNewUniqueId(new Integer(this.getId()));
       this.addEditAction(new AddDomain(domainId, domain));
       DomainDockable d = null;
       if (domain instanceof SandDomain) {
-        d = factory.read(new ValuationDomain(this.getId(),
-            domainId, (SandDomain) domain));
-      }
-      else {
-        d = factory.read(new ValuationDomain(this.getId(),
-            domainId, (AdtDomain) domain));
+        d = factory.read(new ValuationDomain(this.getId(), domainId, (SandDomain) domain));
+      } else {
+        d = factory.read(new ValuationDomain(this.getId(), domainId, (AdtDomain) domain));
       }
       Debug.log("Adding domain to control with id:" + d.getUniqueId());
       controller.getControl().addDockable(d.getUniqueId(), d);
@@ -940,6 +924,15 @@ public abstract class AbstractTreeCanvas extends JPanel
       this.addEditAction(new RemoveDomain(dockable.getCanvas().getValues(), localExtentProvider));
       this.controller.getFrame().getDomainFactory().removeDomain(dockable);
     }
+  }
+
+  /**
+   * Just return this canvas - placeholder for canvases that want to share edit
+   * history - they need to override this method.
+   */
+
+  protected AbstractTreeCanvas getTreeCanvas() {
+    return this;
   }
 
   protected String getNewLabel() {
@@ -1048,21 +1041,18 @@ public abstract class AbstractTreeCanvas extends JPanel
     fillCol = getFillColor(node);
     // ATTACKER type
     if (node instanceof ADTNode) {
-      ADTNode.Role defender =
-          tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
+      ADTNode.Role defender = tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
       if (((ADTNode) node).getRole() == defender) {
         borderCol = Options.canv_BorderColorDef;
         textCol = Options.canv_TextColorDef;
         shape = Options.canv_ShapeDef;
-      }
-      else {
+      } else {
         // ATTACKER type
         borderCol = Options.canv_BorderColorAtt;
         textCol = Options.canv_TextColorAtt;
         shape = Options.canv_ShapeAtt;
       }
-    }
-    else {
+    } else {
       borderCol = Options.canv_BorderColorAtt;
       textCol = Options.canv_TextColorAtt;
       shape = Options.canv_ShapeAtt;
@@ -1135,15 +1125,12 @@ public abstract class AbstractTreeCanvas extends JPanel
       Rectangle2D.Double b2 = new Rectangle2D.Double(0, 0, 0, 0);
       for (Node child : tree.getChildrenList(parent, false)) {
         b2 = bufferedLayout.get(child);
-        if (parent instanceof ADTNode
-            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole()) {
+        if (parent instanceof ADTNode && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole()) {
           g2.setStroke(counterStroke);
-        }
-        else {
+        } else {
           g2.setStroke(basicStroke);
         }
-        if (!(parent instanceof ADTNode
-            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole())) {
+        if (!(parent instanceof ADTNode && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole())) {
           maxX = Math.max(maxX, b2.getCenterX());
           minX = Math.min(minX, b2.getCenterX());
           noChildren++;
@@ -1155,15 +1142,14 @@ public abstract class AbstractTreeCanvas extends JPanel
       boolean drawArrow = false;
 
       if (parent instanceof SandNode) {
-        if ((((SandNode) parent).getType() == SandNode.Type.AND
-            || ((SandNode) parent).getType() == SandNode.Type.SAND) && noChildren > 1) {
+        if ((((SandNode) parent).getType() == SandNode.Type.AND || ((SandNode) parent).getType() == SandNode.Type.SAND)
+            && noChildren > 1) {
           drawArc = true;
           if (((SandNode) parent).getType() == SandNode.Type.SAND) {
             drawArrow = true;
           }
         }
-      }
-      else if (parent instanceof ADTNode) {
+      } else if (parent instanceof ADTNode) {
         if ((((ADTNode) parent).getType() == ADTNode.Type.AND_OPP
             || ((ADTNode) parent).getType() == ADTNode.Type.AND_PRO) && noChildren > 1) {
           drawArc = true;
@@ -1182,9 +1168,8 @@ public abstract class AbstractTreeCanvas extends JPanel
         double endAngle = -180 - Math.toDegrees(Math.atan(tangens1 * shear));
         double a = b1.getWidth() + Options.canv_ArcPadding;
         double b = b1.getHeight() + Options.canv_ArcPadding;
-        Arc2D arc = new Arc2D.Double(b1.getX() - Options.canv_ArcPadding / 2,
-            b1.getY() - Options.canv_ArcPadding / 2, a, b, startAngle, endAngle - startAngle,
-            Arc2D.OPEN);
+        Arc2D arc = new Arc2D.Double(b1.getX() - Options.canv_ArcPadding / 2, b1.getY() - Options.canv_ArcPadding / 2,
+            a, b, startAngle, endAngle - startAngle, Arc2D.OPEN);
 
         if (arc != null) {
           g2.draw(arc);
@@ -1229,8 +1214,7 @@ public abstract class AbstractTreeCanvas extends JPanel
     // ATTACKER type
     Options.ShapeType shape = Options.canv_ShapeAtt;
     if (node instanceof ADTNode) {
-      ADTNode.Role defender =
-          tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
+      ADTNode.Role defender = tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
       if (((ADTNode) node).getRole() == defender) {
         shape = Options.canv_ShapeDef;
       }
@@ -1256,8 +1240,7 @@ public abstract class AbstractTreeCanvas extends JPanel
    *
    */
   protected void updateSize() {
-    Point2D.Double point =
-        new Point2D.Double(this.sizeX + this.borderPad / 2, this.sizeY + this.borderPad / 2);
+    Point2D.Double point = new Point2D.Double(this.sizeX + this.borderPad / 2, this.sizeY + this.borderPad / 2);
     this.viewTransform.transform(point, point);
     int x = 0;
     int y = 0;
@@ -1298,8 +1281,7 @@ public abstract class AbstractTreeCanvas extends JPanel
           cols--;
           return new Point((int) cols, (int) rows);
         }
-      }
-      else {
+      } else {
         rows++;
         if (cols * rows > noPages) {
           rows--;
@@ -1372,12 +1354,12 @@ public abstract class AbstractTreeCanvas extends JPanel
   /**
    * Parameters for the Walkers algorithm.
    */
-  protected final BasicStroke             selectionStroke  =
-      new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] {6, 10}, 0);
-  protected final BasicStroke             basicStroke      =
-      new BasicStroke(Options.canv_LineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+  protected final BasicStroke             selectionStroke  = new BasicStroke(1, BasicStroke.CAP_ROUND,
+      BasicStroke.JOIN_ROUND, 0, new float[] { 6, 10 }, 0);
+  protected final BasicStroke             basicStroke      = new BasicStroke(Options.canv_LineWidth,
+      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
   private final BasicStroke               counterStroke    = new BasicStroke(Options.canv_LineWidth,
-      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] {0, 6}, 0);
+      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] { 0, 6 }, 0);
   protected MainController                controller;
   protected History                       history;
 

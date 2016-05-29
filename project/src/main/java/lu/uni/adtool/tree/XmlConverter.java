@@ -20,17 +20,6 @@
  */
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.RankExporter;
-import lu.uni.adtool.domains.Ranker;
-import lu.uni.adtool.domains.SandDomain;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.ui.MainController;
-import lu.uni.adtool.ui.TreeDockable;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -41,6 +30,15 @@ import java.util.ArrayList;
 import bibliothek.util.xml.XElement;
 import bibliothek.util.xml.XException;
 import bibliothek.util.xml.XIO;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.RankExporter;
+import lu.uni.adtool.domains.Ranker;
+import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.ui.MainController;
+import lu.uni.adtool.ui.TreeDockable;
 
 public class XmlConverter {
 

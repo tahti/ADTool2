@@ -20,9 +20,6 @@
  */
 package lu.uni.adtool.ui.inputdialogs;
 
-import lu.uni.adtool.domains.rings.BoundedInteger;
-import lu.uni.adtool.tools.Options;
-
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -35,13 +32,16 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 
+import lu.uni.adtool.domains.rings.Int;
+import lu.uni.adtool.tools.Options;
+
 /**
  * Dialog to edit values for the attribute domains of real numbers greater than
  * 0..
  *
  * @author Piotr Kordy
  */
-public class BoundedIntegerDialog extends InputDialog {
+public class IntDialog extends InputDialog {
 
   /**
    * Constructs a new instance.
@@ -49,9 +49,8 @@ public class BoundedIntegerDialog extends InputDialog {
    * @param frame
    *          parent frame.
    */
-  public BoundedIntegerDialog(final Frame frame) {
+  public IntDialog(final Frame frame) {
     super(frame, Options.getMsg("inputdialog.intnumber.txt"));
-    infButton = null;
   }
 
   /**
@@ -62,7 +61,7 @@ public class BoundedIntegerDialog extends InputDialog {
    * @param title
    *          window title.
    */
-  public BoundedIntegerDialog(final Frame frame, final String title) {
+  public IntDialog(final Frame frame, final String title) {
     super(frame, title);
   }
 
@@ -108,10 +107,6 @@ public class BoundedIntegerDialog extends InputDialog {
     else if ("x1000".equals(e.getActionCommand())) {
       times(1000);
     }
-    else if (Options.getMsg("inputdialog.infinity").equals(e.getActionCommand())) {
-      valueField.setValue(new Double(Double.POSITIVE_INFINITY));
-      sync();
-    }
     else if (Options.getMsg("inputdialog.zero").equals(e.getActionCommand())) {
       valueField.setValue(new Double(0));
       sync();
@@ -127,15 +122,7 @@ public class BoundedIntegerDialog extends InputDialog {
    * @see InputDialog#isValid(double)
    */
   protected boolean isValid(final double d) {
-    boolean isValid = false;
-    final int bound = ((BoundedInteger) value).getBound();
-    if (new Double(d).isInfinite()) {
-      isValid = false;
-    }
-    else if (d >= 0 && d <= bound) {
-      isValid = true;
-    }
-    return isValid;
+    return true;
   }
 
   /**
@@ -144,45 +131,9 @@ public class BoundedIntegerDialog extends InputDialog {
    * @see InputDialog#setValue(double)
    */
   protected final void setValue(final double d) {
-    final int bound = ((BoundedInteger) value).getBound();
-    if (new Double(d).isInfinite()) {
-      value = new BoundedInteger(BoundedInteger.INF, bound);
-    }
-    else {
-      value = new BoundedInteger((int) d, bound);
-    }
+    value = new Int((int) d);
     valueField.setValue(d);
   }
-  /**
-   * {@inheritDoc}
-   *
-   * @see InputDialog#sync()
-   */
-  // protected final boolean sync()
-  // {
-  // if (isV
-  // final Number num = (Number)valueField.getValue();
-  // if(num == null){
-  // error=true;
-  // }
-  // else{
-  // final double d = num.doubleValue();
-  // final int bound = ((BoundedInteger)value).getBound();
-  // if(new Double(d).isInfinite()){
-  // value = new BoundedInteger(BoundedInteger.INF,bound);
-  // valueField.setValue(value);
-  // }
-  // else if(d >= 0 && d<=bound){
-  // value = new BoundedInteger((int)d,bound);
-  // valueField.setValue(((BoundedInteger)value).getValue());
-  // }
-  // else{
-  // error = true;
-  // valueField.setValue(new Integer(((BoundedInteger)value).getValue()));
-  // }
-  // }
-  // return error;
-  // }
 
   /**
    * {@inheritDoc}
@@ -190,16 +141,11 @@ public class BoundedIntegerDialog extends InputDialog {
    * @see InputDialog#createLayout()
    */
   protected void createLayout(final boolean showDefault) {
-    final int bound = ((BoundedInteger) value).getBound();
-    errorMsg.setText(Options.getMsg("inputdialog.intnumber.error") + " " + bound + ".");
     final NumberFormat f = NumberFormat.getInstance();
     f.setParseIntegerOnly(true);
     valueField = new JFormattedTextField(f);
     valueField.addKeyListener(this);
-    double d = new Double(((BoundedInteger) value).getValue());
-    if (d == BoundedInteger.INF) {
-      d = Double.POSITIVE_INFINITY;
-    }
+    double d = new Double(((Int) value).getValue());
     if (showDefault) {
       valueField.setValue(d);
     }
@@ -265,18 +211,9 @@ public class BoundedIntegerDialog extends InputDialog {
     button = new JButton(Options.getMsg("inputdialog.zero"));
     button.setActionCommand(Options.getMsg("inputdialog.zero"));
     button.addActionListener(this);
-    if (infButton != null) {
-      inputPane.add(button, c);
-      c.gridx = 4;
-      infButton.setActionCommand(Options.getMsg("inputdialog.infinity"));
-      infButton.addActionListener(this);
-      inputPane.add(infButton, c);
-    }
-    else {
-      c.gridwidth = 2;
-      inputPane.add(button, c);
-      c.gridwidth = 1;
-    }
+    c.gridwidth = 2;
+    inputPane.add(button, c);
+    c.gridwidth = 1;
     c.gridx = 5;
     button = new JButton("x10");
     button.setActionCommand("x10");
@@ -302,7 +239,7 @@ public class BoundedIntegerDialog extends InputDialog {
       return;
     }
     double d = num.doubleValue();
-    if (!isValid(d + i) || d == Double.POSITIVE_INFINITY) {
+    if (d == Double.NEGATIVE_INFINITY|| d == Double.POSITIVE_INFINITY) {
       return;
     }
     d = d + i;
@@ -315,7 +252,7 @@ public class BoundedIntegerDialog extends InputDialog {
       return;
     }
     double d = num.doubleValue();
-    if (!isValid(d * i) || d == Double.POSITIVE_INFINITY) {
+    if (d == Double.NEGATIVE_INFINITY|| d == Double.POSITIVE_INFINITY) {
       return;
     }
     d = d * i;
@@ -328,12 +265,11 @@ public class BoundedIntegerDialog extends InputDialog {
       return;
     }
     double d = num.doubleValue();
-    if (!isValid((int) d / i) || d == Double.POSITIVE_INFINITY) {
+    if (d == Double.NEGATIVE_INFINITY|| d == Double.POSITIVE_INFINITY) {
       return;
     }
     d = (int) d / i;
     setValue(d);
   }
   static final long serialVersionUID = 35393957497521213L;
-  protected JButton infButton;
 }

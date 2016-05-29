@@ -20,23 +20,6 @@
  */
 package lu.uni.adtool;
 
-import lu.uni.adtool.tools.Clo;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tree.DomainFactory;
-import lu.uni.adtool.tree.TreeFactory;
-import lu.uni.adtool.tree.XmlConverter;
-import lu.uni.adtool.ui.BackupFactory;
-import lu.uni.adtool.ui.DetailsView;
-import lu.uni.adtool.ui.MainController;
-import lu.uni.adtool.ui.OptionPane;
-import lu.uni.adtool.ui.PermaDockable;
-import lu.uni.adtool.ui.RankingDockable;
-import lu.uni.adtool.ui.StatusLine;
-import lu.uni.adtool.ui.TreeDockable;
-import lu.uni.adtool.ui.ValuationsDockable;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileInputStream;
@@ -75,6 +58,23 @@ import bibliothek.gui.dock.station.support.PlaceholderStrategyListener;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.util.Path;
 import bibliothek.util.xml.XException;
+
+import lu.uni.adtool.tools.Clo;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tree.DomainFactory;
+import lu.uni.adtool.tree.TreeFactory;
+import lu.uni.adtool.tree.XmlConverter;
+import lu.uni.adtool.ui.BackupFactory;
+import lu.uni.adtool.ui.DetailsView;
+import lu.uni.adtool.ui.MainController;
+import lu.uni.adtool.ui.OptionPane;
+import lu.uni.adtool.ui.PermaDockable;
+import lu.uni.adtool.ui.RankingDockable;
+import lu.uni.adtool.ui.StatusLine;
+import lu.uni.adtool.ui.TreeDockable;
+import lu.uni.adtool.ui.ValuationsDockable;
 
 public final class ADToolMain extends JFrame {
 
@@ -132,28 +132,25 @@ public final class ADToolMain extends JFrame {
     super.setJMenuBar(this.controller.getMenu());
     if (clo.getToOpen() == null) {
       Options.tryLoadLayout(control, this);
-    }
-    else {
+    } else {
       XmlConverter converter = new XmlConverter();
-      for (String fileName:clo.getToOpen()) {
+      for (String fileName : clo.getToOpen()) {
         FileInputStream in;
         try {
           in = new FileInputStream(fileName);
           converter.importFrom(in, this.controller);
           in.close();
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
           System.out.println(Options.getMsg("error.xmlimport.fail") + e.getLocalizedMessage());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
           System.out.println(Options.getMsg("error.xmlimport.fail") + e.getLocalizedMessage());
         }
       }
     }
     this.pack();
     this.setVisible(true);
-//     this.setExtendedState(getExtendedState() |JFrame.MAXIMIZED_BOTH);
-//     this.setVisible(true);
+    // this.setExtendedState(getExtendedState() |JFrame.MAXIMIZED_BOTH);
+    // this.setVisible(true);
   }
 
   public TreeFactory getTreeFactory() {
@@ -167,14 +164,10 @@ public final class ADToolMain extends JFrame {
   private void setTheme(CControl control) {
     IconFactory factory = new IconFactory();
     IconManager im = control.intern().getController().getIcons();
-    im.setIconClient("locationmanager.normalize",
-        factory.createImageIcon("/icons/theme/normalize.png"));
-    im.setIconClient("locationmanager.maximize",
-        factory.createImageIcon("/icons/theme/maximize.png"));
-    im.setIconClient("locationmanager.externalize",
-        factory.createImageIcon("/icons/theme/externalize.png"));
-    im.setIconClient("locationmanager.minimize",
-        factory.createImageIcon("/icons/theme/minimize.png"));
+    im.setIconClient("locationmanager.normalize", factory.createImageIcon("/icons/theme/normalize.png"));
+    im.setIconClient("locationmanager.maximize", factory.createImageIcon("/icons/theme/maximize.png"));
+    im.setIconClient("locationmanager.externalize", factory.createImageIcon("/icons/theme/externalize.png"));
+    im.setIconClient("locationmanager.minimize", factory.createImageIcon("/icons/theme/minimize.png"));
     im.setIconClient("close", factory.createImageIcon("/icons/theme/close_active.png"));
     im.setIconClient("flap.hold", factory.createImageIcon("/icons/theme/pin_active.png"));
     im.setIconClient("flap.free", factory.createImageIcon("/icons/theme/unpin_active.png"));
@@ -184,7 +177,8 @@ public final class ADToolMain extends JFrame {
 
   public static void main(String[] args) {
     Clo clo = new Clo();
-    if(clo.parse(args)) {;
+    if (clo.parse(args)) {
+      ;
       ADToolMain adtool = new ADToolMain(clo);
       Debug.log(adtool.getClass().getPackage().getImplementationVersion());
       Debug.log(Options.getAppFolder().toString());
@@ -226,20 +220,20 @@ public final class ADToolMain extends JFrame {
   /**
    * Status bar
    */
-  private StatusLine                     status;
-  private MainController                 controller;
-  private ValuationsDockable             valuationsView;
-  private RankingDockable                rankingView;
-  private DetailsView                    detailsView;
-  private static final long              serialVersionUID = 2554846105872850570L;
-  private TreeFactory                    treeFactory;
-  private DomainFactory                  domainFactory;
-  private CWorkingArea                   work;
+  private StatusLine status;
+  private MainController controller;
+  private ValuationsDockable valuationsView;
+  private RankingDockable rankingView;
+  private DetailsView detailsView;
+  private static final long serialVersionUID = 2554846105872850570L;
+  private TreeFactory treeFactory;
+  private DomainFactory domainFactory;
+  private CWorkingArea work;
   private HashMap<Integer, CContentArea> trees;
 
   /*
-   * This is our very simple PlaceholderStrategy. It only recognizes our custom
-   * Dockable and returns its placeholder.
+   * This is our very simple PlaceholderStrategy. It only recognizes our
+   * custom Dockable and returns its placeholder.
    */
   private static class PermaPlaceholderStrategy implements PlaceholderStrategy {
     public void addListener(PlaceholderStrategyListener listener) {
@@ -277,26 +271,26 @@ public final class ADToolMain extends JFrame {
 
     /**
      * Applies the layout described in <code>setting</code> to the visible
-     * elements. This implementation tries to estimate the location of missing
-     * dockables using
-     * {@link #listEstimateLocations(DockSituation, DockLayoutComposition)}. It
-     * also checks and adds stations and work areas that are not present.
+     * elements. This implementation tries to estimate the location of
+     * missing dockables using
+     * {@link #listEstimateLocations(DockSituation, DockLayoutComposition)}.
+     * It also checks and adds stations and work areas that are not present.
      *
      * @param frontend
-     *          the caller of this method
+     *            the caller of this method
      * @param situation
-     *          used to convert the layout
+     *            used to convert the layout
      * @param setting
-     *          the new layout
+     *            the new layout
      * @param entry
-     *          whether the layout is a full or regular layout
+     *            whether the layout is a full or regular layout
      * @throws IOException
-     *           if the layout cannot be converted
+     *             if the layout cannot be converted
      * @throws XException
-     *           if the layout cannot be converted
+     *             if the layout cannot be converted
      */
-    protected void applyLayout(DockFrontendInternals frontend, DockSituation situation,
-        SettingAccess setting, boolean entry) throws IOException, XException {
+    protected void applyLayout(DockFrontendInternals frontend, DockSituation situation, SettingAccess setting,
+        boolean entry) throws IOException, XException {
       Debug.log("applyLayout");
       DockFrontend dockFrontend = frontend.getFrontend();
       MissingDockableStrategy missingDockable = frontend.getMissingDockableStrategy();
@@ -306,8 +300,7 @@ public final class ADToolMain extends JFrame {
           if (key.startsWith("tree") && key.contains("_")) {
             Integer id = new Integer(Integer.parseInt(key.substring(4, key.indexOf("_"))));
             final String workId = TreeDockable.getWorkAreaId(id.intValue());
-            CWorkingArea workArea =
-                (CWorkingArea) controller.getControl().getSingleDockable(workId);
+            CWorkingArea workArea = (CWorkingArea) controller.getControl().getSingleDockable(workId);
             if (workArea == null) {
               workArea = control.createWorkingArea(workId);
               ((PredefinedDockSituation) situation).put(
@@ -380,8 +373,8 @@ public final class ADToolMain extends JFrame {
       }
     }
 
-    protected Collection<Dockable> approveClosing(DockFrontendInternals frontend,
-        DockSituation situation, SettingAccess setting) {
+    protected Collection<Dockable> approveClosing(DockFrontendInternals frontend, DockSituation situation,
+        SettingAccess setting) {
       // check whether some elements really should be closed
       Set<Dockable> remainingVisible = new HashSet<Dockable>();
       for (RootInfo info : frontend.getRoots()) {

@@ -20,14 +20,9 @@
  */
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.SandDomain;
-import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tree.DomainFactory;
 import lu.uni.adtool.tree.NodeTree;
 import lu.uni.adtool.tree.TreeFactory;
 import lu.uni.adtool.tree.TreeLayout;
