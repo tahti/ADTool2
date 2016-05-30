@@ -58,6 +58,9 @@ public class IntParser extends Parser {
         break;
 
       case LPAREN:
+        if(stack.empty()||(!IntExpression.isFunction(stack.peek().type))) {
+          arg.push(new Integer(0));
+        }
         stack.push(term);
         break;
 
@@ -86,10 +89,13 @@ public class IntParser extends Parser {
             setError(1, "parser.missingarg");
             return null;
           }
+          arg.push(new Integer(arg.pop().intValue() + 1));
         }
-        arg.push(new Integer(arg.pop().intValue() + 1));
+        else {
+          arg.pop();
+          arg.push(new Integer(arg.pop().intValue() + 1));
+        }
         break;
-
       case COMMA:
         while ((!stack.empty()) && (stack.peek().type != IntExpression.Token.LPAREN)) {
           expression.add(stack.pop());
