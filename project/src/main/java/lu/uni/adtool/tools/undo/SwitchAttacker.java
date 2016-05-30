@@ -30,11 +30,11 @@ public class SwitchAttacker extends EditAction {
   }
 @SuppressWarnings("unchecked")
   public void undo(AbstractTreeCanvas canvas) {
-    ((ADTreeCanvas<Ring>)canvas).switchAttacker();
+    ((ADTreeCanvas<Ring>)canvas.getTreeCanvas()).switchAttacker();
   }
 @SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
-    ((ADTreeCanvas<Ring>)canvas).switchAttacker();
+    ((ADTreeCanvas<Ring>)canvas.getTreeCanvas()).switchAttacker();
   }
   public String getName(){
     return Options.getMsg("action.switchattacker");

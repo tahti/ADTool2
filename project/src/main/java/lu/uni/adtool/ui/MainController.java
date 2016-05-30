@@ -439,10 +439,12 @@ public final class MainController implements CControlListener, CFocusListener {
 
       @SuppressWarnings("unchecked")
       public void actionPerformed(ActionEvent e) {
-        if (lastFocusedTree != null && lastFocusedTree instanceof ADTreeCanvas) {
-          ((ADTreeCanvas<Ring>) lastFocusedTree).switchAttacker();
+        if (lastFocusedTree != null && !lastFocusedTree.isSand()) {
+          AbstractTreeCanvas canvas = lastFocusedTree.getTreeCanvas();
+
+          ((ADTreeCanvas<Ring>) canvas).switchAttacker();
           report(Options.getMsg("edit.switchRole.report",
-              (lastFocusedTree.getTree().getLayout().getSwitchRole()
+              (canvas.getTree().getLayout().getSwitchRole()
                   ? Options.getMsg("tablemodel.opponent").toLowerCase()
                   : Options.getMsg("tablemodel.proponent").toLowerCase())));
         }

@@ -436,7 +436,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
    * and domain canvases.
    *
    */
-  protected AbstractTreeCanvas getTreeCanvas() {
+  public AbstractTreeCanvas getTreeCanvas() {
     TreeDockable currentTree = (TreeDockable) getController().getControl()
         .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(getId()));
     if (currentTree != null) {

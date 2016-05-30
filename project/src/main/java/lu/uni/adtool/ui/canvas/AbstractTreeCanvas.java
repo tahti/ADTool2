@@ -931,7 +931,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
    * history - they need to override this method.
    */
 
-  protected AbstractTreeCanvas getTreeCanvas() {
+  public AbstractTreeCanvas getTreeCanvas() {
     return this;
   }
 
