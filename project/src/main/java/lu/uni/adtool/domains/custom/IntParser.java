@@ -11,7 +11,7 @@ public class IntParser extends Parser {
   }
 
   public IntExpression parseString(String toParse) {
-    Debug.log("parsing:" + toParse);
+//     Debug.log("parsing:" + toParse);
     ArrayList<IntExpression.Term> terms = tokenize(toParse);
     if (terms == null || terms.size() == 0) {
       return null;

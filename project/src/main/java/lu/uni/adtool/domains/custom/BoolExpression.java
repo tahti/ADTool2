@@ -52,10 +52,10 @@ public class BoolExpression {
       case NEQ:
       case IMP:
       case CIMP:
-        x = stack.pop();
         y = stack.pop();
-        precX = getPrecedence(precStack.pop());
+        x = stack.pop();
         int precY = getPrecedence(precStack.pop());
+        precX = getPrecedence(precStack.pop());
         if (precX <= getPrecedence(token)) {
           x = tokenToString(Token.LPAREN, useUnicode) + x + tokenToString(Token.RPAREN, useUnicode);
         }
@@ -75,6 +75,7 @@ public class BoolExpression {
 
   public Bool evaluate(Bool x, Bool y) {
     Stack<Bool> stack = new Stack<Bool>();
+    Bool top = null;
     for (Token token : this.tokens) {
       switch (token) {
       case TRUE:
@@ -90,31 +91,40 @@ public class BoolExpression {
         stack.push(y);
         break;
       case OR:
-        stack.push(Bool.or(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.or(stack.pop(), top));
         break;
       case NOR:
-        stack.push(Bool.nor(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.nor(stack.pop(), top));
         break;
       case AND:
-        stack.push(Bool.and(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.and(stack.pop(), top));
         break;
       case NAND:
-        stack.push(Bool.nand(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.nand(stack.pop(), top));
         break;
       case XOR:
-        stack.push(Bool.xor(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.xor(stack.pop(), top));
         break;
       case EQ:
-        stack.push(Bool.eq(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.eq(stack.pop(), top));
         break;
       case NEQ:
-        stack.push(Bool.neq(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.neq(stack.pop(), top));
         break;
       case IMP:
-        stack.push(Bool.implication(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.implication(stack.pop(), top));
         break;
       case CIMP:
-        stack.push(Bool.counterImplication(stack.pop(), stack.pop()));
+        top = stack.pop();
+        stack.push(Bool.counterImplication(stack.pop(), top));
         break;
       case NEG:
         stack.push(Bool.not(stack.pop()));
@@ -130,23 +140,6 @@ public class BoolExpression {
       return stack.pop();
     }
   }
-
-  // public static boolean isOperator(Token token) {
-  // switch (token) {
-  // case OR:
-  // case NOR:
-  // case AND:
-  // case NAND:
-  // case XOR:
-  // case EQ:
-  // case NEQ:
-  // case IMP:
-  // case CIMP:
-  // return true;
-  // default:
-  // return false;
-  // }
-  // }
 
   public static int getPrecedence(Token token) {
     switch (token) {

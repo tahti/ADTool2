@@ -28,25 +28,30 @@ public class IntExpression {
         stack.push(y);
         break;
       case PLUS:
-        stack.push(new Int(stack.pop().getValue() + stack.pop().getValue()));
+        result = stack.pop();
+        stack.push(new Int(stack.pop().getValue() + result.getValue()));
         break;
       case MINUS:
-        stack.push(new Int(stack.pop().getValue() - stack.pop().getValue()));
+        result = stack.pop();
+        stack.push(new Int(stack.pop().getValue() - result.getValue()));
         break;
       case MUL:
-        stack.push(new Int(stack.pop().getValue() * stack.pop().getValue()));
+        result = stack.pop();
+        stack.push(new Int(stack.pop().getValue() * result.getValue()));
         break;
       case DIV:
-        stack.push(new Int(stack.pop().getValue() / stack.pop().getValue()));
+        result = stack.pop();
+        stack.push(new Int(stack.pop().getValue() / result.getValue()));
         break;
       case MODULO:
-        stack.push(new Int(stack.pop().getValue() % stack.pop().getValue()));
+        result = stack.pop();
+        stack.push(new Int(stack.pop().getValue() % result.getValue()));
         break;
       case MAX:
         args = term.value - 1;
         result = stack.pop();
         while (args > 0) {
-          result = new Int(Math.max(result.getValue(), stack.pop().getValue()));
+          result = new Int(Math.max(stack.pop().getValue(), result.getValue()));
           args = args - 1;
         }
         stack.push(result);
@@ -55,7 +60,7 @@ public class IntExpression {
         args = term.value - 1;
         result = stack.pop();
         while (args > 0) {
-          result = new Int(Math.min(result.getValue(), stack.pop().getValue()));
+          result = new Int(Math.min(stack.pop().getValue(), result.getValue()));
           args = args - 1;
         }
         stack.push(result);
@@ -126,7 +131,7 @@ public class IntExpression {
         x = stack.pop();
         precStack.pop();
         while (args > 0) {
-          x = x + ", " + stack.pop();
+          x = stack.pop() + ", " + x;
           precStack.pop();
           args = args - 1;
         }
@@ -139,10 +144,10 @@ public class IntExpression {
       case MUL:
       case DIV:
       case MODULO:
-        x = stack.pop();
         y = stack.pop();
-        precX = getPrecedence(precStack.pop());
+        x = stack.pop();
         int precY = getPrecedence(precStack.pop());
+        precX = getPrecedence(precStack.pop());
         if (precX <= getPrecedence(term.type)) {
           x = termToString(new Term(Token.LPAREN, 0)) + x + termToString(new Term(Token.RPAREN, 0));
         }
