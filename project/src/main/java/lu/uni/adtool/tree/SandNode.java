@@ -20,19 +20,20 @@
  */
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.domains.RankExporter;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Options;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import bibliothek.util.xml.XAttribute;
 import bibliothek.util.xml.XElement;
+
+import lu.uni.adtool.domains.RankExporter;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Options;
 
 public class SandNode extends GuiNode {
 
@@ -106,7 +107,7 @@ public class SandNode extends GuiNode {
    * Export to XML using format used by the first version of ADTool
    *
    */
-  public XElement exportXml(ArrayList<ValuationDomain> domains, ArrayList<RankExporter> rankers) {
+  public XElement exportXml(Collection<ValuationDomain> domains, ArrayList<RankExporter> rankers) {
     XElement result = new XElement("node");
     result.addString("refinement", typeToXml(type));
     result.addElement("label").setString(getName());
@@ -114,8 +115,8 @@ public class SandNode extends GuiNode {
       result.addElement("comment").setString(getComment());
     }
     if (domains != null && Options.main_saveDomains) {
-      for (int i = 0; i < domains.size(); i++) {
-        ValuationDomain vd = domains.get(i);
+      int i = 0;
+      for (ValuationDomain vd: domains) {
         String domainId = vd.getExportXmlId();
         if (this.isEditable()) {
           if (vd.getValue(this) != null) {
@@ -143,6 +144,7 @@ public class SandNode extends GuiNode {
             }
           }
         }
+        ++i;
       }
     }
     if (this.getChildren() != null) {

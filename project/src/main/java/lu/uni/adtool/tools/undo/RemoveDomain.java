@@ -39,7 +39,7 @@ public class RemoveDomain extends EditAction {
 
   public void undo(AbstractTreeCanvas canvas) {
     TreeDockable currentTree = (TreeDockable) canvas.getController().getControl()
-        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(canvas.getId()));
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(canvas.getTreeId()));
     if (currentTree != null) {
       Debug.log("Undo remove damain");
       DomainFactory factory = canvas.getController().getFrame().getDomainFactory();
@@ -52,7 +52,7 @@ public class RemoveDomain extends EditAction {
       currentTree.showDomain(d);
     }
     else {
-      Debug.log("could not find window with id :"+TreeDockable.TREE_ID + Integer.toString(canvas.getId()));
+      Debug.log("could not find window with id :" + TreeDockable.TREE_ID + Integer.toString(canvas.getTreeId()));
     }
   }
 

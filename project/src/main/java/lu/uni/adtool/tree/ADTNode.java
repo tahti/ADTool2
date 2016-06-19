@@ -20,22 +20,24 @@
  */
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.adtree.ADTreeNode;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.RankExporter;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Options;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import bibliothek.util.xml.XAttribute;
 import bibliothek.util.xml.XElement;
 import bibliothek.util.xml.XException;
+
+import lu.uni.adtool.adtree.ADTreeNode;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.RankExporter;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
 
 public class ADTNode extends GuiNode {
 
@@ -153,7 +155,7 @@ public class ADTNode extends GuiNode {
    * Export to XML using format used by the first version of ADTool
    *
    */
-  public XElement exportXml(ArrayList<ValuationDomain> domains, ArrayList<RankExporter> rankers) {
+  public XElement exportXml(Collection<ValuationDomain> domains, ArrayList<RankExporter> rankers) {
     XElement result = new XElement("node");
     result.addString("refinement", typeToXml(type));
     if (getParent() != null && (((ADTNode) getParent()).getRole() != getRole())) {
@@ -164,8 +166,8 @@ public class ADTNode extends GuiNode {
       result.addElement("comment").setString(getComment());
     }
     if (domains != null && Options.main_saveDomains) {
-      for (int i = 0; i < domains.size(); i++) {
-        ValuationDomain vd = domains.get(i);
+      int i = 0;
+      for (ValuationDomain vd : domains) {
         String domainId = vd.getExportXmlId();
         if (this.isEditable((AdtDomain<Ring>) vd.getDomain())) {
           if (vd.getValue(this) != null) {
@@ -201,6 +203,7 @@ public class ADTNode extends GuiNode {
             }
           }
         }
+        ++i;
       }
     }
     if (this.getChildren() != null) {
@@ -511,12 +514,17 @@ public class ADTNode extends GuiNode {
           // "basic" was default category in older versions of ADTool
           category = "basic";
         }
+        Debug.log("adding parameter in category:"+ category);
         if (category.equals("basic")) {
           ValuationDomain d = domains.get(parameter.getString("domainId"));
           if (d != null) {
             Ring r = d.getDomain().getDefaultValue(this);
             r.updateFromString(parameter.getString());
-            d.setValue(this.getRole() == ADTNode.Role.PROPONENT, getName(), r);
+            d.setValue(this.getRole() == ADTNode.Role.PROPONENT, this.getName(), r);
+            Debug.log("set value "+ this.getName() + " to "+  r.toUnicode());
+          }
+          else {
+            Debug.log("No domain with id " + parameter.getString("domainId"));
           }
         }
       }

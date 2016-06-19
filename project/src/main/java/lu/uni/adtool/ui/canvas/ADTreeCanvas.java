@@ -20,6 +20,12 @@
  */
 package lu.uni.adtool.ui.canvas;
 
+import java.awt.Color;
+
+import javax.swing.JScrollPane;
+
+import org.abego.treelayout.util.DefaultConfiguration;
+
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tools.undo.AddChild;
 import lu.uni.adtool.tools.undo.AddCounter;
@@ -37,12 +43,6 @@ import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.NodeTree;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TermView;
-
-import java.awt.Color;
-
-import javax.swing.JScrollPane;
-
-import org.abego.treelayout.util.DefaultConfiguration;
 
 // if Type is null then it is the canvas with the original tree
 public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
@@ -186,7 +186,7 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
   }
 
   public void repaintAll() {
-    controller.getFrame().getDomainFactory().repaintAllDomains(this.getId());
+    controller.getFrame().getDomainFactory().repaintAllDomains(this.getTreeId());
     this.repaint();
   }
 
@@ -207,7 +207,7 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     addEditAction(new ToggleOpAction(node));
     ((ADTNode) node).toggleOp();
     tree.getLayout().recalculateValues();
-    this.repaintAll();
+    this.notifyAllTreeChanged();
     this.terms.updateTerms();
   }
 
@@ -225,7 +225,7 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
       if (newPos != null && newPos.getParent() != null) {
         tree.switchSibling(node, newPos);
         this.notifyAllTreeChanged();
-        terms.updateTerms();
+        this.terms.updateTerms();
       }
     }
   }
@@ -263,11 +263,24 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     this.setScale(1);
   }
 
+  public void updateTerms() {
+    terms.updateTerms();
+  }
+
+  /**
+   * Just return this canvas - placeholder for canvases that want to share edit
+   * history - they need to override this method.
+   */
+  public AbstractTreeCanvas getTreeCanvas() {
+    return this;
+  }
+
   protected Color getFillColor(Node node) {
     return Options.canv_FillColorAtt;
   }
 
 
   protected ADTCanvasHandler  listener;
+  protected TermView          terms;
   private static final long   serialVersionUID = 6626362203605041529L;
 }

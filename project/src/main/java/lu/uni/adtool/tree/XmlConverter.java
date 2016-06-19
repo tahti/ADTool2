@@ -60,15 +60,14 @@ public class XmlConverter {
       ArrayList<RankExporter> rankers = null;
       if (Options.main_saveRanking) {
         rankers = new ArrayList<RankExporter>();
-        for (int i = 0; i <layout.getDomains().size(); i++) {
-          ValuationDomain values = layout.getDomains().get(i);
+        for (ValuationDomain values : layout.getDomains()) {
           rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
                                        new Ranker<Ring>((SandDomain<Ring>)values.getDomain()),
                                        Options.rank_noRanked));
         }
       }
       rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains(), rankers));
-      if (layout.getDomains() != null && Options.main_saveDomains) {
+      if (layout.hasDomain() && Options.main_saveDomains) {
         for (ValuationDomain d : layout.getDomains()) {
           d.exportXML(rootXML);
         }
@@ -79,18 +78,17 @@ public class XmlConverter {
       ArrayList<RankExporter> rankers = null;
       if (Options.main_saveRanking) {
         rankers = new ArrayList<RankExporter>();
-        for (int i = 0; i <layout.getDomains().size(); i++) {
-          ValuationDomain values = layout.getDomains().get(i);
+        for (ValuationDomain values : layout.getDomains()) {
           rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
                                        new Ranker<Ring>((AdtDomain<Ring>)values.getDomain()), Options.rank_noRanked));
         }
       }
-      XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains(),rankers);
+      XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains(), rankers);
       if (layout.getSwitchRole())  {
         rootNode.addString("switchRole", "yes");
       }
       rootXML.addElement(rootNode);
-      if (layout.getDomains() != null && Options.main_saveDomains) {
+      if (layout.hasDomain() && Options.main_saveDomains) {
         for (ValuationDomain d : layout.getDomains()) {
           d.exportXML(rootXML);
         }

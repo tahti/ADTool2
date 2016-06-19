@@ -33,11 +33,13 @@ import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.NodeRanker;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.custom.AdtRealDomain;
 import lu.uni.adtool.domains.rings.Bool;
 import lu.uni.adtool.domains.rings.BoundedInteger;
 import lu.uni.adtool.domains.rings.Int;
 import lu.uni.adtool.domains.rings.LMHEValue;
 import lu.uni.adtool.domains.rings.LMHValue;
+import lu.uni.adtool.domains.rings.Real;
 import lu.uni.adtool.domains.rings.RealG0;
 import lu.uni.adtool.domains.rings.RealZeroOne;
 import lu.uni.adtool.domains.rings.Ring;
@@ -58,6 +60,7 @@ import lu.uni.adtool.ui.inputdialogs.InputDialog;
 import lu.uni.adtool.ui.inputdialogs.IntDialog;
 import lu.uni.adtool.ui.inputdialogs.LMHDialog;
 import lu.uni.adtool.ui.inputdialogs.LMHEDialog;
+import lu.uni.adtool.ui.inputdialogs.RealDialog;
 import lu.uni.adtool.ui.inputdialogs.RealG0Dialog;
 import lu.uni.adtool.ui.inputdialogs.RealZeroOneDialog;
 
@@ -103,7 +106,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
       tree.getSharedExtentProvider().registerCanvas(this);
     }
     this.tree = tree;
-    this.values.setTreeId(tree.getLayout().getId());
+    this.values.setTreeId(tree.getLayout().getTreeId());
     if (this.isSand()) {
       this.values.treeChanged((SandNode) tree.getRoot(true));
     } else {
@@ -132,76 +135,62 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
    * @param node
    */
   public void editValue(Node n) {
+    boolean editable;
+    boolean proponent = true;
+    Ring value;
     if (n instanceof SandNode) {
       SandNode node = (SandNode) n;
-      if (node.isEditable()) {
-        InputDialog dialog;
-        Ring value = (Ring) this.values.getValue(node);
-        if (value instanceof Bool) {
-          value = (Ring) Bool.not((Bool) value);
-        } else if (value instanceof RealG0) {
-          dialog = new RealG0Dialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof RealZeroOne) {
-          dialog = new RealZeroOneDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof LMHValue) {
-          dialog = new LMHDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof LMHEValue) {
-          dialog = new LMHEDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof BoundedInteger) {
-          dialog = new BoundedIntegerDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof Int) {
-          dialog = new IntDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else {
-          Debug.log("Unknown value type " + value);
-        }
-        if (value != null) {
-          String key = node.getName();
-          addEditAction(new SetValuation(value, this.values.getValue(node), key, true, getDomainId()));
-          this.values.setValue(true, key, value);
-          this.valuesUpdated();
-        }
-      }
-    } else if (n instanceof ADTNode) {
+      editable = node.isEditable();
+      value = (Ring) this.values.getValue(node);
+    }
+    else {
       ADTNode node = (ADTNode) n;
-      if (node.isEditable((AdtDomain<Ring>) values.getDomain())) {
-        InputDialog dialog;
-        Ring value = (Ring) this.values.getValue(node);
-        if (value instanceof Bool) {
-          value = (Ring) Bool.not((Bool) value);
-        } else if (value instanceof RealG0) {
-          dialog = new RealG0Dialog(controller.getFrame());
+      editable = node.isEditable((AdtDomain<Ring>) values.getDomain());
+      proponent = node.getRole() == ADTNode.Role.PROPONENT;
+      value = (Ring) this.values.getValue(node);
+    }
+    Ring oldValue = value;
+    String key = n.getName();
+    if (editable) {
+      InputDialog dialog;
+      if (value instanceof Bool) {
+        value = (Ring) Bool.not((Bool) value);
+      }
+      else if (value instanceof RealG0) {
+        dialog = new RealG0Dialog(controller.getFrame());
+        value = (Ring) (dialog.showInputDialog(value));
+      }
+      else if (value instanceof RealZeroOne) {
+        dialog = new RealZeroOneDialog(controller.getFrame());
+        value = (Ring) (dialog.showInputDialog(value));
+      }
+      else if (value instanceof Real) {
+        dialog = new RealDialog(controller.getFrame());
+        value = (Ring) (dialog.showInputDialog(value));
+      }
+      else if (value instanceof LMHValue) {
+        dialog = new LMHDialog(controller.getFrame());
           value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof RealZeroOne) {
-          dialog = new RealZeroOneDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof LMHValue) {
-          dialog = new LMHDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof LMHEValue) {
-          dialog = new LMHEDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof BoundedInteger) {
-          dialog = new BoundedIntegerDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else if (value instanceof Int) {
-          dialog = new IntDialog(controller.getFrame());
-          value = (Ring) (dialog.showInputDialog(value));
-        } else {
-          Debug.log("Unknown value type " + value);
-        }
-        if (value != null) {
-          String key = node.getName();
-          addEditAction(new SetValuation(value, this.values.getValue(node), key,
-              node.getRole() == ADTNode.Role.PROPONENT, getDomainId()));
-          this.values.setValue(node.getRole() == ADTNode.Role.PROPONENT, key, value);
-          this.valuesUpdated();
-        }
+      }
+      else if (value instanceof LMHEValue) {
+        dialog = new LMHEDialog(controller.getFrame());
+        value = (Ring) (dialog.showInputDialog(value));
+      }
+      else if (value instanceof BoundedInteger) {
+        dialog = new BoundedIntegerDialog(controller.getFrame());
+        value = (Ring) (dialog.showInputDialog(value));
+      }
+      else if (value instanceof Int) {
+        dialog = new IntDialog(controller.getFrame());
+        value = (Ring) (dialog.showInputDialog(value));
+      }
+      else {
+        Debug.log("Unknown value type " + value);
+      }
+      if (value != null) {
+        addEditAction(new SetValuation(value, oldValue, key, proponent, getDomainId()));
+        this.values.setValue(proponent, key, value);
+        this.valuesUpdated();
       }
     }
   }
@@ -361,8 +350,8 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
 
   public void repaintAll() {
     DomainFactory factory = getController().getFrame().getDomainFactory();
-    factory.repaintAllDomains(new Integer(getId()));
-    TreeDockable d = (TreeDockable) getController().getControl().getMultipleDockable(TreeDockable.TREE_ID + getId());
+    factory.repaintAllDomains(new Integer(getTreeId()));
+    TreeDockable d = (TreeDockable) getController().getControl().getMultipleDockable(TreeDockable.TREE_ID + getTreeId());
     d.getCanvas().repaint();
   }
 
@@ -397,7 +386,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
   }
 
   @Override
-  public int getId() {
+  public int getTreeId() {
     return values.getTreeId();
   }
 
@@ -414,7 +403,8 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
       if (node.getName().equals(label) && ((SandNode) node).isLeaf()) {
         doMark = true;
       }
-    } else {
+    }
+    else {
       if (node.getName().equals(label) && ((ADTNode) node).hasDefault()) {
         doMark = true;
       }
@@ -438,23 +428,39 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
    */
   public AbstractTreeCanvas getTreeCanvas() {
     TreeDockable currentTree = (TreeDockable) getController().getControl()
-        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(getId()));
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(getTreeId()));
     if (currentTree != null) {
       return currentTree.getCanvas();
     }
     return null;
   }
 
+  public void updateTerms() {
+    throw new ClassCastException ("Wrong class used");
+  }
+
   private String valueToStr(Ring value) {
-    if (value instanceof RealG0 || value instanceof RealZeroOne) {
+    if ((value instanceof Real) && ((Object)this.values.getDomain() instanceof AdtRealDomain)) {
+      try {
+        return ((AdtRealDomain)(Object) this.values.getDomain()).format((Real)value);
+      }
+      catch (NumberFormatException e) {
+      }
+      catch (NullPointerException e) {
+      }
+    }
+    if (value instanceof RealG0 || value instanceof RealZeroOne || value instanceof Real) {
       try {
         return Options.canv_precision.format(Double.parseDouble(value.toUnicode()));
-      } catch (NumberFormatException e) {
+      }
+      catch (NumberFormatException e) {
         return value.toUnicode();
       }
-    } else if (value != null) {
+    }
+    else if (value != null) {
       return value.toUnicode();
-    } else {
+    }
+    else {
       return "null";
     }
   }

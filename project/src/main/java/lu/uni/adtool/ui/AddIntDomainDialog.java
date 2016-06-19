@@ -35,6 +35,7 @@ import javax.swing.event.DocumentListener;
 
 import lu.uni.adtool.domains.custom.AdtIntDomain;
 import lu.uni.adtool.domains.custom.IntParser;
+import lu.uni.adtool.domains.rings.Int;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 
@@ -54,8 +55,10 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
   }
 
   public AdtIntDomain showDialog() {
-    this.createLayout();
-    this.setVisible(true);
+    if (this.domain != null) {
+      this.createLayout();
+      this.setVisible(true);
+    }
     return this.domain;
   }
 
@@ -78,15 +81,26 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     buttonPane.add(cancelButton);
     buttonPane.add(Box.createRigidArea(new Dimension(10, 30)));
     buttonPane.add(okButton);
-    this.name = new JTextField();
-    this.description = new JTextField();
-    this.cp = new JTextField();
-    this.co = new JTextField();
-    this.ap = new JTextField();
-    this.ao = new JTextField();
-    this.op = new JTextField();
-    this.oo = new JTextField();
-    this.defaulto = new JTextField("");
+    if (this.domain.getName() != null && !this.domain.getName().equals(Options.getMsg("adtdomain.custom.int.name"))) {
+      this.name = new JTextField(this.domain.getName());
+    }
+    else {
+      this.name = new JTextField("");
+    }
+    if (this.domain.getShortDescription() != null
+        && !this.domain.getShortDescription().equals(Options.getMsg("adtdomain.custom.int.description"))) {
+      this.description = new JTextField(this.domain.getShortDescription());
+    }
+    else {
+      this.description = new JTextField("");
+    }
+    this.cp = new JTextField(this.domain.getCp());
+    this.co = new JTextField(this.domain.getCo());
+    this.ap = new JTextField(this.domain.getAp());
+    this.ao = new JTextField(this.domain.getAo());
+    this.op = new JTextField(this.domain.getOp());
+    this.oo = new JTextField(this.domain.getOo());
+    this.defaulto = new JTextField(this.domain.getOppDefault());
     this.defaulto.getDocument().addDocumentListener(this);
     this.defaulto.getDocument().putProperty("parent", defaulto);
     this.defaulto.addFocusListener(new FocusListener() {
@@ -99,7 +113,7 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
       }
     });
 
-    this.defaultp = new JTextField("");
+    this.defaultp = new JTextField(this.domain.getProDefault());
     this.defaultp.getDocument().putProperty("parent", defaultp);
     this.defaultp.getDocument().addDocumentListener(this);
     this.defaultp.addFocusListener(new FocusListener() {
@@ -113,9 +127,9 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     });
 
     this.modifiableo = new JCheckBox(Options.getMsg("dialog.adddomain.modifiableo"));
-    this.modifiableo.setSelected(true);
+    this.modifiableo.setSelected(domain.isOppModifiable());
     this.modifiablep = new JCheckBox(Options.getMsg("dialog.adddomain.modifiablep"));
-    this.modifiablep.setSelected(true);
+    this.modifiablep.setSelected(domain.isProModifiable());
     this.name.getDocument().addDocumentListener(this);
     this.description.getDocument().addDocumentListener(this);
     this.cp.getDocument().addDocumentListener(this);
@@ -204,17 +218,36 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     this.ao.getDocument().putProperty("parent", ao);
     this.op.getDocument().putProperty("parent", op);
     this.oo.getDocument().putProperty("parent", oo);
-
-    this.defaultp.setBackground(invalidColor);
-    this.defaulto.setBackground(invalidColor);
-    this.name.setBackground(invalidColor);
-    this.description.setBackground(invalidColor);
-    this.cp.setBackground(invalidColor);
-    this.co.setBackground(invalidColor);
-    this.ap.setBackground(invalidColor);
-    this.ao.setBackground(invalidColor);
-    this.op.setBackground(invalidColor);
-    this.oo.setBackground(invalidColor);
+    try {
+      Integer.parseInt(this.defaultp.getText());
+      this.defaultp.setBackground(validColor);
+    }
+    catch (NumberFormatException e) {
+      this.defaultp.setBackground(invalidColor);
+    }
+    try {
+      Integer.parseInt(this.defaulto.getText());
+      this.defaulto.setBackground(validColor);
+    }
+    catch (NumberFormatException e) {
+      this.defaulto.setBackground(invalidColor);
+    }
+    if (name.getText().length() > 0) {
+      name.setBackground(validColor);
+    } else {
+      name.setBackground(invalidColor);
+    }
+    if (description.getText().length() > 0) {
+      description.setBackground(validColor);
+    } else {
+      description.setBackground(invalidColor);
+    }
+    checkValid(this.cp);
+    checkValid(this.co);
+    checkValid(this.ap);
+    checkValid(this.ao);
+    checkValid(this.op);
+    checkValid(this.oo);
 
     JPanel inputContent = new JPanel();
     inputContent.setLayout(new GridLayout(0, 2, 10, 10));
@@ -320,10 +353,11 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
         field.setBackground(invalidColor);
       }
     } else if (field == this.defaulto || field == this.defaultp) {
-      try {
-        Integer.parseInt(field.getText());
+      Int temp = new Int(0);
+      if (temp.updateFromString(field.getText())) {
         field.setBackground(validColor);
-      } catch (NumberFormatException e) {
+      }
+      else {
         field.setBackground(invalidColor);
         this.errorLabel.setText(Options.getMsg("dialog.adddomain.wrongint"));
       }
@@ -401,7 +435,7 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
       this.setHelpText("name");
       break;
     case DESCR:
-      this.setHelpText("desc");
+      this.setHelpText("description");
       break;
     case DEFAULTP:
     case DEFAULTO:
@@ -421,8 +455,10 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     this.helpPane.add(head);
     if (op.length() > 0) {
       if (op.equals("name")) {
-      } else if (op.equals("desc")) {
-      } else {
+      }
+      else if (op.equals("description")) {
+      }
+      else {
         head = new JLabel(Options.getMsg("dialog.adddomain." + op + ".text"));
         head.setFont(new Font("Serif", Font.PLAIN, 14));
         margin = new EmptyBorder(5, 10, 5, 5);
@@ -432,7 +468,8 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
         ImageIcon icon = iconFactory.createImageIcon("/images/" + op + ".png");
         this.helpPane.add(new JLabel(icon));
       }
-    } else {
+    }
+    else {
       head = new JLabel(Options.getMsg("dialog.addintdomain.syntax"));
       head.setFont(new Font("Serif", Font.PLAIN, 14));
       margin = new EmptyBorder(5, 10, 5, 5);
@@ -443,24 +480,24 @@ public class AddIntDomainDialog extends JDialog implements ActionListener, Docum
     this.helpPane.repaint();
   }
 
-  private AdtIntDomain domain;
-  private JTextField name;
-  private JTextField description;
-  private JTextField ao;
-  private JTextField ap;
-  private JTextField oo;
-  private JTextField op;
-  private JTextField cp;
-  private JTextField co;
-  private JTextField defaulto;
-  private JTextField defaultp;
-  private JCheckBox modifiableo;
-  private JCheckBox modifiablep;
-  private JButton okButton;
-  private JLabel errorLabel;
-  private JPanel helpPane;
+  private AdtIntDomain      domain;
+  private JTextField        name;
+  private JTextField        description;
+  private JTextField        ao;
+  private JTextField        ap;
+  private JTextField        oo;
+  private JTextField        op;
+  private JTextField        cp;
+  private JTextField        co;
+  private JTextField        defaulto;
+  private JTextField        defaultp;
+  private JCheckBox         modifiableo;
+  private JCheckBox         modifiablep;
+  private JButton           okButton;
+  private JLabel            errorLabel;
+  private JPanel            helpPane;
 
-  private static Color validColor = new Color(170, 255, 170);
-  private static Color invalidColor = new Color(255, 170, 170);
+  private static Color      validColor       = new Color(170, 255, 170);
+  private static Color      invalidColor     = new Color(255, 170, 170);
   private static final long serialVersionUID = 3852122176888687082L;
 }

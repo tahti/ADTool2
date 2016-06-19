@@ -21,6 +21,7 @@
 package lu.uni.adtool.tools.undo;
 
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Objects;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
@@ -32,11 +33,11 @@ public class FromTermsTree extends EditAction {
     this.root = root;
   }
 
-@SuppressWarnings("unchecked")
   public void undo(AbstractTreeCanvas canvas) {
     if (canvas instanceof ADTreeCanvas ) {
-      Node tempNode = ((ADTreeCanvas<Ring>) canvas).getRoot();
-      ((ADTreeCanvas<Ring>) canvas).setRoot((ADTNode) this.root);
+      ADTreeCanvas<Ring> c = Objects.cast(canvas);
+      Node tempNode = c.getRoot();
+      c.setRoot((ADTNode) this.root);
       this.root = tempNode;
     }
   }

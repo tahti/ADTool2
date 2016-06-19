@@ -20,37 +20,6 @@
  */
 package lu.uni.adtool.ui.canvas;
 
-import lu.uni.adtool.ADToolMain;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.Domain;
-import lu.uni.adtool.domains.SandDomain;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tools.undo.AddDomain;
-import lu.uni.adtool.tools.undo.EditAction;
-import lu.uni.adtool.tools.undo.FoldAction;
-import lu.uni.adtool.tools.undo.History;
-import lu.uni.adtool.tools.undo.RemoveChildren;
-import lu.uni.adtool.tools.undo.RemoveDomain;
-import lu.uni.adtool.tools.undo.RemoveTree;
-import lu.uni.adtool.tree.ADTNode;
-import lu.uni.adtool.tree.DomainFactory;
-import lu.uni.adtool.tree.GuiNode;
-import lu.uni.adtool.tree.LocalExtentProvider;
-import lu.uni.adtool.tree.Node;
-import lu.uni.adtool.tree.NodeTree;
-import lu.uni.adtool.tree.SandNode;
-import lu.uni.adtool.tree.SharedExtentProvider;
-import lu.uni.adtool.tree.TreeChangeListener;
-import lu.uni.adtool.tree.XmlConverter;
-import lu.uni.adtool.ui.ADAction;
-import lu.uni.adtool.ui.DomainDockable;
-import lu.uni.adtool.ui.MainController;
-import lu.uni.adtool.ui.TermView;
-import lu.uni.adtool.ui.TreeDockable;
-
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -101,6 +70,36 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.Domain;
+import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tools.undo.AddDomain;
+import lu.uni.adtool.tools.undo.EditAction;
+import lu.uni.adtool.tools.undo.FoldAction;
+import lu.uni.adtool.tools.undo.History;
+import lu.uni.adtool.tools.undo.RemoveChildren;
+import lu.uni.adtool.tools.undo.RemoveDomain;
+import lu.uni.adtool.tools.undo.RemoveTree;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.DomainFactory;
+import lu.uni.adtool.tree.GuiNode;
+import lu.uni.adtool.tree.LocalExtentProvider;
+import lu.uni.adtool.tree.Node;
+import lu.uni.adtool.tree.NodeTree;
+import lu.uni.adtool.tree.SandNode;
+import lu.uni.adtool.tree.SharedExtentProvider;
+import lu.uni.adtool.tree.TreeChangeListener;
+import lu.uni.adtool.tree.XmlConverter;
+import lu.uni.adtool.ui.ADAction;
+import lu.uni.adtool.ui.DomainDockable;
+import lu.uni.adtool.ui.MainController;
+import lu.uni.adtool.ui.TreeDockable;
+
 public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, TreeChangeListener, Printable, Pageable {
 
   public AbstractTreeCanvas(NodeTree tree, MainController mc) {
@@ -117,6 +116,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     this.printAttr.add(MediaSizeName.ISO_A4);
     this.pageFormat = new PageFormat();
     this.history = new History();
+    this.scale = 1;
+    setScale(scale);
   }
 
   /**
@@ -133,6 +134,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     this.printAttr.add(MediaSizeName.ISO_A4);
     this.pageFormat = new PageFormat();
     this.history = new History();
+    this.scale = 1;
+    setScale(scale);
   }
 
   public boolean isSand() {
@@ -149,7 +152,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   }
 
   public void notifyAllTreeChanged() {
-    controller.getFrame().getDomainFactory().notifyAllTreeChanged(this.getId());
+    controller.getFrame().getDomainFactory().notifyAllTreeChanged(this.getTreeId());
     this.treeChanged();
   }
 
@@ -173,7 +176,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   public void undo() {
     AbstractTreeCanvas canvas = this.getTreeCanvas();
     if (canvas != null) {
-      canvas.history.undo(this);
+      canvas.history.undo(canvas);
       canvas.updateUndoRedoItems();
     }
   }
@@ -181,7 +184,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   public void redo() {
     AbstractTreeCanvas canvas = this.getTreeCanvas();
     if (canvas != null) {
-      canvas.history.redo(this);
+      canvas.history.redo(canvas);
       canvas.updateUndoRedoItems();
     }
   }
@@ -459,11 +462,11 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   public void removeTree(Node node) {
     if (!node.equals(tree.getRoot(true))) {
       this.addEditAction(new RemoveTree(node));
-      if (lastFocused.equals(node)) {
+      if (lastFocused != null && lastFocused.equals(node)) {
         lastFocused = ((GuiNode) node).getParent(true);
-        if (lastFocused == null) {
-          lastFocused = (GuiNode) tree.getRoot(true);
-        }
+      }
+      if (lastFocused == null) {
+        lastFocused = (GuiNode) tree.getRoot(true);
       }
       if (focused != null) {
         if (focused.equals(node)) {
@@ -472,7 +475,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       }
       tree.removeTree(node);
       this.notifyAllTreeChanged();
-      this.terms.updateTerms();
+      this.updateTerms();
     }
   }
 
@@ -480,7 +483,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     this.addEditAction(new RemoveChildren(node));
     tree.removeAllChildren(node);
     this.notifyAllTreeChanged();
-    terms.updateTerms();
+    this.updateTerms();
   }
 
   public Point2D transform(Point2D point) {
@@ -842,9 +845,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     }
   }
 
-  public void updateTerms() {
-    terms.updateTerms();
-  }
+  public abstract void updateTerms();
 
   /**
    * {@inheritDoc}
@@ -875,21 +876,29 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
 
   public void updateUndoRedoItems() {
     ADAction undo = controller.getUndoItem();
+    ADAction redo = controller.getRedoItem();
     AbstractTreeCanvas canvas = this.getTreeCanvas();
-    String text = canvas.history.getUndoText();
-    if (text != null) {
-      undo.setEnabled(true);
-      undo.setName(text);
-    } else {
+    if (canvas != null) {
+      String text = canvas.history.getUndoText();
+      if (text != null) {
+        undo.setEnabled(true);
+        undo.setName(text);
+      } else {
+        undo.setEnabled(false);
+        undo.setName(Options.getMsg("edit.undo.txt"));
+      }
+      text = canvas.history.getRedoText();
+      if (text != null) {
+        redo.setEnabled(true);
+        redo.setName(text);
+      } else {
+        redo.setEnabled(false);
+        redo.setName(Options.getMsg("edit.redo.txt"));
+      }
+    }
+    else {
       undo.setEnabled(false);
       undo.setName(Options.getMsg("edit.undo.txt"));
-    }
-    ADAction redo = controller.getRedoItem();
-    text = canvas.history.getRedoText();
-    if (text != null) {
-      redo.setEnabled(true);
-      redo.setName(text);
-    } else {
       redo.setEnabled(false);
       redo.setName(Options.getMsg("edit.redo.txt"));
     }
@@ -898,16 +907,16 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public void addDomain(Domain<Ring> domain) {
     TreeDockable currentTree = (TreeDockable) this.controller.getControl()
-        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getId()));
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getTreeId()));
     if (currentTree != null) {
-      DomainFactory factory = controller.getFrame().getDomainFactory();
-      int domainId = factory.getNewUniqueId(new Integer(this.getId()));
+      int domainId = tree.getLayout().getNewDomainId();
       this.addEditAction(new AddDomain(domainId, domain));
       DomainDockable d = null;
+      DomainFactory factory = controller.getFrame().getDomainFactory();
       if (domain instanceof SandDomain) {
-        d = factory.read(new ValuationDomain(this.getId(), domainId, (SandDomain) domain));
+        d = factory.read(new ValuationDomain(this.getTreeId(), domainId, (SandDomain) domain));
       } else {
-        d = factory.read(new ValuationDomain(this.getId(), domainId, (AdtDomain) domain));
+        d = factory.read(new ValuationDomain(this.getTreeId(), domainId, (AdtDomain) domain));
       }
       Debug.log("Adding domain to control with id:" + d.getUniqueId());
       controller.getControl().addDockable(d.getUniqueId(), d);
@@ -926,14 +935,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     }
   }
 
-  /**
-   * Just return this canvas - placeholder for canvases that want to share edit
-   * history - they need to override this method.
-   */
 
-  public AbstractTreeCanvas getTreeCanvas() {
-    return this;
-  }
+  public abstract AbstractTreeCanvas getTreeCanvas();
 
   protected String getNewLabel() {
     labelCounter = labelCounter + 1;
@@ -987,14 +990,14 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     return getColsRows(pf.getImageableWidth(), pf.getImageableHeight(), noMaxPages);
   }
 
-  public int getId() {
+  public int getTreeId() {
     if (tree == null) {
       if (this instanceof AbstractDomainCanvas) {
         return ((AbstractDomainCanvas<?>) this).values.getTreeId();
       }
       return -1;
     }
-    return tree.getLayout().getId();
+    return tree.getLayout().getTreeId();
   }
 
   /**
@@ -1364,7 +1367,6 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   protected History                       history;
 
   static final long                       serialVersionUID = 158222312311522883L;
-  protected TermView                      terms;
   protected int                           labelCounter;
 
   protected static final String           LABEL_PREFIX     = "N_";

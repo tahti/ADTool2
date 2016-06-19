@@ -91,7 +91,7 @@ public class AdtImporter {
 		lu.uni.adtool.adtree.ValueAssignement<Ring> vass = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
         @SuppressWarnings("unchecked")
 		lu.uni.adtool.adtree.ValueAssignement<Ring> vass2 = (lu.uni.adtool.adtree.ValueAssignement<Ring>) in.readObject();
-        treeLayout.addAdtDomain(d, vass, vass2, treeLayout.getId(), i);
+        treeLayout.addAdtDomain(d, vass, vass2, treeLayout.getTreeId(), i);
       }
       TreeFactory treeFactory = controller.getFrame().getTreeFactory();
       TreeDockable treeDockable = treeFactory.load(treeLayout);

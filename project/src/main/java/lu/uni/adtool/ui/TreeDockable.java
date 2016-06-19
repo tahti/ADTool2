@@ -62,7 +62,7 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
     this.setTitleIcon(icon);
     DefaultSingleCDockable canvasDockable = createTreeCanvas(layout);
     DefaultSingleCDockable termDockable = createTermDockable();
-    int id = this.treeCanvas.getId();
+    int id = this.treeCanvas.getTreeId();
     CControl control = controller.getControl();
     CContentArea center = controller.getFrame().getContentArea(id);
     this.workArea = (CWorkingArea) controller.getControl().getSingleDockable(getWorkAreaId(id));
@@ -102,7 +102,7 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
   }
 
   public int getId() {
-    return this.treeCanvas.getId();
+    return this.treeCanvas.getTreeId();
   }
 
   public static String getUniqueId(int id) {
@@ -162,7 +162,7 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
   }
 
   private DefaultSingleCDockable createTreeCanvas(TreeLayout layout) {
-    String id = TREE_ID + Integer.toString(layout.getId()) + TREEVIEW_ID;
+    String id = TREE_ID + Integer.toString(layout.getTreeId()) + TREEVIEW_ID;
     DefaultSingleCDockable dockable =
         (DefaultSingleCDockable) controller.getControl().getSingleDockable(id);
     if (dockable == null) {
@@ -186,7 +186,7 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
   }
 
   private DefaultSingleCDockable createTermDockable() {
-    String id =  getTermId(this.treeCanvas.getId());
+    String id =  getTermId(this.treeCanvas.getTreeId());
     DefaultSingleCDockable dockable =
         (DefaultSingleCDockable) controller.getControl().getSingleDockable(id);
     if (dockable == null) {

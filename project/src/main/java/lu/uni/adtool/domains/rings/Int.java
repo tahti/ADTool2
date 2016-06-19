@@ -1,13 +1,21 @@
 package lu.uni.adtool.domains.rings;
 
+import lu.uni.adtool.tools.Options;
+
 public class Int implements Ring {
 
   public Int(final int value) {
     this.value = value;
+    this.nan = false;
+  }
+
+  public Int(final int value, final boolean nan) {
+    this.value = value;
+    this.nan = nan;
   }
 
   public Object clone() {
-    return new Int(value);
+    return new Int(this.value, this.nan);
   }
 
   /**
@@ -16,15 +24,32 @@ public class Int implements Ring {
    * @see Object#toString()
    */
   public final String toString() {
-    return new Integer(getValue()).toString();
+    if (!this.nan) {
+      return new Integer(getValue()).toString();
+    }
+    else {
+      return Options.getMsg("domain.nan");
+    }
   }
 
   public final String toUnicode() {
-    return new Integer(getValue()).toString();
+    if (!this.nan) {
+      return new Integer(getValue()).toString();
+    }
+    else {
+      return Options.getMsg("domain.nan");
+    }
   }
 
   public final int getValue() {
+    if (this.nan) {
+      throw new ArithmeticException("Not a number");
+    }
     return this.value;
+  }
+
+  public boolean isValid() {
+    return !this.nan;
   }
 
   public int compareTo(Object o) {
@@ -50,6 +75,10 @@ public class Int implements Ring {
    */
   public final boolean updateFromString(String s) {
     int origValue = this.value;
+    if (s.equals(Options.getMsg("domain.nan"))) {
+      this.nan = true;
+      return true;
+    }
     try {
       this.value = Integer.parseInt(s);
     }
@@ -61,4 +90,5 @@ public class Int implements Ring {
   }
 
   private int value;
+  private boolean nan;
 }

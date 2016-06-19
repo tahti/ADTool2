@@ -22,6 +22,7 @@ package lu.uni.adtool.tools.undo;
 
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.TreeDockable;
@@ -39,7 +40,8 @@ public class SetValuation extends EditAction {
   }
 
   public void undo(AbstractTreeCanvas canvas) {
-    ValuationDomain vd = canvas.getTree().getLayout().getDomains().get(domainId - 1);
+    Debug.log("undo on domainId:"+domainId);
+    ValuationDomain vd = canvas.getTree().getLayout().getDomain(domainId);
     vd.setValue(proponent, key, oldValue);
     DomainDockable dockable = (DomainDockable) canvas.getController().getControl()
         .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(vd.getTreeId())
@@ -48,7 +50,7 @@ public class SetValuation extends EditAction {
   }
 
   public void redo(AbstractTreeCanvas canvas) {
-    ValuationDomain vd = canvas.getTree().getLayout().getDomains().get(domainId - 1);
+    ValuationDomain vd = canvas.getTree().getLayout().getDomain(domainId);
     vd.setValue(proponent, key, newValue);
     DomainDockable dockable = (DomainDockable) canvas.getController().getControl()
         .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(vd.getTreeId())

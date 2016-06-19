@@ -52,88 +52,93 @@ import bibliothek.gui.dock.common.SingleCDockable;
 // ~/Library/Application Support
 // CSIDL_LOCAL_APPDATA
 public final class Options {
-  public static String       language                  = new String("en");
-  public static String       country                   = new String("US");
+  public static String        language                  = new String("en");
+  public static String        country                   = new String("US");
   /**
    * Debugging messages
    */
-  public static boolean      debug_enable              = true;
+  public static boolean       debug_enable              = true;
   /**
    * Indentation level when printing Terms.
    */
-  public static Integer      indentLevel               = 2;
+  public static Integer       indentLevel               = 2;
 
   /**
    * logging options
    */
-  public static int          log_noLinesSaved          = 1000;
+  public static int           log_noLinesSaved          = 1000;
   /**
    * Print options
    */
-  public static int          print_noPages             = 1;
-  public static boolean      print_perserveAspectRatio = true;
-  public static boolean      printview_showPageNumbers = true;
-  public static Color        printview_background      = new Color(144, 153, 174);
-  public static Color        printview_border          = Color.DARK_GRAY;
-  public static Color        printview_shadow          = Color.BLACK;
-  public static Color        printview_paper           = Color.WHITE;
+  public static int           print_noPages             = 1;
+  public static boolean       print_perserveAspectRatio = true;
+  public static boolean       printview_showPageNumbers = true;
+  public static Color         printview_background      = new Color(144, 153, 174);
+  public static Color         printview_border          = Color.DARK_GRAY;
+  public static Color         printview_shadow          = Color.BLACK;
+  public static Color         printview_paper           = Color.WHITE;
 
   /**
    * The minimal gap between nodes.
    */
-  public static int          canv_gapBetweenNodes      = 20;
+  public static int           canv_gapBetweenNodes      = 20;
   /**
    * The height of the level when drawing a tree.
    */
-  public static int          canv_gapBetweenLevels     = 50;
+  public static int           canv_gapBetweenLevels     = 50;
 
   /**
    * Gui opitons
    */
-  public static Color        canv_BackgroundColor      = Color.white;
-  public static Color        canv_EdgesColor           = Color.black;
-  public static Color        canv_ArcColor             = Color.black;
-  public static Color        canv_TextColorAtt         = Color.black;
-  public static Color        canv_TextColorDef         = Color.black;
-  public static Color        canv_FillColorAtt         = Color.white;
-  public static Color        canv_FillColorDef         = Color.white;
-  public static Color        canv_BorderColorAtt       = Color.red;
-  public static Color        canv_BorderColorDef       = Color.green;
-  public static Color        canv_EditableColor        = new Color(255, 255, 155);
-  public static ShapeType    canv_ShapeAtt             = ShapeType.OVAL;
-  public static ShapeType    canv_ShapeDef             = ShapeType.RECTANGLE;
-  public static Font         canv_Font                 = new Font("SanSerif", Font.PLAIN, 12);
-  public static Color        canv_LabelMarkColor       = new Color(184, 207, 229);
-  public static Color        canv_rankRootMark         = new Color(150, 150, 0);
-  public static Color        canv_rankNodeMark         = new Color(50, 170, 50);
-  public static Color        canv_rankLeafMark         = new Color(150, 255, 150);
-  public static DecimalFormat canv_precision           = new DecimalFormat("#.###");
-  public static int          canv_tooltipTime          = 1000; // time in milisecodns before tooltip appears
-  public static Color        canv_tooltipBackground    = new Color(255, 255, 204);
+  public static Color         canv_BackgroundColor      = Color.white;
+  public static Color         canv_EdgesColor           = Color.black;
+  public static Color         canv_ArcColor             = Color.black;
+  public static Color         canv_TextColorAtt         = Color.black;
+  public static Color         canv_TextColorDef         = Color.black;
+  public static Color         canv_FillColorAtt         = Color.white;
+  public static Color         canv_FillColorDef         = Color.white;
+  public static Color         canv_BorderColorAtt       = Color.red;
+  public static Color         canv_BorderColorDef       = Color.green;
+  public static Color         canv_EditableColor        = new Color(255, 255, 155);
+  public static ShapeType     canv_ShapeAtt             = ShapeType.OVAL;
+  public static ShapeType     canv_ShapeDef             = ShapeType.RECTANGLE;
+  public static Font          canv_Font                 = new Font("SanSerif", Font.PLAIN, 12);
+  public static Color         canv_LabelMarkColor       = new Color(184, 207, 229);
+  public static Color         canv_rankRootMark         = new Color(150, 150, 0);
+  public static Color         canv_rankNodeMark         = new Color(50, 170, 50);
+  public static Color         canv_rankLeafMark         = new Color(150, 255, 150);
+  public static DecimalFormat canv_precision            = new DecimalFormat("#.###");
+  public static int           canv_tooltipTime          = 1000;                                // time
+                                                                                               // in
+                                                                                               // milisecodns
+                                                                                               // before
+                                                                                               // tooltip
+                                                                                               // appears
+  public static Color         canv_tooltipBackground    = new Color(255, 255, 204);
   // public static ADTNode.Role canv_Defender = ADTNode.Role.OPPONENT; // moved
   // to treeLayout
   /**
    * Arc size of round rectangle for node.
    */
-  public static int          canv_ArcSize              = 10;
+  public static int           canv_ArcSize              = 10;
 
   /**
    * Arc padding for drawing arc to mark conjunctive nodes.
    */
-  public static int          canv_ArcPadding           = 20;
-  public static int          canv_LineWidth            = 2;
-  public static boolean      canv_DoAntialiasing       = true;
+  public static int           canv_ArcPadding           = 20;
+  public static int           canv_LineWidth            = 2;
+  public static boolean       canv_DoAntialiasing       = true;
 
-  public static final double canv_scaleFactor          = 1.1;
+  public static final double  canv_scaleFactor          = 1.1;
   /**
    * options for save/load dialogs
    */
-  public static int          save_version              = 3;
-  public static boolean      main_saveLayout           = true;
-  public static boolean      main_saveDomains          = true;
-  public static boolean      main_saveRanking          = false;
-  public static boolean      main_saveDerivedValues    = false;
-  public static int          rank_noRanked             = 10;
+  public static int           save_version              = 3;
+  public static boolean       main_saveLayout           = true;
+  public static boolean       main_saveDomains          = true;
+  public static boolean       main_saveRanking          = false;
+  public static boolean       main_saveDerivedValues    = false;
+  public static int           rank_noRanked             = 10;
 
   /**
    * Constructs a new instance.
@@ -156,13 +161,13 @@ public final class Options {
   }
 
   public static String getMsg(String msg, String param) {
-    Object[] messageArguments = {param};
+    Object[] messageArguments = { param };
     formatter.applyPattern(messages.getString(msg));
     return formatter.format(messageArguments);
   }
 
   public static String getMsg(String msg, String param1, String param2) {
-    Object[] messageArguments = {param1, param2};
+    Object[] messageArguments = { param1, param2 };
     formatter.applyPattern(messages.getString(msg));
     return formatter.format(messageArguments);
   }
@@ -212,26 +217,26 @@ public final class Options {
             .getSingleDockable(TreeDockable.getUniqueId(1) + TreeDockable.TREEVIEW_ID);
         if (dock != null) {
           dock.toFront();
-          Debug.log("Work Area after loading layout:"+dock.getWorkingArea() + " id:"+TreeDockable.getUniqueId(1) + TreeDockable.TREEVIEW_ID);
+          Debug.log("Work Area after loading layout:" + dock.getWorkingArea() + " id:" + TreeDockable.getUniqueId(1)
+              + TreeDockable.TREEVIEW_ID);
         }
         int i = 1;
-        CWorkingArea workArea =(CWorkingArea) control.getSingleDockable("tree" + i + "_workArea");
+        CWorkingArea workArea = (CWorkingArea) control.getSingleDockable("tree" + i + "_workArea");
         while (workArea != null) {
-          SingleCDockable dockable = (SingleCDockable) control.getSingleDockable("tree"+ i + "_treeView");
+          SingleCDockable dockable = (SingleCDockable) control.getSingleDockable("tree" + i + "_treeView");
           if (dockable != null) {
             dockable.setWorkingArea(workArea);
           }
-          dockable = (SingleCDockable) control.getSingleDockable("tree"+ i + "_termView");
+          dockable = (SingleCDockable) control.getSingleDockable("tree" + i + "_termView");
           if (dockable != null) {
             dockable.setWorkingArea(workArea);
           }
           ++i;
-          workArea =(CWorkingArea) control.getSingleDockable("tree" + i + "_workArea");
+          workArea = (CWorkingArea) control.getSingleDockable("tree" + i + "_workArea");
         }
         prefs.putBoolean("loadedLayout", true);
       }
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return false;
     }
@@ -243,8 +248,7 @@ public final class Options {
     if (!dir.exists()) {
       try {
         dir.mkdir();
-      }
-      catch (SecurityException se) {
+      } catch (SecurityException se) {
         se.printStackTrace();
         return false;
       }
@@ -252,8 +256,7 @@ public final class Options {
     try {
       control.write(new File(dir, pref_layoutfile));
       control.writeXML(new File(dir, pref_layoutfile + ".xml"));
-    }
-    catch (IOException e) {
+    } catch (IOException e) {
       e.printStackTrace();
       return false;
     }
@@ -264,8 +267,7 @@ public final class Options {
     if (Platform.isMac()) {
       File home = new File(System.getProperty("user.home"));
       return new File(new File(home, "Library"), "Application Support");
-    }
-    else if (Platform.isWindows()) {
+    } else if (Platform.isWindows()) {
 
       String path = System.getenv("LOCALAPPDATA");
       if (path == null) {
@@ -276,15 +278,14 @@ public final class Options {
       }
       File home = new File(System.getProperty("user.home"));
       return new File(new File(home, "Local Settings"), "Application Data");
-    }
-    else {
+    } else {
       File home = new File(System.getProperty("user.home"));
       return new File(home, ".config");
     }
   }
 
-  private static ResourceBundle messages       =
-      ResourceBundle.getBundle("i18n.messages", new Locale(language, country));
+  private static ResourceBundle messages       = ResourceBundle.getBundle("i18n.messages",
+      new Locale(language, country));
   private static MessageFormat  formatter      = new MessageFormat("");
 
   private static final String   PREF_PATH      = "adtool/ui/prefs";

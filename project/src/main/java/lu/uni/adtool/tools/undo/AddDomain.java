@@ -20,7 +20,6 @@
  */
 package lu.uni.adtool.tools.undo;
 
-
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.SandDomain;
@@ -35,50 +34,45 @@ import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 
 public class AddDomain extends EditAction {
 
-
   public AddDomain(int domainId, Domain<Ring> domain) {
     this.domain = domain;
     this.domainId = domainId;
   }
 
   public void undo(AbstractTreeCanvas canvas) {
-    DomainDockable dockable = (DomainDockable) canvas.getController().getControl()
-      .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(canvas.getId()) + DomainDockable.DOMAIN_ID
-                           + Integer.toString(domainId));
+    DomainDockable dockable = getDomainDockable(this.domainId, canvas);
     if (dockable != null) {
       canvas.getTree().getLayout().removeValuation(dockable.getCanvas().getValues());
       canvas.getController().getFrame().getDomainFactory().removeDomain(dockable);
       dockable.setVisible(false);
     }
     else {
-      Debug.log("Cold not find dockable with ID:"+ TreeDockable.TREE_ID + Integer.toString(canvas.getId()) + DomainDockable.DOMAIN_ID + Integer.toString(domainId));
+      Debug.log("Cold not find dockable with ID:" + TreeDockable.TREE_ID + Integer.toString(canvas.getTreeId())
+          + DomainDockable.DOMAIN_ID + Integer.toString(domainId));
     }
   }
 
   public void redo(AbstractTreeCanvas canvas) {
     TreeDockable currentTree = (TreeDockable) canvas.getController().getControl()
-      .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(canvas.getId()));
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(canvas.getTreeId()));
     if (currentTree != null) {
       DomainFactory factory = canvas.getController().getFrame().getDomainFactory();
       DomainDockable d = null;
       if (domain instanceof SandDomain) {
-        d = factory.read(new ValuationDomain(canvas.getId(),
-            this.domainId, (SandDomain<Ring>) domain));
+        d = factory.read(new ValuationDomain(canvas.getTreeId(), this.domainId, (SandDomain<Ring>) domain));
       }
       else {
-        d = factory.read(new ValuationDomain(canvas.getId(),
-            this.domainId, (AdtDomain<Ring>) domain));
+        d = factory.read(new ValuationDomain(canvas.getTreeId(), this.domainId, (AdtDomain<Ring>) domain));
       }
       canvas.getController().getControl().addDockable(d.getUniqueId(), d);
       currentTree.showDomain(d);
     }
   }
 
-
-  public String getName(){
+  public String getName() {
     return Options.getMsg("action.adddomain");
   }
 
   private Domain<Ring> domain;
-  private int domainId;
+  private int          domainId;
 }

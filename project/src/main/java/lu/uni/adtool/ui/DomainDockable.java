@@ -84,7 +84,7 @@ public class DomainDockable extends DefaultMultipleCDockable
   }
 
   public String getUniqueId() {
-    return TreeDockable.TREE_ID + Integer.toString(canvas.getId()) + DOMAIN_ID
+    return TreeDockable.TREE_ID + Integer.toString(canvas.getTreeId()) + DOMAIN_ID
         + Integer.toString(canvas.getDomainId());
   }
 

@@ -92,10 +92,10 @@ public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
 
   public final Bool getDefaultValue(Node node) {
     if (((ADTNode) node).getRole() == ADTNode.Role.PROPONENT) {
-      return proDefault;
+      return (Bool)proDefault.clone();
     }
     else {
-      return oppDefault;
+      return (Bool)oppDefault.clone();
     }
   }
 
@@ -160,27 +160,57 @@ public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
   }
 
   public String getCp() {
-    return this.cp.toString(false);
+    if (cp != null) {
+      return this.cp.toString(false);
+    }
+    else {
+      return "";
+    }
   }
 
   public String getCo() {
-    return this.co.toString(false);
+    if (co != null) {
+      return this.co.toString(false);
+    }
+    else {
+      return "";
+    }
   }
 
   public String getAp() {
-    return this.ap.toString(false);
+    if (ap != null) {
+      return this.ap.toString(false);
+    }
+    else {
+      return "";
+    }
   }
 
   public String getAo() {
-    return this.ao.toString(false);
+    if (ao != null) {
+      return this.ao.toString(false);
+    }
+    else {
+      return "";
+    }
   }
 
   public String getOp() {
-    return this.op.toString(false);
+    if (op != null) {
+      return this.op.toString(false);
+    }
+    else {
+      return "";
+    }
   }
 
   public String getOo() {
-    return this.oo.toString(false);
+    if (oo != null) {
+      return this.oo.toString(false);
+    }
+    else {
+      return "";
+    }
   }
 
   public String getName() {
@@ -231,10 +261,20 @@ public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
     this.proponentModifiable = value;
   }
   public String getOppDefault() {
-    return oppDefault.toString();
+    if (this.oppDefault != null) {
+      return oppDefault.toString();
+    }
+    else {
+      return "";
+    }
   }
   public String getProDefault() {
-    return proDefault.toString();
+    if (this.proDefault != null) {
+      return proDefault.toString();
+    }
+    else {
+      return "";
+    }
   }
 
   public boolean isOppModifiable() {

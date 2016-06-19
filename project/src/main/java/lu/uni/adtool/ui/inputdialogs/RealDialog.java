@@ -20,7 +20,7 @@
  */
 package lu.uni.adtool.ui.inputdialogs;
 
-import lu.uni.adtool.domains.rings.RealG0;
+import lu.uni.adtool.domains.rings.Real;
 import lu.uni.adtool.tools.Options;
 
 import java.awt.BorderLayout;
@@ -41,13 +41,13 @@ import javax.swing.JPanel;
  *
  * @author Piotr Kordy
  */
-public class RealG0Dialog extends InputDialog {
+public class RealDialog extends InputDialog {
 
   /**
    * Constructs a new instance.
    */
-  public RealG0Dialog(final Frame frame) {
-    super(frame, Options.getMsg("inputdialog.realnumberg0.title"));
+  public RealDialog(final Frame frame) {
+    super(frame, Options.getMsg("inputdialog.realnumber.title"));
   }
 
   /**
@@ -110,13 +110,7 @@ public class RealG0Dialog extends InputDialog {
    * @see InputDialog#isValid(double)
    */
   protected final boolean isValid(final double d) {
-    if (d >= 0) {
-      RealG0 v = new RealG0(d);
-      if (v.getValue() == d) {
-        return true;
-      }
-    }
-    return false;
+    return true;
   }
 
   /**
@@ -125,7 +119,7 @@ public class RealG0Dialog extends InputDialog {
    * @see InputDialog#setValue(double)
    */
   protected final void setValue(final double d) {
-    value = new RealG0(d);
+    value = new Real(d);
     valueField.setValue(d);
   }
 
@@ -135,13 +129,13 @@ public class RealG0Dialog extends InputDialog {
    * @see InputDialog#createLayout()
    */
   protected void createLayout(boolean showDefault) {
-    errorMsg.setText(Options.getMsg("inputdialog.realnumberg0.txt"));
+    errorMsg.setText(Options.getMsg("inputdialog.realnumber.txt"));
     final DecimalFormat f = new DecimalFormat();
     f.setMaximumFractionDigits(50);
     valueField = new JFormattedTextField(f);
     valueField.addKeyListener(this);
     if (showDefault) {
-      valueField.setValue(new Double(((RealG0) value).getValue()));
+      valueField.setValue(new Double(((Real) value).getValue()));
     }
     valueField.setColumns(15);
     valueField.addPropertyChangeListener("value", this);

@@ -20,13 +20,22 @@
  */
 package lu.uni.adtool.tools.undo;
 
+import lu.uni.adtool.ui.DomainDockable;
+import lu.uni.adtool.ui.TreeDockable;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 
 public abstract class EditAction {
   EditAction() {
   }
+
   public abstract void undo(AbstractTreeCanvas canvas);
+
   public abstract void redo(AbstractTreeCanvas canvas);
+
   public abstract String getName();
 
+  protected DomainDockable getDomainDockable(int domainId, AbstractTreeCanvas canvas) {
+    return (DomainDockable)canvas.getController().getControl().getMultipleDockable(TreeDockable.TREE_ID
+        + Integer.toString(canvas.getTreeId()) + DomainDockable.DOMAIN_ID + Integer.toString(domainId));
+  }
 }

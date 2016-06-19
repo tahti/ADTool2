@@ -413,7 +413,7 @@ public class ValuationDomain implements MultipleCDockableLayout {
    *
    * @return The domain.
    */
-  public Domain<Ring> getDomain() {
+  public lu.uni.adtool.domains.Domain<Ring> getDomain() {
     return domain;
   }
 

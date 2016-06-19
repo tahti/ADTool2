@@ -58,11 +58,11 @@ public class TreeFactory implements MultipleCDockableFactory<TreeDockable, TreeL
   /* Called when applying a stored layout */
   public TreeDockable read(TreeLayout layout) {
     if (layout.getRoot() == null) return null;
-    Debug.log("reading, treeId:" + layout.getId());
-    this.idCount = Math.max(this.idCount, layout.getId());
+    Debug.log("reading, treeId:" + layout.getTreeId());
+    this.idCount = Math.max(this.idCount, layout.getTreeId());
     TreeDockable dockable = new TreeDockable(this, layout, true);
     DomainFactory factory = controller.getFrame().getDomainFactory();
-    ArrayList<DomainDockable> domains = factory.getDomains(new Integer(layout.getId()));
+    ArrayList<DomainDockable> domains = factory.getDomains(new Integer(layout.getTreeId()));
     if (domains != null) {
       // final ArrayList<ValuationDomain> domainArray = layout.getDomains();
       int size = domains.size();
@@ -84,7 +84,7 @@ public class TreeFactory implements MultipleCDockableFactory<TreeDockable, TreeL
    * Used to import from TreeLayout where positions of new windows is not saved
    */
   public TreeDockable load(TreeLayout layout) {
-    this.idCount = Math.max(this.idCount, layout.getId());
+    this.idCount = Math.max(this.idCount, layout.getTreeId());
     TreeDockable dockable = new TreeDockable(this, layout, false);
     return dockable;
   }

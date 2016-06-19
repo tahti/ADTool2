@@ -37,7 +37,7 @@ public class SharedExtentProvider extends AbstractExtentProvider {
   }
 
   public void registerCanvas(AbstractTreeCanvas canvas) {
-    Debug.log("with tree id :"+ canvas.getId());
+    Debug.log("with tree id :"+ canvas.getTreeId());
     canvasSet.add(canvas);
   }
 

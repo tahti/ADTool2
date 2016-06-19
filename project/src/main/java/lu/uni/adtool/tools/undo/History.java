@@ -36,6 +36,9 @@ public class History {
   public void addAction(EditAction action) {
     if (!noUpdates) {
       undoList.addFirst(action);
+      if (undoList.size() > this.maxActions) {
+        undoList.removeLast();
+      }
       redoList.clear();
       Debug.log("Added undo action:"+action.getName());
     }
@@ -85,4 +88,5 @@ public class History {
   private ArrayDeque<EditAction> undoList;
   private ArrayDeque<EditAction> redoList;
   private boolean noUpdates;
+  private int maxActions = 1000;
 }

@@ -20,6 +20,12 @@
  */
 package lu.uni.adtool.ui.canvas;
 
+import java.awt.Color;
+
+import javax.swing.JScrollPane;
+
+import org.abego.treelayout.util.DefaultConfiguration;
+
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tools.undo.AddChild;
 import lu.uni.adtool.tools.undo.AddSibling;
@@ -34,12 +40,6 @@ import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.tree.SandParser;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TermView;
-
-import java.awt.Color;
-
-import javax.swing.JScrollPane;
-
-import org.abego.treelayout.util.DefaultConfiguration;
 
 // if Type is null then it is the canvas with the original tree
 public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
@@ -183,7 +183,7 @@ public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
   }
 
   public void repaintAll() {
-    controller.getFrame().getDomainFactory().repaintAllDomains(this.getId());
+    controller.getFrame().getDomainFactory().repaintAllDomains(this.getTreeId());
     this.repaint();
   }
 
@@ -235,10 +235,23 @@ public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
     this.setScale(1);
   }
 
+  public void updateTerms() {
+    terms.updateTerms();
+  }
+
+  /**
+   * Just return this canvas - placeholder for canvases that want to share edit
+   * history - they need to override this method.
+   */
+  public AbstractTreeCanvas getTreeCanvas() {
+    return this;
+  }
+
   protected Color getFillColor(Node node) {
     return Options.canv_FillColorAtt;
   }
 
   protected SandCanvasHandler listener;
+  protected TermView          terms;
   private static final long   serialVersionUID = 6626362203605041529L;
 }

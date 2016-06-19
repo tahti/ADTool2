@@ -20,6 +20,17 @@
  */
 package lu.uni.adtool.tree;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Vector;
+
+import org.reflections.Reflections;
+
+import bibliothek.gui.dock.common.MultipleCDockableFactory;
+
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.SandDomain;
@@ -39,6 +50,7 @@ import lu.uni.adtool.domains.adtpredefined.SatProp;
 import lu.uni.adtool.domains.adtpredefined.SatScenario;
 import lu.uni.adtool.domains.custom.AdtBoolDomain;
 import lu.uni.adtool.domains.custom.AdtIntDomain;
+import lu.uni.adtool.domains.custom.AdtRealDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.domains.sandpredefined.MinTime;
 import lu.uni.adtool.tools.Debug;
@@ -47,21 +59,9 @@ import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TreeDockable;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Vector;
-
-import org.reflections.Reflections;
-
-import bibliothek.gui.dock.common.MultipleCDockableFactory;
-
 public class DomainFactory implements MultipleCDockableFactory<DomainDockable, ValuationDomain> {
 
   public DomainFactory(MainController controller) {
-    this.domainIdCount = new HashMap<Integer, Integer>();
     this.domainDockables = new HashMap<Integer, ArrayList<DomainDockable>>();
     this.controller = controller;
   }
@@ -84,17 +84,11 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
 
   /* Called when applying a stored layout */
   public DomainDockable read(ValuationDomain values) {
-    if (controller.getControl().getSingleDockable("tree1_treeView") != null) Debug.log("Work area:"
-        + controller.getControl().getSingleDockable("tree1_treeView").getWorkingArea());
+    if (controller.getControl().getSingleDockable("tree1_treeView") != null)
+      Debug.log("Work area:" + controller.getControl().getSingleDockable("tree1_treeView").getWorkingArea());
     Debug.log("Reading domain treeId " + values.getTreeId() + " domainId " + values.getDomainId());
     DomainDockable dockable = new DomainDockable(this, values);
     Integer treeId = new Integer(values.getTreeId());
-    Integer domainCount = domainIdCount.get(treeId);
-    if (domainCount == null) {
-      domainCount = new Integer(0);
-    }
-    domainCount = new Integer(Math.max(domainCount.intValue(), values.getDomainId()));
-    domainIdCount.put(treeId, domainCount);
     ArrayList<DomainDockable> d = this.domainDockables.get(treeId);
     if (d == null) {
       d = new ArrayList<DomainDockable>();
@@ -109,7 +103,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       if (treeDockable.getCanvas().isSand()) {
         dockable.hideShowAll();
       }
-      if (treeDockable.getLayout().getDomains().indexOf(values) == -1) {
+      if (treeDockable.getLayout().getDomain(values.getDomainId()) == null) {
         treeDockable.getLayout().addDomain(values);
       }
       dockable.setWorkingArea(treeDockable.getWorkArea());
@@ -126,17 +120,6 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     return this.controller;
   }
 
-  public int getNewUniqueId(Integer treeId) {
-    Integer domainCount = domainIdCount.get(treeId);
-    if (domainCount == null) {
-      domainCount = new Integer(0);
-    }
-    domainCount = new Integer(domainCount.intValue() + 1);
-    domainIdCount.put(treeId, domainCount);
-    Debug.log("for treeId " + treeId + " value:" + domainCount);
-    return domainCount.intValue();
-  }
-
   @SuppressWarnings("all")
   public static Vector<Domain<?>> getPredefinedDomains(boolean forSand) {
     Vector<Domain<?>> result = new Vector<Domain<?>>();
@@ -145,8 +128,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       Set<Class<? extends SandDomain>> m = reflections.getSubTypesOf(SandDomain.class);
       for (Class<? extends SandDomain> c : m) {
         SandDomain<Ring> d = null;
-        Constructor<SandDomain<Ring>>[] ct =
-            (Constructor<SandDomain<Ring>>[]) c.getDeclaredConstructors();
+        Constructor<SandDomain<Ring>>[] ct = (Constructor<SandDomain<Ring>>[]) c.getDeclaredConstructors();
         try {
           if (ct.length == 1) {
             d = ct[0].newInstance();
@@ -172,10 +154,11 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       }
     }
     else {
-      //add custom domains first
+      // add custom domains first
       result.add(new AdtBoolDomain());
       result.add(new AdtIntDomain());
-      //add other domains
+      result.add(new AdtRealDomain());
+      // add other domains
       Reflections reflections = new Reflections(adtDomainsPrefix);
       Set<Class<? extends AdtDomain>> m = reflections.getSubTypesOf(AdtDomain.class);
       for (Class<? extends AdtDomain> c : m) {
@@ -185,8 +168,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
         }
 
         AdtDomain<Ring> d = null;
-        Constructor<AdtDomain<Ring>>[] ct =
-            (Constructor<AdtDomain<Ring>>[]) c.getDeclaredConstructors();
+        Constructor<AdtDomain<Ring>>[] ct = (Constructor<AdtDomain<Ring>>[]) c.getDeclaredConstructors();
         try {
           if (ct.length == 1) {
             d = ct[0].newInstance();
@@ -231,13 +213,14 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     if (!domainName.startsWith(customDomainsPrefix)) {
       name = customDomainsPrefix + "." + domainName;
     }
-    if (name.equals(customDomainsPrefix + ".AdtBoolDomain") || name.equals(customDomainsPrefix + ".AdtIntDomain")) {
+    if (name.equals(customDomainsPrefix + ".AdtBoolDomain") || name.equals(customDomainsPrefix + ".AdtIntDomain")
+        || name.equals(customDomainsPrefix + ".AdtRealDomain")) {
       return true;
     }
     return false;
   }
 
-@SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
   public static boolean isSandDomain(String domainName) {
     String name = domainName;
     if (!domainName.startsWith(sandDomainsPrefix)) {
@@ -303,7 +286,8 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
         if (!domainName.startsWith(customDomainsPrefix)) {
           name = customDomainsPrefix + "." + domainName;
         }
-      } else {
+      }
+      else {
         if (domainName.startsWith(oldAdtDomainsPrefix)) {
           name = adtDomainsPrefix + domainName.substring(oldAdtDomainsPrefix.length());
           ;
@@ -343,18 +327,20 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     }
   }
 
-  public void notifyAllTreeChanged(Integer id) {
-    ArrayList<DomainDockable> domains = domainDockables.get(id);
+  public void notifyAllTreeChanged(Integer treeId) {
+    ArrayList<DomainDockable> domains = domainDockables.get(treeId);
     if (domains != null) {
       Debug.log("domains size:" + domains.size());
       for (DomainDockable domain : domains) {
+        NodeTree tree = domain.getCanvas().getTree();
+        tree.getSharedExtentProvider().updateTreeSize(tree.getRoot(true));
         domain.getCanvas().treeChanged();
       }
     }
   }
 
-  public void repaintAllDomains(Integer id) {
-    ArrayList<DomainDockable> domains = domainDockables.get(id);
+  public void repaintAllDomains(Integer treeId) {
+    ArrayList<DomainDockable> domains = domainDockables.get(treeId);
     if (domains != null) {
       for (DomainDockable domain : domains) {
         domain.getCanvas().repaint();
@@ -363,7 +349,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
   }
 
   public void removeDomain(DomainDockable dockable) {
-    ArrayList<DomainDockable> d = domainDockables.get(new Integer(dockable.getCanvas().getId()));
+    ArrayList<DomainDockable> d = domainDockables.get(new Integer(dockable.getCanvas().getTreeId()));
     if (d != null) {
       d.remove(dockable);
     }
@@ -385,16 +371,12 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
   }
 
   public static final String                          DOMAIN_FACTORY_ID   = "domain_fact";
-  private static final String                         sandDomainsPrefix   =
-      "lu.uni.adtool.domains.sandpredefined";
-  private static final String                         oldAdtDomainsPrefix =
-      "lu.uni.adtool.domains.predefined";
-  private static final String                         adtDomainsPrefix    =
-      "lu.uni.adtool.domains.adtpredefined";
-  private static final String                         customDomainsPrefix   =
-      "lu.uni.adtool.domains.custom";
+  private static final String                         sandDomainsPrefix   = "lu.uni.adtool.domains.sandpredefined";
+  private static final String                         oldAdtDomainsPrefix = "lu.uni.adtool.domains.predefined";
+  private static final String                         adtDomainsPrefix    = "lu.uni.adtool.domains.adtpredefined";
+  private static final String                         customDomainsPrefix = "lu.uni.adtool.domains.custom";
   private MainController                              controller;
+  /** map from treeId to list of domains */
   private HashMap<Integer, ArrayList<DomainDockable>> domainDockables;
-  private HashMap<Integer, Integer>                   domainIdCount;
 
 }

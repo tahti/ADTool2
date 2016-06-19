@@ -1,51 +1,50 @@
 package lu.uni.adtool.domains.custom;
 
+import java.text.DecimalFormat;
+
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.adtpredefined.DescriptionGenerator;
-import lu.uni.adtool.domains.rings.Int;
+import lu.uni.adtool.domains.rings.Real;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
 
-public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
+public class AdtRealDomain  implements AdtDomain<Real>, AdtCustomDomain {
 
-  public AdtIntDomain() {
-    name = Options.getMsg("adtdomain.custom.int.name");
-    description = Options.getMsg("adtdomain.custom.int.description");
-    this.parser = new IntParser();
-    this.proDefault = new Int(0);
-    this.oppDefault = new Int(0);
+  public AdtRealDomain() {
+    name = Options.getMsg("adtdomain.custom.real.name");
+    description = Options.getMsg("adtdomain.custom.real.description");
+    this.parser = new RealParser();
+    this.proDefault = new Real(0);
+    this.oppDefault = new Real(0);
     this.opponnentModifiable = true;
     this.proponentModifiable = true;
+    this.precision = new DecimalFormat("#0.###");
   }
 
   public boolean isValueModifiable(ADTNode node) {
     if (node.getRole() == ADTNode.Role.PROPONENT) {
       return this.proponentModifiable;
-    } else {
+    }
+    else {
       return this.opponnentModifiable;
     }
   }
 
-  public Int calc(Int a, Int b, ADTNode.Type type) {
-    try {
-      switch (type) {
-      case OR_OPP:
-        return oo.evaluate(a, b);
-      case AND_OPP:
-        return ao.evaluate(a, b);
-      case OR_PRO:
-        return op.evaluate(a, b);
-      case AND_PRO:
-        return ap.evaluate(a, b);
-      default:
-        Debug.log("Wrong type:" + type);
-        return oo.evaluate(a, b);
-      }
-    }
-    catch (ArithmeticException e) {
-      return new Int(0, true);
+  public Real calc(Real a, Real b, ADTNode.Type type) {
+    switch (type) {
+    case OR_OPP:
+      return oo.evaluate(a, b);
+    case AND_OPP:
+      return ao.evaluate(a, b);
+    case OR_PRO:
+      return op.evaluate(a, b);
+    case AND_PRO:
+      return ap.evaluate(a, b);
+    default:
+      Debug.log("Wrong type:" + type);
+      return oo.evaluate(a, b);
     }
   }
 
@@ -59,6 +58,10 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
     return false;
   }
 
+  public String format(Real a) {
+    return this.precision.format(a.getValue());
+  }
+
   public boolean setDescription(String description) {
     if (description == null || (description.equals(""))) {
       return false;
@@ -67,30 +70,46 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
     return true;
   }
 
-  public final Int cp(final Int a, final Int b) {
-    try {
-      return this.cp.evaluate(a, b);
-    }
-    catch (ArithmeticException e) {
-      return new Int(0, true);
-    }
-
+  public final Real cp(final Real a, final Real b) {
+    return this.cp.evaluate(a, b);
   }
 
-  public final Int co(final Int a, final Int b) {
-    try {
-      return this.co.evaluate(a, b);
-    }
-    catch (ArithmeticException e) {
-      return new Int(0, true);
-    }
+  public final Real co(final Real a, final Real b) {
+    return this.co.evaluate(a, b);
   }
 
-  public final Int getDefaultValue(Node node) {
+  public final Real getDefaultValue(Node node) {
     if (((ADTNode) node).getRole() == ADTNode.Role.PROPONENT) {
-      return (Int) proDefault.clone();
-    } else {
-      return (Int) oppDefault.clone();
+      return (Real) proDefault.clone();
+    }
+    else {
+      return (Real) oppDefault.clone();
+    }
+  }
+
+  public final String getPrecision() {
+    if (this.precision == null) {
+      return "";
+    }
+    return this.precision.toPattern();
+  }
+
+  public boolean setPrecision(String text) {
+    if (text.equals("")) {
+      this.precision = null;
+      return true;
+    }
+    else {
+      try {
+        this.precision.applyPattern(text);
+        return true;
+      }
+      catch (IllegalArgumentException e) {
+        return false;
+      }
+      catch (NullPointerException e) {
+        return false;
+      }
     }
   }
 
@@ -158,7 +177,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getCp() {
     if (cp != null) {
       return this.cp.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -166,7 +186,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getCo() {
     if (co != null) {
       return this.co.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -174,7 +195,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getAp() {
     if (ap != null) {
       return this.ap.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -182,7 +204,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getAo() {
     if (ao != null) {
       return this.ao.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -190,7 +213,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getOp() {
     if (op != null) {
       return this.op.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -198,7 +222,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getOo() {
     if (oo != null) {
       return this.oo.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -220,7 +245,7 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
           , this.cp.toString() // 4
           , this.co.toString() // 5
       };
-      return DescriptionGenerator.generateDescription(this, description, Options.getMsg("domain.integer"), operators);
+      return DescriptionGenerator.generateDescription(this, description, Options.getMsg("domain.real"), operators);
     } catch (NullPointerException e) {
       return this.description;
     }
@@ -230,12 +255,12 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
     return this.oppDefault.updateFromString(value);
   }
 
-  public void setOppDefault(int value) {
-    this.oppDefault = new Int(value);
+  public void setOppDefault(double value) {
+    this.oppDefault = new Real(value);
   }
 
-  public void setProDefault(int value) {
-    this.proDefault = new Int(value);
+  public void setProDefault(double value) {
+    this.proDefault = new Real(value);
   }
 
   public boolean setProDefault(String value) {
@@ -253,7 +278,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getOppDefault() {
     if (this.oppDefault != null) {
       return oppDefault.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -261,7 +287,8 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
   public String getProDefault() {
     if (this.proDefault != null) {
       return proDefault.toString();
-    } else {
+    }
+    else {
       return "";
     }
   }
@@ -274,19 +301,20 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
     return this.proponentModifiable;
   }
 
-  private Int                 oppDefault;
-  private Int                 proDefault;
-  private boolean             opponnentModifiable;
-  private boolean             proponentModifiable;
-  private String              name;
-  private String              description;
-  private IntExpression       cp;
-  private IntExpression       co;
-  private IntExpression       ao;
-  private IntExpression       ap;
-  private IntExpression       oo;
-  private IntExpression       op;
-  private transient IntParser parser;
+  private Real                 oppDefault;
+  private Real                 proDefault;
+  private boolean              opponnentModifiable;
+  private boolean              proponentModifiable;
+  private String               name;
+  private String               description;
+  private RealExpression       cp;
+  private RealExpression       co;
+  private RealExpression       ao;
+  private RealExpression       ap;
+  private RealExpression       oo;
+  private RealExpression       op;
+  private DecimalFormat        precision;
+  private transient RealParser parser;
 
-  private static final long   serialVersionUID = -7059248027203727886L;
+  private static final long    serialVersionUID = -7059248027203727886L;
 }
