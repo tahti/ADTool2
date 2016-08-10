@@ -446,7 +446,7 @@ public class FileHandler {
     }
     else {
       String s;
-      if ( controller.getLastFocusedTree() != null) {
+      if ( controller.getLastFocusedTree() != null && controller.getLastFocusedTree().getTree() != null) {
         s = controller.getLastFocusedTree().getRootLabel();
       }
       else {
