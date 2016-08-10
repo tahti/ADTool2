@@ -435,21 +435,24 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   }
 
   /**
-   * Scrolls to the given point on the canvas.
+   * Scrolls canvas by a given vector.
    *
-   * @param x
+   * @param xShift
    *          x-coordinate of the point.
-   * @param y
+   * @param yShift
    *          y-coordinate of the point.
    * @return
+   *      returns by how much canvas was really scrolled
    */
-  public Point scrollTo(double x, double y) {
+  public Point scrollTo(double xShift, double yShift) {
+    Debug.log("trying to scrolled By "+ xShift + " "+  yShift);
     Rectangle r = scrollPane.getViewport().getViewRect();
     Point p = r.getLocation();
-    r.translate((int) x, (int) y);
+    r.translate((int) -xShift, (int) -yShift);
     scrollRectToVisible(r);
-    r = scrollPane.getViewport().getViewRect();
-    p.translate((int) (-r.getX()), (int) (-r.getY()));
+    Rectangle r2 = scrollPane.getViewport().getViewRect();
+    p = new Point((int)(p.getX() - r2.getX()),(int) (p.getY() - r2.getY()));
+    Debug.log("scrolled By "+ p.toString());
     return p;
   }
 

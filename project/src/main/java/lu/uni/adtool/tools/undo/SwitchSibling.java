@@ -41,17 +41,6 @@ public class SwitchSibling extends EditAction {
   public void undo(AbstractTreeCanvas canvas) {
     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
     if (target instanceof SandNode) {
-      ((SandTreeCanvas<Ring>)canvas).switchSibling(target, !onLeft);
-    }
-    else {
-      ((ADTreeCanvas<Ring>)canvas).switchSibling(target, !onLeft);
-    }
-  }
-
-@SuppressWarnings("unchecked")
-  public void redo(AbstractTreeCanvas canvas) {
-    Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
-    if (target instanceof SandNode) {
       ((SandTreeCanvas<Ring>)canvas).switchSibling(target, onLeft);
     }
     else {
@@ -59,9 +48,21 @@ public class SwitchSibling extends EditAction {
     }
   }
 
+@SuppressWarnings("unchecked")
+  public void redo(AbstractTreeCanvas canvas) {
+    undo(canvas);
+//     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
+//     if (target instanceof SandNode) {
+//       ((SandTreeCanvas<Ring>)canvas).switchSibling(target, onLeft);
+//     }
+//     else {
+//       ((ADTreeCanvas<Ring>)canvas).switchSibling(target, onLeft);
+//     }
+  }
+
 
   public String getName(){
-    return Options.getMsg("action.addsibling");
+    return Options.getMsg("action.movenode");
   }
 
   private ArrayList<Integer> targetPath;

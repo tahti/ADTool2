@@ -20,6 +20,7 @@
  */
 package lu.uni.adtool.ui.canvas;
 
+import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.ui.InfoBalloon;
@@ -216,17 +217,21 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
   public void mouseDragged(MouseEvent e) {
     if (dragStart != null) {
       // if (dragScroll) {
-      // Point p = this.canvas.scrollTo(e.getX() - dragStart.getX(), (e.getY() -
-      // dragStart.getY()));
-      // dragStart = new Point(e.getX(), e.getY());
-      // ((Point) dragStart).translate((int) -p.getX(), (int) -p.getY());
+      Debug.log("Mouse:x=" + e.getX()+ " y=" + e.getY());
+      Point p1 = this.canvas.scrollTo(e.getX() - dragStart.getX(), e.getY() - dragStart.getY());
+      Debug.log("drag before :x=" + dragStart.getX()+ " y=" + dragStart.getY());
+//       dragStart = new Point(e.getX(), e.getY());
+//       ((Point) dragStart).translate((int) - p1.getX(), (int) - p1.getY());
+      Debug.log("drag aftere :x=" + dragStart.getX()+ " y=" + dragStart.getY());
       // }
       // else {
       Point2D p = new Point(e.getX(), e.getY());
+      ((Point) p).translate((int) - p1.getX(), (int) - p1.getY());
       p = this.canvas.transform(p);
       Point2D p2 = this.canvas.transform(dragStart);
       this.canvas.moveTree(p.getX() - p2.getX(), p.getY() - p2.getY());
       dragStart = new Point(e.getX(), e.getY());
+      ((Point) dragStart).translate((int) - p1.getX(), (int) - p1.getY());
       // }
     }
   }
