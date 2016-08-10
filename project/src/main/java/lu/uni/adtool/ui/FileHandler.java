@@ -89,6 +89,8 @@ public class FileHandler {
   public FileOutputStream getExportTreeStream(String extension, AbstractTreeCanvas canvas) {
     FileFilter filter = null;
     if (canvas == null) return null;
+    if (canvas.getTree() == null) return null;
+    if (canvas.getTree().getLayout() == null) return null;
     int id = canvas.getTree().getLayout().getTreeId();
     exportDomains.setVisible(false);
     exportRanking.setVisible(false);

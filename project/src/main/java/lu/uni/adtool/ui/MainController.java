@@ -17,6 +17,38 @@
  */
 package lu.uni.adtool.ui;
 
+import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.Domain;
+import lu.uni.adtool.domains.Parametrized;
+import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.custom.AdtBoolDomain;
+import lu.uni.adtool.domains.custom.AdtCustomDomain;
+import lu.uni.adtool.domains.custom.AdtIntDomain;
+import lu.uni.adtool.domains.custom.AdtRealDomain;
+import lu.uni.adtool.domains.rings.BoundedInteger;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Objects;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tools.undo.EditAdtDomain;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.AdtImporter;
+import lu.uni.adtool.tree.CCP;
+import lu.uni.adtool.tree.DomainFactory;
+import lu.uni.adtool.tree.GuiNode;
+import lu.uni.adtool.tree.SandNode;
+import lu.uni.adtool.tree.TreeLayout;
+import lu.uni.adtool.tree.TxtImporter;
+import lu.uni.adtool.tree.XmlConverter;
+import lu.uni.adtool.ui.canvas.ADTreeCanvas;
+import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
+import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
+import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
+import lu.uni.adtool.ui.printview.JPrintPreviewDialog;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -44,37 +76,6 @@ import bibliothek.gui.dock.common.event.CControlListener;
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.theme.ThemeMap;
-
-import lu.uni.adtool.ADToolMain;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.Domain;
-import lu.uni.adtool.domains.Parametrized;
-import lu.uni.adtool.domains.SandDomain;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.custom.AdtBoolDomain;
-import lu.uni.adtool.domains.custom.AdtCustomDomain;
-import lu.uni.adtool.domains.custom.AdtIntDomain;
-import lu.uni.adtool.domains.custom.AdtRealDomain;
-import lu.uni.adtool.domains.rings.BoundedInteger;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Objects;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tools.undo.EditAdtDomain;
-import lu.uni.adtool.tree.ADTNode;
-import lu.uni.adtool.tree.AdtImporter;
-import lu.uni.adtool.tree.CCP;
-import lu.uni.adtool.tree.DomainFactory;
-import lu.uni.adtool.tree.GuiNode;
-import lu.uni.adtool.tree.SandNode;
-import lu.uni.adtool.tree.TreeLayout;
-import lu.uni.adtool.tree.XmlConverter;
-import lu.uni.adtool.ui.canvas.ADTreeCanvas;
-import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
-import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
-import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
-import lu.uni.adtool.ui.printview.JPrintPreviewDialog;
 
 public final class MainController implements CControlListener, CFocusListener {
   public MainController(ADToolMain newFrame, CControl control) {
@@ -398,6 +399,7 @@ public final class MainController implements CControlListener, CFocusListener {
     importFrom.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.import.key")).getKeyCode());
     menuItem = importFrom.add(fileImportFromXml);
     menuItem = importFrom.add(fileImportFromAdt);
+    menuItem = importFrom.add(fileImportFromTxt);
     menuItem.addMouseListener(mouseHandler);
     importFrom.add(menuItem);
     fileMenu.add(importFrom);
@@ -764,6 +766,16 @@ public final class MainController implements CControlListener, CFocusListener {
     fileImportFromAdt.setSmallIcon(iconFac.createImageIcon("/icons/tree_16x16.png"));
     fileImportFromAdt.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.import.adt.key")));
 
+    fileImportFromTxt = new ADAction(Options.getMsg("file.export.txt.txt")) {
+      private static final long serialVersionUID = -5605440635343377923L;
+
+      public void actionPerformed(final ActionEvent e) {
+        importFrom("txt");
+      }
+    };
+    fileImportFromTxt.setSmallIcon(iconFac.createImageIcon("/icons/txt_16x16.png"));
+    fileImportFromTxt.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.txt.key")));
+
     filePrint = new ADAction(Options.getMsg("file.print.txt")) {
       public void actionPerformed(final ActionEvent e) {
         printCanvas();
@@ -1071,6 +1083,13 @@ public final class MainController implements CControlListener, CFocusListener {
         }
       }
       else if (type.equals("txt")) {
+        TxtImporter txtImporter = new TxtImporter();
+        try {
+          txtImporter.importFrom(in, this);
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
   }
@@ -1129,6 +1148,7 @@ public final class MainController implements CControlListener, CFocusListener {
   private static ADAction      fileExit;
   private static ADAction      fileImportFromXml;
   private static ADAction      fileImportFromAdt;
+  private static ADAction      fileImportFromTxt;
   private static ADAction      editCopy;
   private static ADAction      editCut;
   private static ADAction      editPaste;
