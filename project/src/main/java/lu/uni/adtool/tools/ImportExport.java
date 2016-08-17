@@ -56,8 +56,38 @@ public class ImportExport {
     this.viewPortSize = null;
   }
 
+  public int countDomains(String fileName) {
+    InputStream fileStream = null;
+    try {
+      fileStream = new FileInputStream(new File(fileName));
+    }
+    catch (FileNotFoundException e) {
+      System.err.println(Options.getMsg("error.xmlimport.fail") + " " + e.getLocalizedMessage());
+      return -1;
+    }
+    try {
+      if (fileStream != null) {
+        BufferedInputStream in = new BufferedInputStream(fileStream);
+        XElement element = null;
+        element = XIO.readUTF(in);
+        in.close();
+        if (element == null) return -1;
+        return element.getElements("domain").length;
+          }
+    }
+    catch (IllegalArgumentException e) {
+    }
+    catch (IOException e) {
+    }
+    return -1;
+  }
+
   /**
    * Function used to import from command line only - no GUI window created
+   *
+   * @param fileName
+   * @return true if there tree is ready to be exported and false in case of
+   * error or e. g. counting domains only
    */
   public boolean doImport(String fileName) {
     InputStream fileStream = null;
@@ -75,6 +105,12 @@ public class ImportExport {
         element = XIO.readUTF(in);
         in.close();
         if (element == null) return false;
+        if (this.exportDomainStr.equals("?") || this.exportDomainStr.equals("-1")) {
+          fileStream.close();
+          System.out.println(new Integer(element.getElements("domain").length));
+          return false;
+        }
+
         this.treeLayout = new TreeLayout(1);
         this.treeLayout.importXml(element, 1);
         if (this.exportDomainStr != null) {

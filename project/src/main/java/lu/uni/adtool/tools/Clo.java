@@ -92,7 +92,8 @@ public class Clo {
           this.toOpen = null;
         }
       }
-      if (cmd.hasOption("i") && cmd.hasOption("x")) {
+      if (cmd.hasOption("i") && cmd.hasOption("x") ||
+          cmd.hasOption("i") && cmd.hasOption("d")) {
         ImportExport exporter = new ImportExport();
         if (cmd.hasOption("a")) {
           exporter.setExportAllDomains(true);
@@ -128,7 +129,12 @@ public class Clo {
         }
         if (cmd.hasOption("d")) {
           String domainId = cmd.getOptionValue("d");
+
           if (domainId != null) {
+//             if (domainId == "?" || domainId=="-1") {
+//               System.out.println(new Integer(exporter.countDomains(fileName)));
+//               return false;
+//              }
             exporter.setExportDomainStr(domainId);
           }
         }

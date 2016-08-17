@@ -20,6 +20,14 @@
  */
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.adtree.ADTreeNode;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.RankExporter;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -30,14 +38,6 @@ import java.util.HashMap;
 import bibliothek.util.xml.XAttribute;
 import bibliothek.util.xml.XElement;
 import bibliothek.util.xml.XException;
-
-import lu.uni.adtool.adtree.ADTreeNode;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.RankExporter;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
 
 public class ADTNode extends GuiNode {
 
@@ -425,7 +425,18 @@ public class ADTNode extends GuiNode {
     }
   }
 
-  public void importXml(XElement e, HashMap<String, ValuationDomain> domains, int treeId)
+  /**
+   *  Function imports the tree contained in XML element
+   *
+   * @param e - xml element from which we import
+   * @param domains - initialized set of domains for which we set the valuations
+   * @param treeId - tree id for which we import nodes
+   * @return true if switchRole is set for a node (important for root node only)
+   *
+   * @throws IllegalArgumentException
+   * @throws XException
+   */
+  public boolean importXml(XElement e, HashMap<String, ValuationDomain> domains, int treeId)
       throws IllegalArgumentException, XException {
     setName(e.getElement("label").getString());
     XElement commentXml = e.getElement("comment");
@@ -446,7 +457,7 @@ public class ADTNode extends GuiNode {
     else {
       this.type = xmlToType(e.getString("refinement"), ((ADTNode) getParent()).getRole());
     }
-    if (switchRole) {
+    if (switchRole && getParent() != null) {
       this.toggleRole();
     }
     XElement[] parameters = e.getElements("parameter");
@@ -534,6 +545,7 @@ public class ADTNode extends GuiNode {
       this.addChild(ch);
       ch.importXml(child, domains, treeId);
     }
+    return switchRole;
   }
 
   private String typeToString(Type type) {

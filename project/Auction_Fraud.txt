@@ -1,0 +1,67 @@
+ap(
+  ap(
+    cp(
+      Ask Vera about Sam,
+      Subvert Verify
+    ),
+    cp(
+      ap(
+        Acquire Malware,
+        Acquire Emails,
+        Acquire Chris CC
+      ),
+      Police Internet
+    ),
+    ap(
+      ap(
+        cp(
+          Rachel Accepts Job,
+          Train Rachel
+        ),
+        Send Job Ad to Emails
+      ),
+      ap(
+        cp(
+          Tino Opens Attachment,
+          Train Tina
+        ),
+        Send Malware to Emails
+      )
+    )
+  ),
+  ap(
+    cp(
+      Credentials from Tina,
+      Profile Credential Usage
+    ),
+    Purchase Goods,
+    cp(
+      Pay with Chris CC,
+      Check CCs for Theft
+    )
+  ),
+  ap(
+    cp(
+      Max to Rachel,
+      Mark Goods
+    ),
+    cp(
+      Rachel to Dave,
+      oo(
+        Mark Goods,
+        Spot-check Drop Boxes
+      )
+    ),
+    cp(
+      Otto from Dave,
+      Spot-check Drop Boxes
+    )
+  ),
+  cp(
+    Otto sells to Perry,
+    oo(
+      Police Pawn Brokers,
+      Revenue Checks
+    )
+  )
+)

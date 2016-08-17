@@ -276,38 +276,7 @@ public class TreeLayout implements MultipleCDockableLayout {
         domainsHash.put(domain.getString("id"), new ValuationDomain(treeId, i, d));
       }
       this.treeRoot = new ADTNode();
-      this.treeRoot.setName(root.getElement("label").getString());
-      try {
-        this.switchRole = (root.getString("switchRole").toLowerCase().equals("yes")
-            || root.getString("switchRole").toLowerCase().equals("true"));
-      } catch (XException exception) {
-        this.switchRole = false;
-      }
-      for (XElement parameter : root.getElements("parameter")) {
-        String category = parameter.getString("category");
-        if (category == null) {
-          throw new IllegalArgumentException(Options.getMsg("exception.wrongxml"));
-        }
-        Debug.log("adding parameter in category:"+ category);
-        if (category.equals("basic")) {
-          ValuationDomain vd = domainsHash.get(parameter.getString("domainId"));
-          if (vd != null) {
-            Ring r = vd.getDomain().getDefaultValue(this.treeRoot);
-            r.updateFromString(parameter.getString());
-            vd.setValue(true, this.treeRoot.getName(), r);
-            Debug.log("set value "+this.treeRoot.getName() + " to "+  r.toUnicode());
-
-          }
-          else {
-            Debug.log("No domain with id " + parameter.getString("domainId"));
-          }
-        }
-      }
-      for (XElement child : root.getElements("node")) {
-        ADTNode ch = new ADTNode();
-        this.treeRoot.addChild(ch);
-        ch.importXml(child, domainsHash, treeId);
-      }
+      this.switchRole = ((ADTNode) this.treeRoot).importXml(root, domainsHash, treeId);
     }
 
     this.domains = new HashMap<Integer, ValuationDomain>();

@@ -20,12 +20,6 @@
  */
 package lu.uni.adtool.ui.canvas;
 
-import java.awt.Color;
-
-import javax.swing.JScrollPane;
-
-import org.abego.treelayout.util.DefaultConfiguration;
-
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tools.undo.AddChild;
 import lu.uni.adtool.tools.undo.AddCounter;
@@ -43,6 +37,12 @@ import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.NodeTree;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TermView;
+
+import java.awt.Color;
+
+import javax.swing.JScrollPane;
+
+import org.abego.treelayout.util.DefaultConfiguration;
 
 // if Type is null then it is the canvas with the original tree
 public class ADTreeCanvas<Type> extends AbstractTreeCanvas {

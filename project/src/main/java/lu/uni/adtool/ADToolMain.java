@@ -132,7 +132,8 @@ public final class ADToolMain extends JFrame {
     super.setJMenuBar(this.controller.getMenu());
     if (clo.getToOpen() == null) {
       Options.tryLoadLayout(control, this);
-    } else {
+    }
+    else {
       XmlConverter converter = new XmlConverter();
       for (String fileName : clo.getToOpen()) {
         FileInputStream in;
