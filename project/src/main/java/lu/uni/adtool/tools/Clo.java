@@ -1,22 +1,19 @@
 /**
- * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>)
- * Date:   10/12/2015
- * Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty of Science,
- *     Technology and Communication FSTC
- * All rights reserved.
- * Licensed under GNU Affero General Public License 3.0;
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Affero General Public License as
- *    published by the Free Software Foundation, either version 3 of the
- *    License, or (at your option) any later version.
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>) Date:
+ * 10/12/2015 Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty
+ * of Science, Technology and Communication FSTC All rights reserved. Licensed
+ * under GNU Affero General Public License 3.0; This program is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- *    You should have received a copy of the GNU Affero General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package lu.uni.adtool.tools;
 
@@ -31,6 +28,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
+
 /**
  * Class to parse command line options
  */
@@ -92,8 +90,8 @@ public class Clo {
           this.toOpen = null;
         }
       }
-      if (cmd.hasOption("i") && cmd.hasOption("x") ||
-          cmd.hasOption("i") && cmd.hasOption("d")) {
+      if (cmd.hasOption("i") && cmd.hasOption("x") || cmd.hasOption("i") && cmd.hasOption("d")
+          && (cmd.getOptionValue("d").equals("?") || cmd.getOptionValue("d").equals("-1"))) {
         ImportExport exporter = new ImportExport();
         if (cmd.hasOption("a")) {
           exporter.setExportAllDomains(true);
@@ -116,10 +114,10 @@ public class Clo {
         if (cmd.hasOption("s")) {
           String size = cmd.getOptionValue("s");
           int index = size.indexOf('x');
-          if (index > 0){
-            try{
+          if (index > 0) {
+            try {
               int x = Integer.parseInt(size.substring(0, index));
-              int y = Integer.parseInt(size.substring(index +1));
+              int y = Integer.parseInt(size.substring(index + 1));
               exporter.setViewPortSize(new Dimension(x, y));
             }
             catch (NumberFormatException e) {
@@ -131,10 +129,10 @@ public class Clo {
           String domainId = cmd.getOptionValue("d");
 
           if (domainId != null) {
-//             if (domainId == "?" || domainId=="-1") {
-//               System.out.println(new Integer(exporter.countDomains(fileName)));
-//               return false;
-//              }
+            // if (domainId == "?" || domainId=="-1") {
+            // System.out.println(new Integer(exporter.countDomains(fileName)));
+            // return false;
+            // }
             exporter.setExportDomainStr(domainId);
           }
         }
@@ -146,6 +144,11 @@ public class Clo {
           }
         }
         return toOpen != null;
+      }
+      if (cmd.getOptions().length > 0 ) {
+        System.err.println(Options.getMsg("clo.wrongCombination") + ".");
+        help();
+        return false;
       }
     }
     catch (ParseException e) {

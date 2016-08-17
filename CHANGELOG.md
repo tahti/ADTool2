@@ -11,6 +11,7 @@ All notable changes to the ADTool will be documented in this file.
   - fixed issue with undo after moving node left/right (issue #10)
   - fixed issue when importing and no tree is open (issue #7)
   - fixed issue with comment not being imported from XML
+  - improved error messages for command line options
 
 ## [2.1.1] - 2016-04-28 ##
   - fixed not unfolding with space
