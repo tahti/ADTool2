@@ -38,12 +38,13 @@ public class Clo {
     this.options = new org.apache.commons.cli.Options();
     this.options.addOption("h", "help", false, Options.getMsg("clo.help.txt"));
     this.options.addOption("v", "version", false, Options.getMsg("clo.version.txt"));
-    this.options.addOption("a", "all-domains", false, Options.getMsg("clo.allDomains.txt"));
+//     this.options.addOption("a", "all-domains", false, Options.getMsg("clo.allDomains.txt"));
     this.options.addOption("D", "no-derived", false, Options.getMsg("clo.derived.txt"));
     this.options.addOption("m", "mark-editable", false, Options.getMsg("clo.markEditable.txt"));
     this.options.addOption("L", "no-labels", false, Options.getMsg("clo.labels.txt"));
     this.options.addOption("C", "no-computed", false, Options.getMsg("clo.computed.txt"));
-    this.options.addOption("r", "rank", false, Options.getMsg("clo.rank.txt"));
+    // this.options.addOption("r", "rank", false,
+    // Options.getMsg("clo.rank.txt"));
 
     Option option = new Option("o", "open", true, Options.getMsg("clo.open.txt"));
     // Set option c to take 1 to oo arguments
@@ -57,8 +58,13 @@ public class Clo {
     option.setArgName("file");
     this.options.addOption(option);
     option = new Option("d", "domain", true, Options.getMsg("clo.domain.txt"));
-    option.setArgs(1);
+//     option.setValueSeparator(',');
+//     option.setArgs(1);
     option.setArgName("domainID");
+    this.options.addOption(option);
+    option = new Option("r", "rank", true, Options.getMsg("clo.rank.txt"));
+    option.setArgs(1);
+    option.setArgName("rankNo");
     this.options.addOption(option);
     option = new Option("s", "size", true, Options.getMsg("clo.size.txt"));
     option.setArgs(1);
@@ -91,11 +97,8 @@ public class Clo {
         }
       }
       if (cmd.hasOption("i") && cmd.hasOption("x") || cmd.hasOption("i") && cmd.hasOption("d")
-          && (cmd.getOptionValue("d").equals("?") || cmd.getOptionValue("d").equals("-1"))) {
+          && (cmd.getOptionValue("d", "0").equals("?") || cmd.getOptionValue("d", "0").equals("q"))) {
         ImportExport exporter = new ImportExport();
-        if (cmd.hasOption("a")) {
-          exporter.setExportAllDomains(true);
-        }
         if (cmd.hasOption("D")) {
           exporter.setNoDerivedValues(true);
         }
@@ -103,7 +106,19 @@ public class Clo {
           exporter.setMarkEditable(true);
         }
         if (cmd.hasOption("r")) {
-          exporter.setExportRanking(true);
+          String r = cmd.getOptionValue("r");
+          try {
+            int x = Integer.parseInt(r);
+            if (x > 0) {
+              exporter.setExportRanking(x);
+            }
+            else {
+              System.err.println(Options.getMsg("clo.wrongrank"));
+            }
+          }
+          catch (NumberFormatException e) {
+            System.err.println(Options.getMsg("clo.wrongrank"));
+          }
         }
         if (cmd.hasOption("L")) {
           exporter.setNoLabels(true);
@@ -126,14 +141,14 @@ public class Clo {
           }
         }
         if (cmd.hasOption("d")) {
-          String domainId = cmd.getOptionValue("d");
+          String[] domainIds = cmd.getOptionValues("d");
 
-          if (domainId != null) {
-            // if (domainId == "?" || domainId=="-1") {
+          if (domainIds != null) {
+            // if (domainId == "?" || domainId=="q") {
             // System.out.println(new Integer(exporter.countDomains(fileName)));
             // return false;
             // }
-            exporter.setExportDomainStr(domainId);
+            exporter.setExportDomainStr(domainIds);
           }
         }
         String fileName = cmd.getOptionValue("i");
@@ -145,7 +160,7 @@ public class Clo {
         }
         return toOpen != null;
       }
-      if (cmd.getOptions().length > 0 ) {
+      if (cmd.getOptions().length > 0) {
         System.err.println(Options.getMsg("clo.wrongCombination") + ".");
         help();
         return false;

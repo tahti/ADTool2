@@ -20,18 +20,6 @@
  */
 package lu.uni.adtool.tools;
 
-import java.awt.Dimension;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import bibliothek.util.xml.XElement;
-import bibliothek.util.xml.XIO;
-
 import lu.uni.adtool.domains.ValuationDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tree.NodeTree;
@@ -41,19 +29,33 @@ import lu.uni.adtool.ui.canvas.ADTreeCanvas;
 import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 import lu.uni.adtool.ui.canvas.SandTreeCanvas;
+
+import java.awt.Dimension;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Set;
+import java.util.TreeSet;
+
+import bibliothek.util.xml.XElement;
+import bibliothek.util.xml.XIO;
 /**
  * Class used by command line importing/exporting
  */
 public class ImportExport {
   public ImportExport() {
-    exportAllDomains = false;
-    this.exportDomain = -1;
+    this.exportDomainSet = null;
     markEditable = false;
     noLabels = false;
     noComputedValues = false;
     noDerivedValues = false;
-    this.exportDomainStr = null;
+    this.exportDomainIds = null;
     this.viewPortSize = null;
+    this.ranking = 0;
   }
 
   public int countDomains(String fileName) {
@@ -73,7 +75,7 @@ public class ImportExport {
         in.close();
         if (element == null) return -1;
         return element.getElements("domain").length;
-          }
+      }
     }
     catch (IllegalArgumentException e) {
     }
@@ -105,7 +107,9 @@ public class ImportExport {
         element = XIO.readUTF(in);
         in.close();
         if (element == null) return false;
-        if (this.exportDomainStr.equals("?") || this.exportDomainStr.equals("-1")) {
+        if (this.exportDomainIds != null && this.exportDomainIds.length == 1
+            && (this.exportDomainIds[0].equals("?") || this.exportDomainIds[0].equals("q"))) {
+          //printing number of domains
           fileStream.close();
           System.out.println(new Integer(element.getElements("domain").length));
           return false;
@@ -113,25 +117,38 @@ public class ImportExport {
 
         this.treeLayout = new TreeLayout(1);
         this.treeLayout.importXml(element, 1);
-        if (this.exportDomainStr != null) {
-          try {
-            this.exportDomain = Integer.parseInt(this.exportDomainStr);
-          }
-          catch (NumberFormatException exception) {
-            this.exportDomain = 0;
+        if (this.exportDomainIds != null) {
+          this.exportDomainSet = new TreeSet<Integer>();
+          if (this.exportDomainIds.length == 1 && this.exportDomainIds[0].equals("a")) {
+            //add all domains
             int i = 1;
             for (XElement domain : element.getElements("domain")) {
-              String domainId = domain.getString("id");
-              if (this.exportDomainStr != null && this.exportDomainStr.equals(domainId)) {
-                this.exportDomain = i;
-                break;
-              }
+              this.exportDomainSet.add(i);
               i++;
+            }
+          }
+          else {
+            for (String id:this.exportDomainIds) {
+              try {
+                int no = Integer.parseInt(id);
+                this.exportDomainSet.add(no);
+              }
+              catch (NumberFormatException exception) {
+                int i = 1;
+                for (XElement domain : element.getElements("domain")) {
+                  String domainId = domain.getString("id");
+                  if (id != null && id.equals(domainId)) {
+                    this.exportDomainSet.add(i);
+                    break;
+                  }
+                  i++;
+                }
+              }
             }
           }
         }
         else {
-          this.exportDomain = 0;
+          this.exportDomainSet = null;
         }
       }
       fileStream.close();
@@ -166,7 +183,7 @@ public class ImportExport {
       return;
     }
     if (ext.toLowerCase().equals("xml")) {
-      this.exportXml(out, this.treeLayout);
+      this.exportXml(out, this.treeLayout, this.exportDomainSet);
     }
     else if (ext.toLowerCase().equals("txt")) {
       AbstractTreeCanvas canvas = null;
@@ -190,7 +207,7 @@ public class ImportExport {
     else if (ext.toLowerCase().equals("pdf") || ext.toLowerCase().equals("png")
              || ext.toLowerCase().equals("jpg") || ext.toLowerCase().equals("jpeg")) {
       AbstractTreeCanvas canvas = null;
-      if (this.exportDomain == 0) {
+      if (this.exportDomainSet == null) {
         if (treeLayout.isSand()) {
           canvas = new SandTreeCanvas<Ring>(new NodeTree(treeLayout));
         }
@@ -199,13 +216,14 @@ public class ImportExport {
         }
       }
       else {
-        ValuationDomain domain = treeLayout.getDomain(this.exportDomain);
-        if (domain != null) {
-          canvas = new AbstractDomainCanvas<Ring>(domain);
-          ((AbstractDomainCanvas<Ring>) canvas).setMarkEditable(this.markEditable);
-          ((AbstractDomainCanvas<Ring>) canvas).setShowLabels(!this.noLabels);
-          ((AbstractDomainCanvas<Ring>) canvas).getValues().setShowAllLabels(!this.noComputedValues);
-          ((AbstractDomainCanvas<Ring>) canvas).setTree(new NodeTree(this.treeLayout));
+        ValuationDomain[] domains = (ValuationDomain[])treeLayout.getDomains().toArray();
+        if (domains != null && domains.length > 0 && domains[0] != null) {
+          ValuationDomain domain = domains[0];
+            canvas = new AbstractDomainCanvas<Ring>(domain);
+            ((AbstractDomainCanvas<Ring>) canvas).setMarkEditable(this.markEditable);
+            ((AbstractDomainCanvas<Ring>) canvas).setShowLabels(!this.noLabels);
+            ((AbstractDomainCanvas<Ring>) canvas).getValues().setShowAllLabels(!this.noComputedValues);
+            ((AbstractDomainCanvas<Ring>) canvas).setTree(new NodeTree(this.treeLayout));
         }
         else {
           System.err.println(Options.getMsg("clo.nodomainError", new Integer(treeLayout.getNewDomainId() - 1).toString()));
@@ -214,8 +232,8 @@ public class ImportExport {
           }
           catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
-            return;
           }
+          return;
         }
       }
       if (this.viewPortSize != null) {
@@ -241,31 +259,22 @@ public class ImportExport {
     }
   }
 
-  private void exportXml(FileOutputStream fileStream, TreeLayout layout) {
+  private void exportXml(FileOutputStream fileStream, TreeLayout layout, Set<Integer> ids) {
     boolean oldSaveDerived = Options.main_saveDerivedValues;
-    Options.main_saveDerivedValues = exportAllDomains;
+    Options.main_saveDerivedValues = !this.noDerivedValues;
+    int oldRanking = Options.rank_noRanked;
+    Options.rank_noRanked = this.ranking;
     boolean oldSaveRanking = Options.main_saveRanking;
-    Options.main_saveRanking = this.exportRanking;
-    boolean oldSaveDomain = Options.main_saveDomains;
-    Options.main_saveDomains = !noDerivedValues;
+    Options.main_saveRanking = (this.ranking > 0);
     try {
-      new XmlConverter().exportTo(fileStream, layout);
+      new XmlConverter().exportTo(fileStream, layout, ids);
     }
     catch (IOException e) {
       System.err.println(Options.getMsg("clo.export.fail") + " " + e.getLocalizedMessage());
     }
-
     Options.main_saveDerivedValues = oldSaveDerived;
+    Options.rank_noRanked  = oldRanking;
     Options.main_saveRanking = oldSaveRanking;
-    Options.main_saveDomains = oldSaveDomain;
-  }
-
-  /**
-   * @param exportAllDomains
-   *          the exportAllDomains to set
-   */
-  public void setExportAllDomains(boolean exportAllDomains) {
-    this.exportAllDomains = exportAllDomains;
   }
 
   /**
@@ -304,12 +313,12 @@ public class ImportExport {
     this.viewPortSize = dim;
   }
 
-  public void setExportDomainStr(String domainId) {
-    this.exportDomainStr = domainId;
+  public void setExportDomainStr(String[] domainIds) {
+    this.exportDomainIds = domainIds;
   }
 
-  public void setExportRanking(boolean exportRanking) {
-    this.exportRanking = exportRanking;
+  public void setExportRanking(int ranking) {
+    this.ranking = ranking;
   }
 
   private String getExtension(String filename) {
@@ -326,14 +335,13 @@ public class ImportExport {
     }
   }
 
-  private boolean    exportAllDomains;
-  private String     exportDomainStr;
-  private int        exportDomain;
+  private String[]   exportDomainIds;
+  private Set<Integer> exportDomainSet;
   private boolean    markEditable;
   private boolean    noLabels;
   private boolean    noComputedValues;
   private boolean    noDerivedValues;
-  private boolean    exportRanking;
+  private int        ranking;
   private TreeLayout treeLayout;
   private Dimension  viewPortSize;
 }

@@ -44,13 +44,22 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.Vector;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -60,7 +69,7 @@ import javax.swing.table.TableModel;
 
 import bibliothek.util.Path;
 
-public class RankingDockable extends PermaDockable implements KeyListener, ListSelectionListener {
+public class RankingDockable extends PermaDockable implements KeyListener, ListSelectionListener, ChangeListener {
 
   public RankingDockable() {
     super(new Path(ID_RANKINGVIEW), ID_RANKINGVIEW, Options.getMsg("windows.ranking.txt"));
@@ -111,7 +120,9 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         Debug.log("Root used with name:" + root.getName());
         RankingTableModel model = ((RankingTableModel) this.table.getModel());
         if (model != null) {
-          this.titleLabel.setText(Options.getMsg("windows.ranking.labeltitle",
+          Debug.log("has model");
+//           this.updateTitlePane(root);
+          this.rootLabel.setText(Options.getMsg("windows.ranking.labeltitle",
               ((AbstractDomainCanvas<Ring>) getCanvas()).getDomain().getName(), root.getName()));
 
           model.setCanvas((AbstractDomainCanvas<Ring>) canvas, root, recalculate);
@@ -126,6 +137,15 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     }
   }
 
+  public void stateChanged(ChangeEvent e) {
+    SpinnerModel model = this.spinner.getModel();
+    Debug.log("value of spinner changed");
+    if (model instanceof SpinnerNumberModel) {
+      Debug.log("value of spinner updated");
+      Options.rank_noRanked = ((SpinnerNumberModel)model).getNumber().intValue();
+      this.setCanvas(this.canvas);
+    }
+  }
   /**
    * @return the canvas
    */
@@ -180,7 +200,6 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
 
   public static final String ID_RANKINGVIEW = "rank_view";
 
-  @SuppressWarnings("unchecked")
   private JPanel createTable(AbstractDomainCanvas<Ring> canvas) {
     JPanel result = new JPanel();
     if (canvas.isSand()) {
@@ -209,12 +228,51 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     table.setDefaultRenderer(Ring.class, new RankingRenderer());
     // table.setRowSorter(new TableRowSorter<TableModel>(table.getModel()));
     table.setFillsViewportHeight(true);
-    this.titleLabel = new JLabel(Options.getMsg("windows.ranking.labeltitle",
-        ((AbstractDomainCanvas<Ring>) getCanvas()).getDomain().getName(),
-        getCanvas().getTree().getRoot(true).getName()));
-    result.add(titleLabel);
+    /* create title */
+    this.spinner = new JSpinner(new SpinnerNumberModel(Options.rank_noRanked, 0, 999, 1));
+    spinner.addChangeListener(this);
+    JFormattedTextField ftf = ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField();
+    ftf.setColumns(4);
+//     ftf.setHorizontalAlignment(JTextField.RIGHT);
+
+    JPanel titlePane = new JPanel();
+    titlePane.setLayout(new BoxLayout(titlePane, BoxLayout.Y_AXIS));
+    JPanel top = new JPanel();
+    top.setBorder(new EmptyBorder(0, 0, 0, 0));
+//     top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
+    JLabel l = new JLabel(Options.getMsg("windows.ranking.labeltitleleft"));
+    l.setHorizontalAlignment(SwingConstants.LEFT);
+    JLabel r = new JLabel(Options.getMsg("windows.ranking.labeltitleright"));
+    r.setHorizontalAlignment(SwingConstants.LEFT);
+    top.add(l);
+    top.add(spinner);
+    top.add(r);
+//     top.add(Box.createHorizontalGlue());
+    top.setAlignmentX( Component.LEFT_ALIGNMENT );
+//     top.setPreferredSize(new Dimension(40,100));
+//     top.setMaximumSize(new Dimension(40,100));
+    top.setMaximumSize( top.getPreferredSize() );
+    titlePane.add(top);
+    this.rootLabel = new JLabel(Options.getMsg("windows.ranking.labeltitle",
+        ((AbstractDomainCanvas<Ring>) this.getCanvas()).getDomain().getName(),
+                                  getCanvas().getTree().getRoot(true).getName()));
+    this.rootLabel.setHorizontalAlignment(SwingConstants.LEFT);
+    titlePane.add(rootLabel);
+    titlePane.setAlignmentX( Component.LEFT_ALIGNMENT );
+    titlePane.setBorder(new EmptyBorder(0, 0, 0, 0));
+
+    
+//     this.updateTitlePane(getCanvas().getTree().getRoot(true));
+//     this.titlePane = new JPanel();
+//     titlePane.setLayout(new BoxLayout(result, BoxLayout.X_AXIS));
+//     this.titleLabel = new JLabel(Options.getMsg("windows.ranking.labeltitle",
+//         ((AbstractDomainCanvas<Ring>) getCanvas()).getDomain().getName(),
+//         getCanvas().getTree().getRoot(true).getName()));
+    result.add(titlePane);
+//     result.add(this.spinner);
     result.add(table.getTableHeader());
     result.add(table);
+    result.add(Box.createVerticalGlue());
     return result;
   }
 
@@ -354,9 +412,50 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     getCanvas().repaint();
   }
 
+//   @SuppressWarnings("unchecked")
+//   private void updateTitlePane(Node root) {
+//     Debug.log("update title page  name:"+root.getName());
+// 
+//     this.spinner = new JSpinner(new SpinnerNumberModel(Options.rank_noRanked, 0, 999, 1));
+// //     this.spinner.getComponent(0).setPreferredSize(new Dimension(4,4));
+// //     this.spinner.getComponent(1).setPreferredSize(new Dimension(4,4));
+//     this.spinner.addChangeListener(this);
+//     JFormattedTextField ftf = ((JSpinner.DefaultEditor)this.spinner.getEditor()).getTextField();
+//     ftf.setColumns(4);
+// //     ftf.setHorizontalAlignment(JTextField.RIGHT);
+// 
+//     this.titlePane = new JPanel();
+//     titlePane.setLayout(new BoxLayout(titlePane, BoxLayout.Y_AXIS));
+//     JPanel top = new JPanel();
+//     top.setBorder(new EmptyBorder(0, 0, 0, 0));
+// //     top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
+//     JLabel l = new JLabel(Options.getMsg("windows.ranking.labeltitleleft"));
+//     l.setHorizontalAlignment(SwingConstants.LEFT);
+//     JLabel r = new JLabel(Options.getMsg("windows.ranking.labeltitleright"));
+//     r.setHorizontalAlignment(SwingConstants.LEFT);
+//     top.add(l);
+//     top.add(this.spinner);
+//     top.add(r);
+// //     top.add(Box.createHorizontalGlue());
+//     top.setAlignmentX( Component.LEFT_ALIGNMENT );
+// //     top.setPreferredSize(new Dimension(40,100));
+// //     top.setMaximumSize(new Dimension(40,100));
+//     top.setMaximumSize( top.getPreferredSize() );
+//     this.titlePane.add(top);
+//     r = new JLabel(Options.getMsg("windows.ranking.labeltitle",
+//         ((AbstractDomainCanvas<Ring>) this.getCanvas()).getDomain().getName(),
+//                                   root.getName()));
+//     r.setHorizontalAlignment(SwingConstants.LEFT);
+//     this.titlePane.add(r);
+//     this.titlePane.setAlignmentX( Component.LEFT_ALIGNMENT );
+//     this.titlePane.setBorder(new EmptyBorder(0, 0, 0, 0));
+// //     titlePane.setMaximumSize( titlePane.getPreferredSize() );
+//   }
+
   private JPanel             pane;
+  private JSpinner           spinner;
   private AbstractTreeCanvas canvas;
-  private JLabel             titleLabel;
+  private JLabel             rootLabel;
   private JTable             table;
   private Ranker<Ring>       ranker;
 }

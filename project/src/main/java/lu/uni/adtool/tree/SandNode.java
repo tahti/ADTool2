@@ -20,20 +20,21 @@
  */
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.domains.RankExporter;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Options;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 import bibliothek.util.xml.XAttribute;
 import bibliothek.util.xml.XElement;
-
-import lu.uni.adtool.domains.RankExporter;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Options;
 
 public class SandNode extends GuiNode {
 
@@ -107,49 +108,51 @@ public class SandNode extends GuiNode {
    * Export to XML using format used by the first version of ADTool
    *
    */
-  public XElement exportXml(Collection<ValuationDomain> domains, ArrayList<RankExporter> rankers) {
+  public XElement exportXml(Collection<ValuationDomain> domains, ArrayList<RankExporter> rankers, Set<Integer> idToExport) {
     XElement result = new XElement("node");
     result.addString("refinement", typeToXml(type));
     result.addElement("label").setString(getName());
     if (getComment()!= null && (!getComment().equals(""))) {
       result.addElement("comment").setString(getComment());
     }
-    if (domains != null && Options.main_saveDomains) {
+    if (domains != null && idToExport != null) {
       int i = 0;
       for (ValuationDomain vd: domains) {
-        String domainId = vd.getExportXmlId();
-        if (this.isEditable()) {
-          if (vd.getValue(this) != null) {
-            XElement param = result.addElement("parameter");
-            param.addString("domainId", domainId);
-            param.addString("category", "basic");
-            param.setString(vd.getValue(this).toString());
-          }
-        }
-        else {
-          if (Options.main_saveDerivedValues) {
-            XElement param = result.addElement("parameter");
-            param.addString("domainId", domainId);
-            param.addString("category", "derived");
-            param.setString(vd.getTermValue(this).toString());
-          }
-        }
-        if (rankers != null && rankers.size() > i) {
-          for (int j=0; j < Options.rank_noRanked; j++) {
-            Ring value = rankers.get(i).getValue(this, j);
-            if(value != null) {
-              XElement rank = result.addElement("ranking");
-              rank.addInt("rank", j + 1);
-              rank.setString(value.toString());
+        if (idToExport.contains(vd.getDomainId())) {
+          String domainId = vd.getExportXmlId();
+          if (this.isEditable()) {
+            if (vd.getValue(this) != null) {
+              XElement param = result.addElement("parameter");
+              param.addString("domainId", domainId);
+              param.addString("category", "basic");
+              param.setString(vd.getValue(this).toString());
             }
           }
+          else {
+            if (Options.main_saveDerivedValues) {
+              XElement param = result.addElement("parameter");
+              param.addString("domainId", domainId);
+              param.addString("category", "derived");
+              param.setString(vd.getTermValue(this).toString());
+            }
+          }
+          if (rankers != null && rankers.size() > i) {
+            for (int j=0; j < Options.rank_noRanked; j++) {
+              Ring value = rankers.get(i).getValue(this, j);
+              if(value != null) {
+                XElement rank = result.addElement("ranking");
+                rank.addInt("rank", j + 1);
+                rank.setString(value.toString());
+              }
+            }
+          }
+          ++i;
         }
-        ++i;
       }
     }
     if (this.getChildren() != null) {
       for (Node node : this.getNotNullChildren()) {
-        result.addElement(((SandNode) node).exportXml(domains, rankers));
+        result.addElement(((SandNode) node).exportXml(domains, rankers, idToExport));
       }
     }
     return result;

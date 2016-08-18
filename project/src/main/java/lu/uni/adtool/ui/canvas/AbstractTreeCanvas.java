@@ -1,24 +1,52 @@
 /**
- * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>)
- * Date:   10/12/2015
- * Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty of Science,
- *     Technology and Communication FSTC
- * All rights reserved.
- * Licensed under GNU Affero General Public License 3.0;
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Affero General Public License as
- *    published by the Free Software Foundation, either version 3 of the
- *    License, or (at your option) any later version.
+ * Author: Piotr Kordy (piotr.kordy@uni.lu <mailto:piotr.kordy@uni.lu>) Date:
+ * 10/12/2015 Copyright (c) 2015,2013,2012 University of Luxembourg -- Faculty
+ * of Science, Technology and Communication FSTC All rights reserved. Licensed
+ * under GNU Affero General Public License 3.0; This program is free software:
+ * you can redistribute it and/or modify it under the terms of the GNU Affero
+ * General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Affero General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
  *
- *    You should have received a copy of the GNU Affero General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 package lu.uni.adtool.ui.canvas;
+
+import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.Domain;
+import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tools.undo.AddDomain;
+import lu.uni.adtool.tools.undo.EditAction;
+import lu.uni.adtool.tools.undo.FoldAction;
+import lu.uni.adtool.tools.undo.History;
+import lu.uni.adtool.tools.undo.RemoveChildren;
+import lu.uni.adtool.tools.undo.RemoveDomain;
+import lu.uni.adtool.tools.undo.RemoveTree;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.DomainFactory;
+import lu.uni.adtool.tree.GuiNode;
+import lu.uni.adtool.tree.LocalExtentProvider;
+import lu.uni.adtool.tree.Node;
+import lu.uni.adtool.tree.NodeTree;
+import lu.uni.adtool.tree.SandNode;
+import lu.uni.adtool.tree.SharedExtentProvider;
+import lu.uni.adtool.tree.TreeChangeListener;
+import lu.uni.adtool.tree.TreeLayout;
+import lu.uni.adtool.tree.XmlConverter;
+import lu.uni.adtool.ui.ADAction;
+import lu.uni.adtool.ui.DomainDockable;
+import lu.uni.adtool.ui.MainController;
+import lu.uni.adtool.ui.TreeDockable;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -50,6 +78,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.imageio.ImageIO;
 import javax.print.attribute.HashPrintRequestAttributeSet;
@@ -70,37 +100,8 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import lu.uni.adtool.ADToolMain;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.Domain;
-import lu.uni.adtool.domains.SandDomain;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tools.undo.AddDomain;
-import lu.uni.adtool.tools.undo.EditAction;
-import lu.uni.adtool.tools.undo.FoldAction;
-import lu.uni.adtool.tools.undo.History;
-import lu.uni.adtool.tools.undo.RemoveChildren;
-import lu.uni.adtool.tools.undo.RemoveDomain;
-import lu.uni.adtool.tools.undo.RemoveTree;
-import lu.uni.adtool.tree.ADTNode;
-import lu.uni.adtool.tree.DomainFactory;
-import lu.uni.adtool.tree.GuiNode;
-import lu.uni.adtool.tree.LocalExtentProvider;
-import lu.uni.adtool.tree.Node;
-import lu.uni.adtool.tree.NodeTree;
-import lu.uni.adtool.tree.SandNode;
-import lu.uni.adtool.tree.SharedExtentProvider;
-import lu.uni.adtool.tree.TreeChangeListener;
-import lu.uni.adtool.tree.XmlConverter;
-import lu.uni.adtool.ui.ADAction;
-import lu.uni.adtool.ui.DomainDockable;
-import lu.uni.adtool.ui.MainController;
-import lu.uni.adtool.ui.TreeDockable;
-
-public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, TreeChangeListener, Printable, Pageable {
+public abstract class AbstractTreeCanvas extends JPanel
+    implements Scrollable, TreeChangeListener, Printable, Pageable {
 
   public AbstractTreeCanvas(NodeTree tree, MainController mc) {
     super(new BorderLayout());
@@ -141,7 +142,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   public boolean isSand() {
     if (tree != null) {
       return tree.getLayout().isSand();
-    } else {
+    }
+    else {
       return true;
     }
   }
@@ -224,7 +226,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
         Point2D point = viewTransform.inverseTransform(new Point2D.Double(x, y), null);
         x = point.getX();
         y = point.getY();
-      } catch (NoninvertibleTransformException e) {
+      }
+      catch (NoninvertibleTransformException e) {
         System.err.println("Cannot translate click point!!");
       }
       if (x > sizeX || y > sizeY || x < 0 || y < 0) {
@@ -242,8 +245,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
           break;
         // case ROUNDRECT:
         default:
-          shape = new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight(),
-              Options.canv_ArcSize, Options.canv_ArcSize);
+          shape = new RoundRectangle2D.Double(rect.getX(), rect.getY(), rect.getWidth(),
+              rect.getHeight(), Options.canv_ArcSize, Options.canv_ArcSize);
           break;
         }
         if (shape.contains(x, y)) {
@@ -382,7 +385,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
         b2 = bufferedLayout.get(focused);
       }
       Point2D p1 = new Point2D.Double(b2.getX() - borderPad / 2, b2.getY() - borderPad / 2);
-      Point2D p2 = new Point2D.Double((b2.getWidth() + borderPad) * scale, (b2.getHeight() + borderPad) * scale);
+      Point2D p2 = new Point2D.Double((b2.getWidth() + borderPad) * scale,
+          (b2.getHeight() + borderPad) * scale);
       viewTransform.transform(p1, p1);
       if (p1.getX() < 0) {
         setMoveX(getMoveX() - p1.getX() / scale);
@@ -393,7 +397,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
         p1.setLocation(p1.getX(), 0);
       }
       this.updateSize();
-      scrollRectToVisible(new Rectangle((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY()));
+      scrollRectToVisible(
+          new Rectangle((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY()));
     }
     this.repaint();
     if (controller != null && this instanceof AbstractDomainCanvas) {
@@ -420,14 +425,16 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
             pjob.print();
             return true;
           }
-        } else {
+        }
+        else {
           PageFormat page = pjob.pageDialog(getPageFormat(0));
           if (page != getPageFormat(0)) {
             setPageFormat(page);
             return true;
           }
         }
-      } catch (PrinterException exc) {
+      }
+      catch (PrinterException exc) {
         reportError(exc.getLocalizedMessage());
       }
     }
@@ -441,8 +448,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
    *          x-coordinate of the point.
    * @param yShift
    *          y-coordinate of the point.
-   * @return
-   *      returns by how much canvas was really scrolled
+   * @return returns by how much canvas was really scrolled
    */
   public Point scrollTo(double xShift, double yShift) {
     Rectangle r = scrollPane.getViewport().getViewRect();
@@ -450,7 +456,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     r.translate((int) -xShift, (int) -yShift);
     scrollRectToVisible(r);
     Rectangle r2 = scrollPane.getViewport().getViewRect();
-    p = new Point((int)(p.getX() - r2.getX()),(int) (p.getY() - r2.getY()));
+    p = new Point((int) (p.getX() - r2.getX()), (int) (p.getY() - r2.getY()));
     return p;
   }
 
@@ -490,7 +496,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   public Point2D transform(Point2D point) {
     try {
       return viewTransform.inverseTransform(point, null);
-    } catch (NoninvertibleTransformException e) {
+    }
+    catch (NoninvertibleTransformException e) {
       return point;
     }
   }
@@ -506,7 +513,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     // make up for dissapearing scrollbars
     if (this.scrollPane != null) {
       if (this.scrollPane.getHorizontalScrollBar().isVisible()) {
-        this.viewPortSize.height += this.scrollPane.getHorizontalScrollBar().getPreferredSize().height;
+        this.viewPortSize.height +=
+            this.scrollPane.getHorizontalScrollBar().getPreferredSize().height;
       }
       if (this.scrollPane.getVerticalScrollBar().isVisible()) {
         this.viewPortSize.width += this.scrollPane.getVerticalScrollBar().getPreferredSize().width;
@@ -582,7 +590,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     NodeExtentProvider<Node> extentProvider;
     if (localExtentProvider) {
       extentProvider = new LocalExtentProvider(this);
-    } else {
+    }
+    else {
       Debug.log("tree:" + tree);
       extentProvider = tree.getSharedExtentProvider();
     }
@@ -675,9 +684,11 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       g2.dispose();
       document.close();
       fileStream.close();
-    } catch (DocumentException e) {
+    }
+    catch (DocumentException e) {
       reportError(Options.getMsg("error.exportingpdf") + e);
-    } catch (IOException e) {
+    }
+    catch (IOException e) {
       reportError(Options.getMsg("error.exportingpdf") + e);
     }
     setScale(oldScale);
@@ -693,8 +704,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
    */
   public void createImage(FileOutputStream fileStream, String formatName) {
     Dimension dim = getPreferredSize();
-    Debug.log("dim:" + dim);
-    BufferedImage bufferedImage = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
+    BufferedImage bufferedImage =
+        new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = bufferedImage.createGraphics();
     g2d.setColor(Options.canv_BackgroundColor);
     Rectangle r = new Rectangle(dim);
@@ -706,13 +717,14 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     try {
       ImageIO.write(bufferedImage, formatName, fileStream);
       fileStream.close();
-    } catch (IOException e) {
-      System.err.println("Error while exporting to image:" + e);
+    }
+    catch (IOException e) {
+      reportError(Options.getMsg("error.export.fail") + e);
     }
   }
 
   /**
-   * Save tree as an image
+   * Save tree in XML format
    *
    * @param fileStream
    *          stream to which we write
@@ -720,9 +732,20 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   public void createXml(FileOutputStream fileStream) {
     XmlConverter converter = new XmlConverter();
     try {
-      converter.exportTo(fileStream, tree.getLayout());
-    } catch (IOException e) {
-      e.printStackTrace();
+      TreeLayout layout = tree.getLayout();
+      if (Options.main_saveDomains) {
+        Set<Integer> ids= new TreeSet<Integer>();
+        for (ValuationDomain values : layout.getDomains()) {
+          ids.add(values.getDomainId());
+        }
+        converter.exportTo(fileStream, layout, ids);
+      }
+      else {
+        converter.exportTo(fileStream, layout, null);
+      }
+    }
+    catch (IOException e) {
+      reportError(Options.getMsg("error.xmlexport.fail") + e);
     }
   }
 
@@ -732,7 +755,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   public String getTermsString() {
     if (this.tree.getRoot(true) instanceof SandNode) {
       return ((SandNode) this.tree.getRoot(true)).toTerms();
-    } else {
+    }
+    else {
       return ((ADTNode) this.tree.getRoot(true)).toTerms();
     }
   }
@@ -741,7 +765,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     Node root = this.tree.getRoot(true);
     if (root instanceof SandNode) {
       fileStream.write(((SandNode) root).toTerms().getBytes(Charset.forName("UTF-8")));
-    } else {
+    }
+    else {
       fileStream.write(((ADTNode) root).toTerms().getBytes(Charset.forName("UTF-8")));
     }
     fileStream.close();
@@ -807,14 +832,16 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     if (Options.print_perserveAspectRatio) {
       if (printScaleX < printScaleY) {
         printScaleY = printScaleX;
-      } else {
+      }
+      else {
         printScaleX = printScaleY;
       }
     }
     int shiftX = page % (int) p.getX();
     int shiftY = page / (int) p.getX();
     // align origin
-    g.translate((int) (pf.getImageableX() - (shiftX * pW)), (int) (pf.getImageableY() - (shiftY * pH)));
+    g.translate((int) (pf.getImageableX() - (shiftX * pW)),
+        (int) (pf.getImageableY() - (shiftY * pH)));
     ((Graphics2D) g).scale(printScaleX, printScaleY);
     g.translate(Options.canv_LineWidth, Options.canv_LineWidth);
     this.paintComponent((Graphics2D) g, tree.getRoot(false));
@@ -835,7 +862,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     g2.setStroke(basicStroke);
     if (Options.canv_DoAntialiasing) {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    } else {
+    }
+    else {
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
     paintEdges(g2, startNode);
@@ -860,7 +888,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     Rectangle r = g2.getClipBounds();
     if (r != null) {
       g2.fillRect(r.x, r.y, r.width, r.height);
-    } else {
+    }
+    else {
       Debug.log("null clip bounds");
     }
     g2.transform(viewTransform);
@@ -884,7 +913,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       if (text != null) {
         undo.setEnabled(true);
         undo.setName(text);
-      } else {
+      }
+      else {
         undo.setEnabled(false);
         undo.setName(Options.getMsg("edit.undo.txt"));
       }
@@ -892,7 +922,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       if (text != null) {
         redo.setEnabled(true);
         redo.setName(text);
-      } else {
+      }
+      else {
         redo.setEnabled(false);
         redo.setName(Options.getMsg("edit.redo.txt"));
       }
@@ -905,7 +936,7 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     }
   }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({"unchecked", "rawtypes"})
   public void addDomain(Domain<Ring> domain) {
     TreeDockable currentTree = (TreeDockable) this.controller.getControl()
         .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getTreeId()));
@@ -916,7 +947,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       DomainFactory factory = controller.getFrame().getDomainFactory();
       if (domain instanceof SandDomain) {
         d = factory.read(new ValuationDomain(this.getTreeId(), domainId, (SandDomain) domain));
-      } else {
+      }
+      else {
         d = factory.read(new ValuationDomain(this.getTreeId(), domainId, (AdtDomain) domain));
       }
       Debug.log("Adding domain to control with id:" + d.getUniqueId());
@@ -935,7 +967,6 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       this.controller.getFrame().getDomainFactory().removeDomain(dockable);
     }
   }
-
 
   public abstract AbstractTreeCanvas getTreeCanvas();
 
@@ -1045,18 +1076,21 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     fillCol = getFillColor(node);
     // ATTACKER type
     if (node instanceof ADTNode) {
-      ADTNode.Role defender = tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
+      ADTNode.Role defender =
+          tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
       if (((ADTNode) node).getRole() == defender) {
         borderCol = Options.canv_BorderColorDef;
         textCol = Options.canv_TextColorDef;
         shape = Options.canv_ShapeDef;
-      } else {
+      }
+      else {
         // ATTACKER type
         borderCol = Options.canv_BorderColorAtt;
         textCol = Options.canv_TextColorAtt;
         shape = Options.canv_ShapeAtt;
       }
-    } else {
+    }
+    else {
       borderCol = Options.canv_BorderColorAtt;
       textCol = Options.canv_TextColorAtt;
       shape = Options.canv_ShapeAtt;
@@ -1129,12 +1163,15 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       Rectangle2D.Double b2 = new Rectangle2D.Double(0, 0, 0, 0);
       for (Node child : tree.getChildrenList(parent, false)) {
         b2 = bufferedLayout.get(child);
-        if (parent instanceof ADTNode && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole()) {
+        if (parent instanceof ADTNode
+            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole()) {
           g2.setStroke(counterStroke);
-        } else {
+        }
+        else {
           g2.setStroke(basicStroke);
         }
-        if (!(parent instanceof ADTNode && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole())) {
+        if (!(parent instanceof ADTNode
+            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole())) {
           maxX = Math.max(maxX, b2.getCenterX());
           minX = Math.min(minX, b2.getCenterX());
           noChildren++;
@@ -1146,14 +1183,15 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
       boolean drawArrow = false;
 
       if (parent instanceof SandNode) {
-        if ((((SandNode) parent).getType() == SandNode.Type.AND || ((SandNode) parent).getType() == SandNode.Type.SAND)
-            && noChildren > 1) {
+        if ((((SandNode) parent).getType() == SandNode.Type.AND
+            || ((SandNode) parent).getType() == SandNode.Type.SAND) && noChildren > 1) {
           drawArc = true;
           if (((SandNode) parent).getType() == SandNode.Type.SAND) {
             drawArrow = true;
           }
         }
-      } else if (parent instanceof ADTNode) {
+      }
+      else if (parent instanceof ADTNode) {
         if ((((ADTNode) parent).getType() == ADTNode.Type.AND_OPP
             || ((ADTNode) parent).getType() == ADTNode.Type.AND_PRO) && noChildren > 1) {
           drawArc = true;
@@ -1172,8 +1210,9 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
         double endAngle = -180 - Math.toDegrees(Math.atan(tangens1 * shear));
         double a = b1.getWidth() + Options.canv_ArcPadding;
         double b = b1.getHeight() + Options.canv_ArcPadding;
-        Arc2D arc = new Arc2D.Double(b1.getX() - Options.canv_ArcPadding / 2, b1.getY() - Options.canv_ArcPadding / 2,
-            a, b, startAngle, endAngle - startAngle, Arc2D.OPEN);
+        Arc2D arc = new Arc2D.Double(b1.getX() - Options.canv_ArcPadding / 2,
+            b1.getY() - Options.canv_ArcPadding / 2, a, b, startAngle, endAngle - startAngle,
+            Arc2D.OPEN);
 
         if (arc != null) {
           g2.draw(arc);
@@ -1218,7 +1257,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
     // ATTACKER type
     Options.ShapeType shape = Options.canv_ShapeAtt;
     if (node instanceof ADTNode) {
-      ADTNode.Role defender = tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
+      ADTNode.Role defender =
+          tree.getLayout().getSwitchRole() ? ADTNode.Role.PROPONENT : ADTNode.Role.OPPONENT;
       if (((ADTNode) node).getRole() == defender) {
         shape = Options.canv_ShapeDef;
       }
@@ -1244,7 +1284,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
    *
    */
   protected void updateSize() {
-    Point2D.Double point = new Point2D.Double(this.sizeX + this.borderPad / 2, this.sizeY + this.borderPad / 2);
+    Point2D.Double point =
+        new Point2D.Double(this.sizeX + this.borderPad / 2, this.sizeY + this.borderPad / 2);
     this.viewTransform.transform(point, point);
     int x = 0;
     int y = 0;
@@ -1285,7 +1326,8 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
           cols--;
           return new Point((int) cols, (int) rows);
         }
-      } else {
+      }
+      else {
         rows++;
         if (cols * rows > noPages) {
           rows--;
@@ -1358,12 +1400,12 @@ public abstract class AbstractTreeCanvas extends JPanel implements Scrollable, T
   /**
    * Parameters for the Walkers algorithm.
    */
-  protected final BasicStroke             selectionStroke  = new BasicStroke(1, BasicStroke.CAP_ROUND,
-      BasicStroke.JOIN_ROUND, 0, new float[] { 6, 10 }, 0);
-  protected final BasicStroke             basicStroke      = new BasicStroke(Options.canv_LineWidth,
-      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+  protected final BasicStroke             selectionStroke  =
+      new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] {6, 10}, 0);
+  protected final BasicStroke             basicStroke      =
+      new BasicStroke(Options.canv_LineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
   private final BasicStroke               counterStroke    = new BasicStroke(Options.canv_LineWidth,
-      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] { 0, 6 }, 0);
+      BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, new float[] {0, 6}, 0);
   protected MainController                controller;
   protected History                       history;
 

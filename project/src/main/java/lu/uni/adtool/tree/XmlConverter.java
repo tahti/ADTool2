@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Set;
 
 import bibliothek.util.xml.XElement;
 import bibliothek.util.xml.XException;
@@ -48,52 +49,63 @@ public class XmlConverter {
   }
 
   /**
-   * Exports tree into the xml file.
+   * Exports tree to the file stream in XML format.
    *
-   * @param fileStream
-   *          stream to which we write - we assume stream is open and we close
-   *          it.
+   * @param fileStream - file stream to which we want to export the tree in XML format
+   * @param layout - layout containing the tree and the associated domains
+   * @param idToExport - set od domain IDs to export
+   *
+   * @throws IOException
    */
-  public void exportTo(FileOutputStream fileStream, TreeLayout layout) //, ArrayList<ValuationDomain> domains)
+  public void exportTo(FileOutputStream fileStream, TreeLayout layout, Set<Integer> idToExport) //, ArrayList<ValuationDomain> domains)
       throws IOException {
     XElement rootXML = null;
     if (layout.isSand())  {
       rootXML = new XElement("sandtree");
       ArrayList<RankExporter> rankers = null;
-      if (Options.main_saveRanking) {
+      if (Options.main_saveRanking && idToExport != null) {
         rankers = new ArrayList<RankExporter>();
         for (ValuationDomain values : layout.getDomains()) {
-          rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
+          if (idToExport.contains(values.getDomainId())) {
+            rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
                                        new Ranker<Ring>((SandDomain<Ring>)values.getDomain()),
                                        Options.rank_noRanked));
+          }
         }
       }
-      rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains(), rankers));
-      if (layout.hasDomain() && Options.main_saveDomains) {
+    rootXML.addElement(((SandNode) layout.getRoot()).exportXml(layout.getDomains(), rankers, idToExport));
+      if (layout.hasDomain() && idToExport != null) {
         for (ValuationDomain d : layout.getDomains()) {
-          d.exportXML(rootXML);
+          if (idToExport.contains(d.getDomainId())) {
+            d.exportXML(rootXML);
+          }
         }
       }
     }
     else {
       rootXML = new XElement("adtree");
       ArrayList<RankExporter> rankers = null;
-      if (Options.main_saveRanking) {
+      if (Options.main_saveRanking && idToExport != null) {
         rankers = new ArrayList<RankExporter>();
         for (ValuationDomain values : layout.getDomains()) {
-          rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
+          if (idToExport.contains(values.getDomainId())) {
+            rankers.add(new RankExporter(layout.getRoot(), values.getValueMap(),
                                        new Ranker<Ring>((AdtDomain<Ring>)values.getDomain()), Options.rank_noRanked));
+          }
         }
       }
-      XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains(), rankers);
+      XElement rootNode = ((ADTNode) layout.getRoot()).exportXml(layout.getDomains(), rankers, idToExport);
       if (layout.getSwitchRole())  {
         rootNode.addString("switchRole", "yes");
         Debug.log("exporting switch role");
       }
       rootXML.addElement(rootNode);
-      if (layout.hasDomain() && Options.main_saveDomains) {
+//       if (layout.hasDomain() && Options.main_saveDomains) {
+      if (layout.hasDomain() && idToExport != null) {
         for (ValuationDomain d : layout.getDomains()) {
-          d.exportXML(rootXML);
+          if (idToExport.contains(d.getDomainId())) {
+            d.exportXML(rootXML);
+          }
         }
       }
     }
@@ -115,10 +127,10 @@ public class XmlConverter {
       controller.addTreeDockable(treeDockable);
     }
     catch (IllegalArgumentException e) {
-      controller.report(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
+      controller.reportError(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
     }
     catch (XException e) {
-      controller.report(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
+      controller.reportError(Options.getMsg("error.xmlimport.fail") +  e.getMessage());
     }
   }
 }

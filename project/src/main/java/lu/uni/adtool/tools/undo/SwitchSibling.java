@@ -48,16 +48,8 @@ public class SwitchSibling extends EditAction {
     }
   }
 
-@SuppressWarnings("unchecked")
   public void redo(AbstractTreeCanvas canvas) {
     undo(canvas);
-//     Node target = canvas.getTree().getRoot(true).fromPath(targetPath, 0);
-//     if (target instanceof SandNode) {
-//       ((SandTreeCanvas<Ring>)canvas).switchSibling(target, onLeft);
-//     }
-//     else {
-//       ((ADTreeCanvas<Ring>)canvas).switchSibling(target, onLeft);
-//     }
   }
 
 
