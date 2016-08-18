@@ -216,9 +216,9 @@ public class ImportExport {
         }
       }
       else {
-        ValuationDomain[] domains = (ValuationDomain[])treeLayout.getDomains().toArray();
+        Object[] domains = treeLayout.getDomains().toArray();
         if (domains != null && domains.length > 0 && domains[0] != null) {
-          ValuationDomain domain = domains[0];
+          ValuationDomain domain = (ValuationDomain) domains[0];
             canvas = new AbstractDomainCanvas<Ring>(domain);
             ((AbstractDomainCanvas<Ring>) canvas).setMarkEditable(this.markEditable);
             ((AbstractDomainCanvas<Ring>) canvas).setShowLabels(!this.noLabels);
