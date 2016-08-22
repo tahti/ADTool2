@@ -123,7 +123,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
           Debug.log("has model");
 //           this.updateTitlePane(root);
           this.rootLabel.setText(Options.getMsg("windows.ranking.labeltitle",
-              ((AbstractDomainCanvas<Ring>) getCanvas()).getDomain().getName(), root.getName()));
+              ((AbstractDomainCanvas<Ring>)canvas).getDomain().getName(), root.getName()));
 
           model.setCanvas((AbstractDomainCanvas<Ring>) canvas, root, recalculate);
         }
