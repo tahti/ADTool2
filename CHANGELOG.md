@@ -1,7 +1,7 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
 
-## Unreleased
+## [2.2.0] - 2016-08-16 ##
   - added custom domains
   - added import from terms/txt file
   - fixed missing undo/redo for copy/pasting nodes
