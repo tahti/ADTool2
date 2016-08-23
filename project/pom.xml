@@ -210,6 +210,7 @@
               <Permissions>all-permissions</Permissions>
             </manifestEntries>
           </archive>
+          <tarLongFileMode>posix</tarLongFileMode>
         </configuration>
 <!--         <configuration> -->
 <!--           <archive> -->
