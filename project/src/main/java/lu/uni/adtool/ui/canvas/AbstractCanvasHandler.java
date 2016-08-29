@@ -284,12 +284,7 @@ public abstract class AbstractCanvasHandler implements MouseListener, KeyListene
           node = null;
         }
         if (node != null )  {
-          if (balloon.isVisible()) {
-            balloon.setText(node.getComment());
-          }
-          else {
-            balloon.showBalloon(canvas.getController().getFrame(), node.getComment());
-          }
+            balloon.showBalloon(canvas.getController().getFrame(), node);
         }
         else if (node == null) {
           balloon.hideBalloon();

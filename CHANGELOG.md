@@ -1,6 +1,8 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
-
+## Unreleased
+  - added "Close all trees" menu item
+  - fxed positioning of baloon window showing comments
 ## [2.2.0] - 2016-08-16 ##
   - added custom domains
   - added import from terms/txt file
