@@ -60,6 +60,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.ButtonGroup;
@@ -74,6 +76,7 @@ import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.event.CControlListener;
 import bibliothek.gui.dock.common.event.CFocusListener;
+import bibliothek.gui.dock.common.intern.CControlAccess;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 
@@ -81,6 +84,7 @@ public final class MainController implements CControlListener, CFocusListener {
   public MainController(ADToolMain newFrame, CControl control) {
     this.frame = newFrame;
     this.control = control;
+    this.treeDockables = new HashSet<Integer>();
     // this.areas = new HashMap<Integer, TreeWorkArea>();
     mouseHandler = new MouseHandler();
     toDisableItems = new ArrayList<JMenuItem>();
@@ -157,8 +161,16 @@ public final class MainController implements CControlListener, CFocusListener {
    */
 
   public void added(CControl control, CDockable dockable) {
-    if (dockable instanceof DefaultSingleCDockable) {
-      // dockable).getUniqueId());
+//     if (dockable instanceof DefaultSingleCDockable) {
+//       Debug.log("added dockable with id:"+ ((DefaultSingleCDockable)dockable).getUniqueId());
+//     }
+//     else {
+//       Debug.log("other dockable added"+dockable.toString());
+//     }
+    if (dockable instanceof TreeDockable) {
+//       Debug.log("*** added tree dockable with id:"+ ((TreeDockable)dockable).getId());
+      this.treeDockables.add(((TreeDockable)dockable).getId());
+      fileCloseAll.setEnabled(true);
     }
 
   }
@@ -171,6 +183,15 @@ public final class MainController implements CControlListener, CFocusListener {
     return editUndo;
   }
 
+  public void closeAllTrees() {
+    for (Object o:this.treeDockables.toArray()) {
+      int i = ((Integer)o).intValue();
+      TreeDockable d = (TreeDockable)control.getMultipleDockable(TreeDockable.getUniqueId(i));
+      d.setVisible(false);
+    }
+    fileCloseAll.setEnabled(this.treeDockables.size() > 0);
+  }
+
   /**
    * Called when <code>dockable</code> has been removed.
    *
@@ -180,6 +201,10 @@ public final class MainController implements CControlListener, CFocusListener {
    *          the element that is no longer known
    */
   public void removed(CControl control, CDockable dockable) {
+    if (dockable instanceof TreeDockable) {
+      this.treeDockables.remove(((TreeDockable)dockable).getId());
+      fileCloseAll.setEnabled(this.treeDockables.size() > 0);
+    }
     if (dockable instanceof TreeDockable && lastFocusedTree instanceof AbstractTreeCanvas) {
       if (((TreeDockable) dockable).getId() == lastFocusedTree.getTreeId()) {
         setLastFocused(null);
@@ -213,8 +238,9 @@ public final class MainController implements CControlListener, CFocusListener {
    * @see CDockable#isVisible()
    */
   public void opened(CControl control, CDockable dockable) {
-    if (dockable instanceof DefaultSingleCDockable) {
-    }
+//     if (dockable instanceof TreeDockable) {
+//       Debug.log("*** opened tree dockable with id:"+ ((TreeDockable)dockable).getId());
+//     }
   }
 
   /**
@@ -227,6 +253,9 @@ public final class MainController implements CControlListener, CFocusListener {
    * @see CDockable#isVisible()
    */
   public void closed(CControl control, CDockable dockable) {
+//     if (dockable instanceof TreeDockable) {
+//       Debug.log("*** closed tree dockable with id:"+ ((TreeDockable)dockable).getId());
+//     }
     if (dockable instanceof TreeDockable && lastFocusedTree instanceof AbstractTreeCanvas) {
       if (((TreeDockable) dockable).getId() == lastFocusedTree.getTreeId()) {
         setLastFocused(null);
@@ -411,6 +440,10 @@ public final class MainController implements CControlListener, CFocusListener {
     menuItem.setEnabled(false);
     this.toDisableItems.add(menuItem);
     fileMenu.addSeparator();
+
+    menuItem = fileMenu.add(fileCloseAll);
+    fileCloseAll.setEnabled(false);
+    menuItem.addMouseListener(mouseHandler);
     menuItem = fileMenu.add(fileExit);
     menuItem.addMouseListener(mouseHandler);
     return fileMenu;
@@ -798,6 +831,17 @@ public final class MainController implements CControlListener, CFocusListener {
     filePrintPreview.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.printPreview.key")));
     filePrintPreview.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.printPreview.acc")));
 
+    fileCloseAll = new ADAction(Options.getMsg("file.closeall.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        closeAllTrees();
+      }
+      private static final long serialVersionUID = 1265611132353219697L;
+    };
+    fileCloseAll.setToolTip(Options.getMsg("file.closeall.tooltip"));
+    fileCloseAll.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.closeall.key")));
+    fileCloseAll.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.closeall.acc")));
+    fileCloseAll.setSmallIcon(iconFac.createImageIcon("/icons/close.png"));
+
     fileExit = new ADAction(Options.getMsg("file.exit.txt")) {
       public void actionPerformed(final ActionEvent e) {
         WindowEvent windowClosing = new WindowEvent(frame, WindowEvent.WINDOW_CLOSING);
@@ -1145,6 +1189,7 @@ public final class MainController implements CControlListener, CFocusListener {
   private static ADAction      fileExportToXml;
   private static ADAction      filePrint;
   private static ADAction      filePrintPreview;
+  private static ADAction      fileCloseAll;
   private static ADAction      fileExit;
   private static ADAction      fileImportFromXml;
   private static ADAction      fileImportFromAdt;
@@ -1165,4 +1210,5 @@ public final class MainController implements CControlListener, CFocusListener {
 
   private CControl             control;
   private CCP                  copyHandler;
+  private Set<Integer>         treeDockables;
 }
