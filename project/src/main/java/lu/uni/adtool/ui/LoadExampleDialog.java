@@ -18,6 +18,7 @@
 package lu.uni.adtool.ui;
 
 import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 
 import java.awt.BorderLayout;
@@ -35,6 +36,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -177,24 +179,37 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
     description = new JLabel(Options.getMsg("example.noinit")) {
 
       public Dimension getPreferredSize() {
-        return new Dimension(400, 300);
+        return new Dimension(400, 40);
       }
 
       public Dimension getMinimumSize() {
-        return new Dimension(400, 300);
+        return new Dimension(400, 40);
       }
 
       public Dimension getMaximumSize() {
-        return new Dimension(400, 300);
+        return new Dimension(400, 40);
       }
 
       private static final long serialVersionUID = -6683205667737229246L;
     };
+    ImageIcon icon;
+
+    IconFactory iconFactory = new IconFactory();
+    icon = iconFactory.createImageIcon("/examples/Auction_Fraud.png", "test");
+    picture = new JLabel(icon);
+
     description.setVerticalAlignment(SwingConstants.TOP);
     description.setFont(new Font("Sans", Font.TRUETYPE_FONT, 13));
     description.setHorizontalAlignment(SwingConstants.LEFT);
+    description.setVerticalAlignment(SwingConstants.TOP);
 
-    JScrollPane descPane = new JScrollPane(description);
+    JPanel content2 = new JPanel();
+    content2.setLayout(new BoxLayout(content2, BoxLayout.PAGE_AXIS));
+    content2.add(description);
+    content2.add(picture);
+    content2.setPreferredSize(new Dimension(400, 300));
+    JScrollPane descPane = new JScrollPane();
+    descPane.setViewportView(content2);
     descPane.setBorder(
         BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10),
             BorderFactory.createTitledBorder(Options.getMsg("example.description"))));
@@ -254,6 +269,8 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
       result = examplesFileName[i];
       list.setSelectedValue(examplesList[i], true);
       description.setText("<html>" + examplesDesc[i] + "<br></html>");
+      IconFactory iconFactory = new IconFactory();
+      picture.setIcon(iconFactory.createImageIcon("/examples/"+ examplesPics[i], "test"));
     }
     else {
       result = null;
@@ -266,6 +283,7 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
   private JButton           setButton;
   private JList<String>     list;
   private JLabel            description;
+  private JLabel            picture;
   private final String[]    examplesList     = {Options.getMsg("example.auctionfraud.txt"),
       Options.getMsg("example.rfiddos.txt"), Options.getMsg("example.rfidblock.txt"),
       Options.getMsg("example.breakwarehouse.txt"), Options.getMsg("example.rfidwarehouse.txt"),
@@ -282,6 +300,11 @@ public class LoadExampleDialog extends JDialog implements ActionListener, ListSe
       Options.getMsg("example.rfiddos.desc"), Options.getMsg("example.rfidblock.desc"),
       Options.getMsg("example.breakwarehouse.desc"), Options.getMsg("example.rfidwarehouse.desc"),
       Options.getMsg("example.data.desc"), Options.getMsg("example.bankaccount.desc")};
+  private final String[]    examplesPics = {"Auction_Fraud.png", "RFID_Dos_Attack.png",
+                                            "Block_Communication.png", "Breaking_and_Entering.png", 
+                                            "RFID_Dos_AttackW.png", "Data_Confidentiality.png",
+                                            "Bank_Account.png"};
+
   private String            result;
 
 }

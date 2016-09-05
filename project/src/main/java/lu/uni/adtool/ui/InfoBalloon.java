@@ -32,6 +32,12 @@ import javax.swing.JTextPane;
 import javax.swing.JWindow;
 import javax.swing.border.EmptyBorder;
 
+/**
+ * Class representing a baloon window showing comments in the nodes.
+ *
+ * @author Piotr Kordy
+ */
+
 public class InfoBalloon {
 
   public InfoBalloon() {
@@ -40,10 +46,14 @@ public class InfoBalloon {
     lastNode = null;
   }
 
-//   public void setText(String msg) {
-//     msgPane.setText(msg);
-//   }
 
+  /**
+   * Shows window with comment for the node
+   *
+   * @param parent - parent window
+   * @param node - node for which we show comment
+   */
+  
   public void showBalloon(Window parent, Node node) {
     if (node != lastNode) {
       if (errorWindow != null) {
@@ -71,6 +81,10 @@ public class InfoBalloon {
     }
   }
 
+  /**
+   * Hides the window with comment
+   *
+   */
   public void hideBalloon() {
     if (errorWindow != null) {
       errorWindow.setVisible(false);

@@ -76,11 +76,11 @@ import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.event.CControlListener;
 import bibliothek.gui.dock.common.event.CFocusListener;
-import bibliothek.gui.dock.common.intern.CControlAccess;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.theme.ThemeMap;
 
 public final class MainController implements CControlListener, CFocusListener {
+
   public MainController(ADToolMain newFrame, CControl control) {
     this.frame = newFrame;
     this.control = control;
@@ -168,7 +168,6 @@ public final class MainController implements CControlListener, CFocusListener {
 //       Debug.log("other dockable added"+dockable.toString());
 //     }
     if (dockable instanceof TreeDockable) {
-//       Debug.log("*** added tree dockable with id:"+ ((TreeDockable)dockable).getId());
       this.treeDockables.add(((TreeDockable)dockable).getId());
       fileCloseAll.setEnabled(true);
     }
