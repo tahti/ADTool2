@@ -20,12 +20,6 @@
  */
 package lu.uni.adtool.ui.canvas;
 
-import java.awt.Color;
-
-import javax.swing.JScrollPane;
-
-import org.abego.treelayout.util.DefaultConfiguration;
-
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tools.undo.AddChild;
 import lu.uni.adtool.tools.undo.AddSibling;
@@ -40,6 +34,13 @@ import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.tree.SandParser;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TermView;
+import lu.uni.adtool.ui.TreeDockable;
+
+import java.awt.Color;
+
+import javax.swing.JScrollPane;
+
+import org.abego.treelayout.util.DefaultConfiguration;
 
 // if Type is null then it is the canvas with the original tree
 public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
@@ -176,6 +177,13 @@ public class SandTreeCanvas<Type> extends AbstractTreeCanvas {
     addEditAction(new SetLabel(node, node.getName(), node.getComment(), label, comment));
     tree.setName(node, label);
     node.setComment(comment);
+    if (node == tree.getLayout().getRoot()) {
+      TreeDockable currentTree = (TreeDockable) this.controller.getControl()
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getTreeId()));
+       if (currentTree != null) {
+         currentTree.setTitleText("Sand Tree - " + tree.getLayout().getRoot().getName());
+       }
+    }
     this.notifyAllTreeChanged();
     if (node.isLeaf()) {
       this.terms.updateTerms();

@@ -37,6 +37,7 @@ import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.NodeTree;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TermView;
+import lu.uni.adtool.ui.TreeDockable;
 
 import java.awt.Color;
 
@@ -179,6 +180,14 @@ public class ADTreeCanvas<Type> extends AbstractTreeCanvas {
     addEditAction(new SetLabel(node, node.getName(), node.getComment(), label, comment));
     tree.setName(node, label);
     node.setComment(comment);
+    if (node == tree.getLayout().getRoot()) {
+      TreeDockable currentTree = (TreeDockable) this.controller.getControl()
+        .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(this.getTreeId()));
+       if (currentTree != null) {
+         currentTree.setTitleText("ADTree - " + tree.getLayout().getRoot().getName());
+       }
+    }
+
     this.notifyAllTreeChanged();
     if (node.hasDefault()) {
       this.terms.updateTerms();
