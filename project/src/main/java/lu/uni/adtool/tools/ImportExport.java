@@ -121,10 +121,8 @@ public class ImportExport {
           this.exportDomainSet = new TreeSet<Integer>();
           if (this.exportDomainIds.length == 1 && this.exportDomainIds[0].equals("a")) {
             //add all domains
-            int i = 1;
-            for (XElement domain : element.getElements("domain")) {
+            for (int i = 1; i<=  element.getElements("domain").length; i++) {
               this.exportDomainSet.add(i);
-              i++;
             }
           }
           else {

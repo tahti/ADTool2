@@ -151,20 +151,7 @@ public class Evaluator<Type extends Ring> {
           result = evaluate((SandNode) child, map);
         }
         else {
-          switch (root.getType()) {
-          case AND:
-            result = sandDomain.and(result, evaluate((SandNode) child, map));
-            break;
-          case OR:
-            result = sandDomain.or(result, evaluate((SandNode) child, map));
-            break;
-          case SAND:
-            result = sandDomain.sand(result, evaluate((SandNode) child, map));
-            break;
-          default:
-            System.err.println(Options.getMsg("error.evaluation.noType"));
-            return null;
-          }
+          result = sandDomain.calc(result,  evaluate((SandNode) child, map), root.getType());
         }
       }
     }

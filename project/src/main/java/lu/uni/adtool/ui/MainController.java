@@ -27,6 +27,10 @@ import lu.uni.adtool.domains.custom.AdtBoolDomain;
 import lu.uni.adtool.domains.custom.AdtCustomDomain;
 import lu.uni.adtool.domains.custom.AdtIntDomain;
 import lu.uni.adtool.domains.custom.AdtRealDomain;
+import lu.uni.adtool.domains.custom.SandBoolDomain;
+import lu.uni.adtool.domains.custom.SandCustomDomain;
+import lu.uni.adtool.domains.custom.SandIntDomain;
+import lu.uni.adtool.domains.custom.SandRealDomain;
 import lu.uni.adtool.domains.rings.BoundedInteger;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
@@ -34,6 +38,7 @@ import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Objects;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tools.undo.EditAdtDomain;
+import lu.uni.adtool.tools.undo.EditSandDomain;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.AdtImporter;
 import lu.uni.adtool.tree.CCP;
@@ -135,7 +140,7 @@ public final class MainController implements CControlListener, CFocusListener {
     }
     if (lastFocusedTree instanceof AbstractDomainCanvas) {
       AbstractDomainCanvas<Ring> c = Objects.cast(lastFocusedTree);
-      if (c.getDomain() instanceof AdtCustomDomain) {
+      if (c.getDomain() instanceof AdtCustomDomain || c.getDomain() instanceof SandCustomDomain) {
         editEditDomain.setEnabled(true);
       }
     }
@@ -954,13 +959,37 @@ public final class MainController implements CControlListener, CFocusListener {
       Domain<Ring> domain = c.getDomain();
       int domainId = c.getValues().getDomainId();
       if (this.lastFocusedTree.isSand()) {
-        // TODO
+        EditSandDomain action = new EditSandDomain(domainId, (SandCustomDomain) domain);
+        if ((Object)domain instanceof SandBoolDomain) {
+          SandBoolDomain d = Objects.cast(domain);
+          AddBoolSandDomDialog dialog = new AddBoolSandDomDialog(this.frame, d);
+          if (dialog.showDialog() != null) {
+            this.lastFocusedTree.addEditAction(action);
+            c.valuesUpdated();
+          }
+        }
+        else if ((Object)domain instanceof SandIntDomain) {
+          SandIntDomain d = Objects.cast(domain);
+          AddIntSandDomDialog dialog = new AddIntSandDomDialog(this.frame, d);
+          if (dialog.showDialog() != null) {
+            this.lastFocusedTree.addEditAction(action);
+            c.valuesUpdated();
+          }
+        }
+        else if ((Object)domain instanceof SandRealDomain) {
+          SandRealDomain d = Objects.cast(domain);
+          AddRealSandDomDialog dialog = new AddRealSandDomDialog(this.frame, d);
+          if (dialog.showDialog() != null) {
+            this.lastFocusedTree.addEditAction(action);
+            c.valuesUpdated();
+          }
+        }
       }
       else {
         EditAdtDomain action = new EditAdtDomain(domainId, (AdtCustomDomain) domain);
         if ((Object)domain instanceof AdtBoolDomain) {
           AdtBoolDomain d = Objects.cast(domain);
-          AddBoolDomainDialog dialog = new AddBoolDomainDialog(this.frame, d);
+          AddBoolAdtDomDialog dialog = new AddBoolAdtDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
             c.valuesUpdated();
@@ -968,7 +997,7 @@ public final class MainController implements CControlListener, CFocusListener {
         }
         else if ((Object)domain instanceof AdtIntDomain) {
           AdtIntDomain d = Objects.cast(domain);
-          AddIntDomainDialog dialog = new AddIntDomainDialog(this.frame, d);
+          AddIntAdtDomDialog dialog = new AddIntAdtDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
             c.valuesUpdated();
@@ -976,7 +1005,7 @@ public final class MainController implements CControlListener, CFocusListener {
         }
         else if ((Object)domain instanceof AdtRealDomain) {
           AdtRealDomain d = Objects.cast(domain);
-          AddRealDomainDialog dialog = new AddRealDomainDialog(this.frame, d);
+          AddRealAdtDomDialog dialog = new AddRealAdtDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
             c.valuesUpdated();
@@ -992,40 +1021,56 @@ public final class MainController implements CControlListener, CFocusListener {
       if (this.lastFocusedTree.isSand()) {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(true);
         AddSandDomainDialog addDialog = new AddSandDomainDialog(this.frame);
-        SandDomain<Ring> d = addDialog.showDomainDialog(domains);
+        SandDomain<?> d = addDialog.showDomainDialog(domains);
         if (d == null) {
           return;
+        }
+        if (d instanceof SandBoolDomain) {
+          AddBoolSandDomDialog boolDialog = new AddBoolSandDomDialog(this.frame, (SandBoolDomain) d);
+          if (boolDialog.showDialog() == null) {
+            return;
+          }
+        }
+        else if (d instanceof SandIntDomain) {
+          AddIntSandDomDialog intDialog = new AddIntSandDomDialog(this.frame, (SandIntDomain) d);
+          if (intDialog.showDialog() == null) {
+            return;
+          }
+        }
+        else if (d instanceof SandRealDomain) {
+          AddRealSandDomDialog realDialog = new AddRealSandDomDialog(this.frame, (SandRealDomain) d);
+          if (realDialog.showDialog() == null) {
+            return;
+          }
         }
         TreeDockable currentTree = (TreeDockable) this.control
             .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(lastFocusedTree.getTreeId()));
         if (currentTree != null) {
-          currentTree.getCanvas().addDomain(d);
+          currentTree.getCanvas().addDomain((Domain<Ring>)d);
           this.report(Options.getMsg("status.newdomain") + " " + d.getName());
         }
       }
       else {
         Vector<Domain<?>> domains = DomainFactory.getPredefinedDomains(false);
-        Debug.log(" domains size:" + domains.size());
         AddAdtDomainDialog addDialog = new AddAdtDomainDialog(this.frame);
         AdtDomain<?> d = addDialog.showDomainDialog(domains);
         if (d == null) {
           return;
         }
         if (d instanceof AdtBoolDomain) {
-          AddBoolDomainDialog boolDialog = new AddBoolDomainDialog(this.frame, (AdtBoolDomain) d);
+          AddBoolAdtDomDialog boolDialog = new AddBoolAdtDomDialog(this.frame, (AdtBoolDomain) d);
           if (boolDialog.showDialog() == null) {
-            Debug.log("cancel pressed");
             return;
           }
         }
         else if (d instanceof AdtIntDomain) {
-          AddIntDomainDialog intDialog = new AddIntDomainDialog(this.frame, (AdtIntDomain) d);
+          AddIntAdtDomDialog intDialog = new AddIntAdtDomDialog(this.frame, (AdtIntDomain) d);
           if (intDialog.showDialog() == null) {
             return;
           }
         }
         else if (d instanceof AdtRealDomain) {
-          AddRealDomainDialog realDialog = new AddRealDomainDialog(this.frame, (AdtRealDomain) d);
+          AddRealAdtDomDialog realDialog = new AddRealAdtDomDialog(this.frame, (AdtRealDomain) d);
           if (realDialog.showDialog() == null) {
             return;
           }
@@ -1146,6 +1191,7 @@ public final class MainController implements CControlListener, CFocusListener {
         InputStream in = url.openStream();
         XmlConverter converter = new XmlConverter();
         converter.importFrom(in, this);
+//           lastFocusedTree.fitToWindow();
         this.report(Options.getMsg("example.loaded"));
       }
       catch (IOException e) {

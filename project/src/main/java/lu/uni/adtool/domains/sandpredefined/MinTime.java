@@ -23,15 +23,17 @@ package lu.uni.adtool.domains.sandpredefined;
 import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.RankNode;
 import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.SandRank;
 import lu.uni.adtool.domains.adtpredefined.DescriptionGenerator;
 import lu.uni.adtool.domains.rings.RealG0;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.Node;
+import lu.uni.adtool.tree.SandNode;
 
 import java.util.ArrayList;
 
-public class MinTime implements SandDomain<RealG0> {
+public class MinTime implements SandDomain<RealG0>, SandRank<RealG0>{
 
   public MinTime() {
   }
@@ -66,18 +68,30 @@ public class MinTime implements SandDomain<RealG0> {
         {"min(<i>x</i>,<i>y</i>)", "max(<i>x</i>,<i>y</i>)", "<i>x</i>+<i>y</i>"};
     return DescriptionGenerator.generateDescription(this, name, vd, operators);
   }
-
-  public RealG0 or(final RealG0 a, final RealG0 b) {
-    return RealG0.min(a, b);
+  public RealG0 calc(RealG0 a, RealG0 b, SandNode.Type type) {
+    switch (type) {
+    case AND:
+      return RealG0.max(a, b);
+    case SAND:
+      return RealG0.sum(a, b);
+    case OR:
+      return RealG0.min(a, b);
+    default:
+      return RealG0.min(a, b);
+    }
   }
 
-  public RealG0 and(final RealG0 a, final RealG0 b) {
-    return RealG0.max(a, b);
-  }
-
-  public RealG0 sand(final RealG0 a, final RealG0 b) {
-    return RealG0.sum(a, b);
-  }
+//   public RealG0 or(final RealG0 a, final RealG0 b) {
+//     return RealG0.min(a, b);
+//   }
+// 
+//   public RealG0 and(final RealG0 a, final RealG0 b) {
+//     return RealG0.max(a, b);
+//   }
+// 
+//   public RealG0 sand(final RealG0 a, final RealG0 b) {
+//     return RealG0.sum(a, b);
+//   }
 
   @Override
   public ArrayList<RankNode<RealG0>> and(ArrayList<ArrayList<RankNode<RealG0>>> children,
@@ -153,14 +167,14 @@ public class MinTime implements SandDomain<RealG0> {
     int iResult = 0;
     while (iResult < maxItems && iLeft < left.size() && iRight < right.size()) {
       result.add(
-          new RankNode<RealG0>(this.and(left.get(iLeft).value, right.get(iRight).value), left.get(iLeft), right.get(iRight)));
+                 new RankNode<RealG0>(this.calc(left.get(iLeft).value, right.get(iRight).value, SandNode.Type.AND), left.get(iLeft), right.get(iRight)));
       iResult++;
       if ((iLeft + 1) >= left.size() && (iRight + 1) >= right.size()) break;
       if (((iRight + 1) >= right.size()) || (((iLeft + 1) < left.size()) && (left.get(iLeft + 1).value.compareTo(right.get(iRight + 1).value) < 0))) {
         iLeft++;
         for (int i = 0; i< iRight && iResult < maxItems; i++) {
           result.add(
-              new RankNode<RealG0>(this.and(left.get(iLeft).value, right.get(i).value), left.get(iLeft), right.get(i)));
+                     new RankNode<RealG0>(this.calc(left.get(iLeft).value, right.get(i).value, SandNode.Type.AND), left.get(iLeft), right.get(i)));
           iResult++;
         }
       }
@@ -168,7 +182,7 @@ public class MinTime implements SandDomain<RealG0> {
         iRight++;
         for (int i = 0; i< iLeft && iResult < maxItems; i++) {
           result.add(
-              new RankNode<RealG0>(this.and(left.get(i).value, right.get(iRight).value), left.get(i), right.get(iRight)));
+                     new RankNode<RealG0>(this.calc(left.get(i).value, right.get(iRight).value, SandNode.Type.AND), left.get(i), right.get(iRight)));
           iResult++;
         }
       }
@@ -185,7 +199,7 @@ public class MinTime implements SandDomain<RealG0> {
     int ir = 0;
     while (ir < maxItems && ia < a.size() && ib < b.size()) {
       result.add(
-          new RankNode<RealG0>(this.sand(a.get(ia).value, b.get(ib).value), a.get(ia), b.get(ib)));
+                 new RankNode<RealG0>(this.calc(a.get(ia).value, b.get(ib).value, SandNode.Type.SAND), a.get(ia), b.get(ib)));
       ir++;
       Debug.log("added to result:" + result.get(result.size() - 1).value + " ir:" + ir);
       if ((ia + 1) >= a.size() && (ib + 1) >= b.size()) break;
@@ -194,7 +208,7 @@ public class MinTime implements SandDomain<RealG0> {
         ia++;
         for (int i = 0; i< ib && ir < maxItems; i++) {
           result.add(
-              new RankNode<RealG0>(this.sand(a.get(ia).value, b.get(i).value), a.get(ia), b.get(i)));
+              new RankNode<RealG0>(this.calc(a.get(ia).value, b.get(i).value, SandNode.Type.SAND), a.get(ia), b.get(i)));
           ir++;
         }
       }
@@ -202,7 +216,7 @@ public class MinTime implements SandDomain<RealG0> {
         ib++;
         for (int i = 0; i< ia && ir < maxItems; i++) {
           result.add(
-              new RankNode<RealG0>(this.sand(a.get(i).value, b.get(ib).value), a.get(i), b.get(ib)));
+              new RankNode<RealG0>(this.calc(a.get(i).value, b.get(ib).value, SandNode.Type.SAND), a.get(i), b.get(ib)));
           ir++;
         }
       }

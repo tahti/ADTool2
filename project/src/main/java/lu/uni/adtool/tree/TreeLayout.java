@@ -17,6 +17,17 @@
  */
 package lu.uni.adtool.tree;
 
+import lu.uni.adtool.adtree.ADTreeNode;
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.Parametrized;
+import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.custom.AdtCustomDomain;
+import lu.uni.adtool.domains.custom.SandCustomDomain;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.Options;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -30,16 +41,6 @@ import java.util.Map;
 import bibliothek.gui.dock.common.MultipleCDockableLayout;
 import bibliothek.util.xml.XElement;
 import bibliothek.util.xml.XException;
-
-import lu.uni.adtool.adtree.ADTreeNode;
-import lu.uni.adtool.domains.AdtDomain;
-import lu.uni.adtool.domains.Parametrized;
-import lu.uni.adtool.domains.SandDomain;
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.custom.AdtCustomDomain;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.tools.Options;
 
 public class TreeLayout implements MultipleCDockableLayout {
   public static int SAND_ID = 1;
@@ -226,6 +227,14 @@ public class TreeLayout implements MultipleCDockableLayout {
         SandDomain<Ring> d = (SandDomain<Ring>) DomainFactory.createFromString(domainName);
         if (d == null) {
           throw new IllegalArgumentException(Options.getMsg("exception.nodomain") + domainName);
+        }
+        if (d instanceof SandCustomDomain) {
+          ((SandCustomDomain)d).setName(domain.getElement("name").getString());
+          ((SandCustomDomain)d).setDescription(domain.getElement("description").getString());
+          ((SandCustomDomain)d).setOr(domain.getElement("or").getString());
+          ((SandCustomDomain)d).setAnd(domain.getElement("and").getString());
+          ((SandCustomDomain)d).setSand(domain.getElement("sand").getString());
+          ((SandCustomDomain)d).setDefault(domain.getElement("defaultValue").getString());
         }
         String domainId = domain.getString("id");
         if (domainId == null || domainsHash.containsKey(domainId)) {

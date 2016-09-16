@@ -177,6 +177,7 @@ public class TreeDockable extends DefaultMultipleCDockable implements CVetoClosi
     final JScrollPane scrollPane = new JScrollPane(treeCanvas);
     scrollPane.setAutoscrolls(true);
     treeCanvas.setScrollPane(scrollPane);
+//     treeCanvas.fitToWindow();
     dockable.add(scrollPane);
     controller.getControl().addDockable(dockable);
     return dockable;

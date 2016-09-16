@@ -115,6 +115,7 @@ public class XmlConverter {
   }
 
   public void importFrom(InputStream fileStream, MainController controller) throws IOException {
+    final TreeDockable treeDockable;
     BufferedInputStream in = new BufferedInputStream(fileStream);
     XElement element = XIO.readUTF(in);
     in.close();
@@ -123,7 +124,7 @@ public class XmlConverter {
     TreeLayout treeLayout = new TreeLayout(treeId);
     try {
       treeLayout.importXml(element, treeId);
-      TreeDockable treeDockable = treeFactory.load(treeLayout);
+      treeDockable = treeFactory.load(treeLayout);
       controller.addTreeDockable(treeDockable);
     }
     catch (IllegalArgumentException e) {

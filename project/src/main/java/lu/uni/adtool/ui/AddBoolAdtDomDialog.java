@@ -12,7 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -20,6 +19,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -34,19 +34,20 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import lu.uni.adtool.domains.custom.AdtRealDomain;
-import lu.uni.adtool.domains.custom.RealParser;
-import lu.uni.adtool.domains.rings.Real;
+import lu.uni.adtool.domains.custom.AdtBoolDomain;
+import lu.uni.adtool.domains.custom.BoolParser;
 import lu.uni.adtool.tools.IconFactory;
 import lu.uni.adtool.tools.Options;
 
-public class AddRealDomainDialog extends JDialog implements ActionListener, DocumentListener {
+public class AddBoolAdtDomDialog extends JDialog implements ActionListener, DocumentListener {
+
+  private static final long serialVersionUID = 5279882898155421759L;
 
   public enum FieldType {
-    AP, AO, OP, OO, CP, CO, NAME, DESCR, NONE, DEFAULTP, DEFAULTO, PRECISION
+    AP, AO, OP, OO, CP, CO, NAME, DESCR, NONE
   }
 
-  public AddRealDomainDialog(Frame frame, AdtRealDomain domain) {
+  public AddBoolAdtDomDialog(Frame frame, AdtBoolDomain domain) {
     super(frame, Options.getMsg("adtdomain.custom.dialogtitle"), true);
     this.domain = domain;
     setAlwaysOnTop(true);
@@ -55,11 +56,9 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     setSize(800, 600);
   }
 
-  public AdtRealDomain showDialog() {
-    if (this.domain != null) {
-      this.createLayout();
-      this.setVisible(true);
-    }
+  public AdtBoolDomain showDialog() {
+    this.createLayout();
+    this.setVisible(true);
     return this.domain;
   }
 
@@ -82,14 +81,14 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     buttonPane.add(cancelButton);
     buttonPane.add(Box.createRigidArea(new Dimension(10, 30)));
     buttonPane.add(okButton);
-    if (this.domain.getName() != null && !this.domain.getName().equals(Options.getMsg("adtdomain.custom.real.name"))) {
+    if (this.domain.getName() != null && !this.domain.getName().equals(Options.getMsg("adtdomain.custom.bool.name"))) {
       this.name = new JTextField(this.domain.getName());
     }
     else {
       this.name = new JTextField("");
     }
     if (this.domain.getShortDescription() != null
-        && !this.domain.getShortDescription().equals(Options.getMsg("adtdomain.custom.real.description"))) {
+        && !this.domain.getShortDescription().equals(Options.getMsg("adtdomain.custom.bool.description"))) {
       this.description = new JTextField(this.domain.getShortDescription());
     }
     else {
@@ -101,50 +100,15 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     this.ao = new JTextField(this.domain.getAo());
     this.op = new JTextField(this.domain.getOp());
     this.oo = new JTextField(this.domain.getOo());
-    this.precision = new JTextField(this.domain.getPrecision());
-    this.defaulto = new JTextField(this.domain.getOppDefault());
-    this.defaulto.getDocument().addDocumentListener(this);
-    this.defaulto.getDocument().putProperty("parent", defaulto);
-    this.defaulto.addFocusListener(new FocusListener() {
-      public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.DEFAULTO);
-      }
-
-      public void focusLost(FocusEvent e) {
-        setHelpContent(FieldType.NONE);
-      }
-    });
-
-    this.defaultp = new JTextField(this.domain.getProDefault());
-    this.defaultp.getDocument().putProperty("parent", defaultp);
-    this.defaultp.getDocument().addDocumentListener(this);
-    this.defaultp.addFocusListener(new FocusListener() {
-      public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.DEFAULTP);
-      }
-
-      public void focusLost(FocusEvent e) {
-        setHelpContent(FieldType.NONE);
-      }
-    });
-
+    String[] valueList = { "true", "false" };
+    this.defaulto = new JComboBox<String>(valueList);
+    this.defaultp = new JComboBox<String>(valueList);
     this.modifiableo = new JCheckBox(Options.getMsg("dialog.adddomain.modifiableo"));
     this.modifiableo.setSelected(domain.isOppModifiable());
     this.modifiablep = new JCheckBox(Options.getMsg("dialog.adddomain.modifiablep"));
     this.modifiablep.setSelected(domain.isProModifiable());
     this.name.getDocument().addDocumentListener(this);
     this.description.getDocument().addDocumentListener(this);
-    this.precision.getDocument().addDocumentListener(this);
-    this.precision.addFocusListener(new FocusListener() {
-      public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.PRECISION);
-      }
-
-      public void focusLost(FocusEvent e) {
-        setHelpContent(FieldType.NONE);
-      }
-    });
-
     this.cp.getDocument().addDocumentListener(this);
     this.cp.addFocusListener(new FocusListener() {
       public void focusGained(FocusEvent e) {
@@ -225,27 +189,13 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
         setHelpContent(FieldType.NONE);
       }
     });
-    this.precision.getDocument().putProperty("parent", precision);
     this.cp.getDocument().putProperty("parent", cp);
     this.co.getDocument().putProperty("parent", co);
     this.ap.getDocument().putProperty("parent", ap);
     this.ao.getDocument().putProperty("parent", ao);
     this.op.getDocument().putProperty("parent", op);
     this.oo.getDocument().putProperty("parent", oo);
-    try {
-      Double.parseDouble(this.defaultp.getText());
-      this.defaultp.setBackground(validColor);
-    }
-    catch (NumberFormatException e) {
-      this.defaultp.setBackground(invalidColor);
-    }
-    try {
-      Double.parseDouble(this.defaulto.getText());
-      this.defaulto.setBackground(validColor);
-    }
-    catch (NumberFormatException e) {
-      this.defaulto.setBackground(invalidColor);
-    }
+
     if (name.getText().length() > 0) {
       name.setBackground(validColor);
     } else {
@@ -256,7 +206,6 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     } else {
       description.setBackground(invalidColor);
     }
-    checkValid(this.precision);
     checkValid(this.cp);
     checkValid(this.co);
     checkValid(this.ap);
@@ -288,8 +237,6 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     inputContent.add(this.cp);
     inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.co")));
     inputContent.add(this.co);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.precision")));
-    inputContent.add(this.precision);
     JPanel mainContent = new JPanel();
     mainContent.setLayout(new BoxLayout(mainContent, BoxLayout.LINE_AXIS));
     mainContent.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -345,18 +292,17 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
   }
 
   public void enterPressed() {
+    domain.setProDefault(this.defaultp.getSelectedIndex() == 0);
+    domain.setOppDefault(this.defaulto.getSelectedIndex() == 0);
     domain.setProModifiable(this.modifiablep.isSelected());
     domain.setOppModifiable(this.modifiableo.isSelected());
     if ((!this.domain.setName(this.name.getText())) || (!this.domain.setCp(this.cp.getText()))
         || (!this.domain.setCo(this.co.getText())) || (!this.domain.setAp(this.ap.getText()))
         || (!this.domain.setAo(this.ao.getText())) || (!this.domain.setOp(this.op.getText()))
-        || (!this.domain.setOo(this.oo.getText())) || (!domain.setProDefault(this.defaultp.getText()))
-        || (!this.domain.setOppDefault(this.defaulto.getText()))
-        || (!this.domain.setDescription(this.description.getText()))
-        || (!this.domain.setPrecision(this.precision.getText()))) {
+        || (!this.domain.setOo(this.oo.getText()))
+        || (!this.domain.setDescription(this.description.getText()))) {
       okButton.setEnabled(false);
-    }
-    else {
+    } else {
       setVisible(false);
       dispose();
     }
@@ -365,48 +311,14 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
   public boolean checkValid(JTextField field) {
     okButton.setEnabled(false);
     this.errorLabel.setText("");
-    String text = field.getText().trim();
     if (field == this.name || field == this.description) {
-      if (text.length() > 0) {
+      if (field.getText().length() > 0) {
         field.setBackground(validColor);
-      }
-      else {
+      } else {
         field.setBackground(invalidColor);
       }
-    }
-    else if (field == this.defaulto || field == this.defaultp) {
-      Real temp = new Real(0);
-      if (temp.updateFromString(text)) {
-        field.setBackground(validColor);
-      }
-      else {
-        field.setBackground(invalidColor);
-        this.errorLabel.setText(Options.getMsg("dialog.adddomain.wrongreal"));
-      }
-    }
-    else if (field == this.precision) {
-      if (text.equals("")) {
-        field.setBackground(validColor);
-      }
-      else {
-        try {
-          DecimalFormat temp = new DecimalFormat();
-          temp.applyPattern(text);
-          field.setBackground(validColor);
-          if (this.helpPane != null) {
-            setHelpText("prec");
-          }
-        }
-        catch (IllegalArgumentException e) {
-          field.setBackground(invalidColor);
-        }
-        catch (NullPointerException e) {
-          field.setBackground(invalidColor);
-        }
-      }
-    }
-    else {
-      RealParser parser = new RealParser();
+    } else {
+      BoolParser parser = new BoolParser();
       if (field.getText().length() > 0 && parser.parseString(field.getText()) != null) {
         field.setBackground(validColor);
       } else {
@@ -414,17 +326,14 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
         field.setBackground(invalidColor);
       }
     }
-    if (this.name.getBackground() == AddRealDomainDialog.validColor
-        && this.defaultp.getBackground() == AddRealDomainDialog.validColor
-        && this.defaulto.getBackground() == AddRealDomainDialog.validColor
-        && this.description.getBackground() == AddRealDomainDialog.validColor
-        && this.ao.getBackground() == AddRealDomainDialog.validColor
-        && this.ap.getBackground() == AddRealDomainDialog.validColor
-        && this.oo.getBackground() == AddRealDomainDialog.validColor
-        && this.op.getBackground() == AddRealDomainDialog.validColor
-        && this.co.getBackground() == AddRealDomainDialog.validColor
-        && this.cp.getBackground() == AddRealDomainDialog.validColor
-        && this.precision.getBackground() == AddRealDomainDialog.validColor) {
+    if (this.name.getBackground() == AddBoolAdtDomDialog.validColor
+        && this.description.getBackground() == AddBoolAdtDomDialog.validColor
+        && this.ao.getBackground() == AddBoolAdtDomDialog.validColor
+        && this.ap.getBackground() == AddBoolAdtDomDialog.validColor
+        && this.oo.getBackground() == AddBoolAdtDomDialog.validColor
+        && this.op.getBackground() == AddBoolAdtDomDialog.validColor
+        && this.co.getBackground() == AddBoolAdtDomDialog.validColor
+        && this.cp.getBackground() == AddBoolAdtDomDialog.validColor) {
       okButton.setEnabled(true);
       return true;
     }
@@ -482,11 +391,6 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     case DESCR:
       this.setHelpText("description");
       break;
-    case PRECISION:
-      this.setHelpText("prec");
-      break;
-    case DEFAULTP:
-    case DEFAULTO:
     case NONE:
       this.setHelpText("");
       break;
@@ -502,19 +406,9 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     head.setBorder(new CompoundBorder(border, margin));
     this.helpPane.add(head);
     if (op.length() > 0) {
-//       if (op.equals("name")) {
-//       }
-//       else if (op.equals("description")) {
-//       }
-      if (op.equals("prec")) {
-        DecimalFormat temp = new DecimalFormat();
-        temp.applyPattern(this.precision.getText());
-        head = new JLabel(Options.getMsg("dialog.adddomain.precision.text",
-                          this.precision.getText(), temp.format(Math.PI)));
-        head.setFont(new Font("Serif", Font.PLAIN, 14));
-        margin = new EmptyBorder(5, 10, 5, 5);
-        head.setBorder(new CompoundBorder(border, margin));
-        this.helpPane.add(head);
+      if (op.equals("name")) {
+      }
+      else if (op.equals("descripiton")) {
       }
       else {
         head = new JLabel(Options.getMsg("dialog.adddomain." + op + ".text"));
@@ -526,9 +420,8 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
         ImageIcon icon = iconFactory.createImageIcon("/images/" + op + ".png");
         this.helpPane.add(new JLabel(icon));
       }
-    }
-    else {
-      head = new JLabel(Options.getMsg("dialog.addrealdomain.syntax"));
+    } else {
+      head = new JLabel(Options.getMsg("dialog.addbooldomain.syntax"));
       head.setFont(new Font("Serif", Font.PLAIN, 14));
       margin = new EmptyBorder(5, 10, 5, 5);
       head.setBorder(new CompoundBorder(border, margin));
@@ -538,25 +431,23 @@ public class AddRealDomainDialog extends JDialog implements ActionListener, Docu
     this.helpPane.repaint();
   }
 
-  private AdtRealDomain     domain;
-  private JTextField        name;
-  private JTextField        description;
-  private JTextField        ao;
-  private JTextField        ap;
-  private JTextField        oo;
-  private JTextField        op;
-  private JTextField        cp;
-  private JTextField        co;
-  private JTextField        defaulto;
-  private JTextField        defaultp;
-  private JTextField        precision;
-  private JCheckBox         modifiableo;
-  private JCheckBox         modifiablep;
-  private JButton           okButton;
-  private JLabel            errorLabel;
-  private JPanel            helpPane;
+  private AdtBoolDomain domain;
+  private JTextField name;
+  private JTextField description;
+  private JTextField ao;
+  private JTextField ap;
+  private JTextField oo;
+  private JTextField op;
+  private JTextField cp;
+  private JTextField co;
+  private JComboBox<String> defaulto;
+  private JComboBox<String> defaultp;
+  private JCheckBox modifiableo;
+  private JCheckBox modifiablep;
+  private JButton okButton;
+  private JLabel errorLabel;
+  private JPanel helpPane;
 
-  private static Color      validColor       = new Color(170, 255, 170);
-  private static Color      invalidColor     = new Color(255, 170, 170);
-  private static final long serialVersionUID = 4666484261485989975L;
+  private static Color validColor = new Color(170, 255, 170);
+  private static Color invalidColor = new Color(255, 170, 170);
 }

@@ -18,6 +18,7 @@
 package lu.uni.adtool.domains;
 
 import lu.uni.adtool.domains.custom.AdtCustomDomain;
+import lu.uni.adtool.domains.custom.SandCustomDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tree.ADTNode;
@@ -123,7 +124,16 @@ public class ValuationDomain implements MultipleCDockableLayout {
     this.treeId = element.getElement("treeId").getInt();
     this.domainId = element.getElement("domainId").getInt();
     Debug.log(" layout with treeId " + treeId + " domainId:" + domainId);
-    if (domain instanceof AdtCustomDomain) {
+    if (domain instanceof SandCustomDomain) {
+      SandCustomDomain custom = (SandCustomDomain) domain;
+      custom.setName(element.getElement("name").getString());
+      custom.setDescription(element.getElement("description").getString());
+      custom.setOr(element.getElement("or").getString());
+      custom.setAnd(element.getElement("and").getString());
+      custom.setSand(element.getElement("sand").getString());
+      custom.setDefault(element.getElement("defaultValue").getString());
+    }
+    else if (domain instanceof AdtCustomDomain) {
       AdtCustomDomain custom = (AdtCustomDomain) domain;
       custom.setName(element.getElement("name").getString());
       custom.setDescription(element.getElement("description").getString());
@@ -196,7 +206,16 @@ public class ValuationDomain implements MultipleCDockableLayout {
     dElement.addString("id", getExportXmlId());
     dElement.addElement("class").setString(domain.getClass().getName());
     dElement.addElement("tool").setString("ADTool2");
-    if (domain instanceof AdtCustomDomain) {
+    if (domain instanceof SandCustomDomain) {
+      SandCustomDomain custom = (SandCustomDomain) domain;
+      dElement.addElement("name").setString(custom.getName());
+      dElement.addElement("description").setString(custom.getShortDescription());
+      dElement.addElement("or").setString(custom.getOr());
+      dElement.addElement("and").setString(custom.getAnd());
+      dElement.addElement("sand").setString(custom.getSand());
+      dElement.addElement("defaultValue").setString(custom.getDefault());
+    }
+    else if (domain instanceof AdtCustomDomain) {
       AdtCustomDomain custom = (AdtCustomDomain) domain;
       dElement.addElement("name").setString(custom.getName());
       dElement.addElement("description").setString(custom.getShortDescription());
@@ -232,7 +251,16 @@ public class ValuationDomain implements MultipleCDockableLayout {
     element.addElement("domain").setString(domainName);
     element.addElement("treeId").setInt(this.treeId);
     element.addElement("domainId").setInt(this.domainId);
-    if (domain instanceof AdtCustomDomain) {
+    if (domain instanceof SandCustomDomain) {
+      SandCustomDomain custom = (SandCustomDomain) domain;
+      element.addElement("name").setString(custom.getName());
+      element.addElement("description").setString(custom.getShortDescription());
+      element.addElement("or").setString(custom.getOr());
+      element.addElement("and").setString(custom.getAnd());
+      element.addElement("sand").setString(custom.getSand());
+      element.addElement("defaultValue").setString(custom.getDefault());
+    }
+    else if (domain instanceof AdtCustomDomain) {
       AdtCustomDomain custom = (AdtCustomDomain) domain;
       element.addElement("name").setString(custom.getName());
       element.addElement("description").setString(custom.getShortDescription());

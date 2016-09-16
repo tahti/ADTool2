@@ -24,6 +24,7 @@ import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.RankNode;
 import lu.uni.adtool.domains.Ranker;
 import lu.uni.adtool.domains.SandDomain;
+import lu.uni.adtool.domains.SandRank;
 import lu.uni.adtool.domains.ValueAssignement;
 import lu.uni.adtool.domains.adtpredefined.RankingDomain;
 import lu.uni.adtool.domains.rings.Ring;
@@ -90,8 +91,9 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     pane.removeAll();
     this.canvas = canvas;
     if (this.getCanvas() instanceof AbstractDomainCanvas) {
-      if (canvas.getTree() != null && (canvas.isSand()
-          || (canvas instanceof AbstractDomainCanvas && ((AbstractDomainCanvas<Ring>) canvas)
+      if (canvas.getTree() != null && (((AbstractDomainCanvas<Ring>) canvas)
+              .getValues().getDomain() instanceof SandRank
+          || (((AbstractDomainCanvas<Ring>) canvas)
               .getValues().getDomain() instanceof RankingDomain))) {
         JScrollPane scrollPane =
             new JScrollPane(this.createTable((AbstractDomainCanvas<Ring>) canvas));
@@ -116,7 +118,9 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     }
     else {
       if (canvas instanceof AbstractDomainCanvas && (((AbstractDomainCanvas<Ring>) canvas)
-          .getValues().getDomain() instanceof RankingDomain) || canvas.isSand()) {
+          .getValues().getDomain() instanceof RankingDomain) ||
+          ((AbstractDomainCanvas<Ring>) canvas)
+              .getValues().getDomain() instanceof SandRank) {
         Debug.log("Root used with name:" + root.getName());
         RankingTableModel model = ((RankingTableModel) this.table.getModel());
         if (model != null) {
@@ -200,6 +204,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
 
   public static final String ID_RANKINGVIEW = "rank_view";
 
+  @SuppressWarnings("unchecked")
   private JPanel createTable(AbstractDomainCanvas<Ring> canvas) {
     JPanel result = new JPanel();
     if (canvas.isSand()) {
@@ -216,8 +221,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         // scrollPane.setVisible(false);
         return false;
       }
-
-      private static final long serialVersionUID = 4413320872836263114L;
+      private static final long serialVersionUID = 4413320872836262912L;
     };
     table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     ListSelectionModel listSelectionModel = table.getSelectionModel();
@@ -261,7 +265,6 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     titlePane.setAlignmentX( Component.LEFT_ALIGNMENT );
     titlePane.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-    
 //     this.updateTitlePane(getCanvas().getTree().getRoot(true));
 //     this.titlePane = new JPanel();
 //     titlePane.setLayout(new BoxLayout(result, BoxLayout.X_AXIS));
@@ -331,7 +334,8 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
       if (canvas == null || root == null) {
         return;
       }
-      if (canvas.isSand()) {
+      if (((AbstractDomainCanvas<Ring>) canvas)
+              .getValues().getDomain() instanceof SandRank) {
         ValueAssignement<Ring> va = canvas.getValues().getValueMap();
         ArrayList<RankNode<Ring>> ranking;
         ranking = ranker.rank((SandNode) root, va, Options.rank_noRanked);

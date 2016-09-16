@@ -20,17 +20,6 @@
  */
 package lu.uni.adtool.tree;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Vector;
-
-import org.reflections.Reflections;
-
-import bibliothek.gui.dock.common.MultipleCDockableFactory;
-
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
 import lu.uni.adtool.domains.SandDomain;
@@ -51,6 +40,9 @@ import lu.uni.adtool.domains.adtpredefined.SatScenario;
 import lu.uni.adtool.domains.custom.AdtBoolDomain;
 import lu.uni.adtool.domains.custom.AdtIntDomain;
 import lu.uni.adtool.domains.custom.AdtRealDomain;
+import lu.uni.adtool.domains.custom.SandBoolDomain;
+import lu.uni.adtool.domains.custom.SandIntDomain;
+import lu.uni.adtool.domains.custom.SandRealDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.domains.sandpredefined.MinTime;
 import lu.uni.adtool.tools.Debug;
@@ -58,6 +50,17 @@ import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TreeDockable;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.Vector;
+
+import org.reflections.Reflections;
+
+import bibliothek.gui.dock.common.MultipleCDockableFactory;
 
 public class DomainFactory implements MultipleCDockableFactory<DomainDockable, ValuationDomain> {
 
@@ -124,6 +127,9 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
   public static Vector<Domain<?>> getPredefinedDomains(boolean forSand) {
     Vector<Domain<?>> result = new Vector<Domain<?>>();
     if (forSand) {
+      result.add(new SandBoolDomain());
+      result.add(new SandIntDomain());
+      result.add(new SandRealDomain());
       Reflections reflections = new Reflections(sandDomainsPrefix);
       Set<Class<? extends SandDomain>> m = reflections.getSubTypesOf(SandDomain.class);
       for (Class<? extends SandDomain> c : m) {
@@ -213,8 +219,13 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     if (!domainName.startsWith(customDomainsPrefix)) {
       name = customDomainsPrefix + "." + domainName;
     }
-    if (name.equals(customDomainsPrefix + ".AdtBoolDomain") || name.equals(customDomainsPrefix + ".AdtIntDomain")
-        || name.equals(customDomainsPrefix + ".AdtRealDomain")) {
+    if (   name.equals(customDomainsPrefix + ".AdtBoolDomain")
+        || name.equals(customDomainsPrefix + ".AdtIntDomain")
+        || name.equals(customDomainsPrefix + ".AdtRealDomain")
+        || name.equals(customDomainsPrefix + ".SandBoolDomain")
+        || name.equals(customDomainsPrefix + ".SandIntDomain")
+        || name.equals(customDomainsPrefix + ".SandRealDomain")
+           ) {
       return true;
     }
     return false;
@@ -224,7 +235,19 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
   public static boolean isSandDomain(String domainName) {
     String name = domainName;
     if (!domainName.startsWith(sandDomainsPrefix)) {
-      name = sandDomainsPrefix + "." + domainName;
+      if (name.equals(customDomainsPrefix + ".SandBoolDomain")
+          || name.equals(customDomainsPrefix + ".SandIntDomain")
+          || name.equals(customDomainsPrefix + ".SandRealDomain")) {
+        return true;
+      }
+      else if (name.equals("SandBoolDomain")
+          || name.equals("SandIntDomain")
+          || name.equals("SandRealDomain")) {
+        return true;
+      }
+      else {
+        name = sandDomainsPrefix + "." + domainName;
+      }
     }
     Constructor<SandDomain<Ring>>[] ct = null;
     try {
@@ -249,8 +272,15 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
     String name = domainName;
     boolean isSand = isSandDomain(domainName);
     if (isSand) {
-      if (!domainName.startsWith(sandDomainsPrefix)) {
-        name = sandDomainsPrefix + "." + domainName;
+      if (isCustom(domainName)) {
+        if (!domainName.startsWith(customDomainsPrefix)) {
+          name = customDomainsPrefix + "." + domainName;
+        }
+      }
+      else {
+        if (!domainName.startsWith(sandDomainsPrefix)) {
+          name = sandDomainsPrefix + "." + domainName;
+        }
       }
       Constructor<SandDomain<Ring>>[] ct = null;
       try {

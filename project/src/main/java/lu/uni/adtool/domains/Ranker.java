@@ -68,7 +68,8 @@ public class Ranker<Type extends Ring> {
   public final ArrayList<RankNode<Type>> rank(final SandNode root,
       final ValueAssignement<Type> valueAssigment, int maxItems) {
     this.lastNode = root;
-    if (valueAssigment == null || root == null || sandDomain == null) {
+    if (valueAssigment == null || root == null || sandDomain == null ||
+        !(this.sandDomain instanceof SandRank<?>)) {
       Debug.log("NULL result");
       return null;
     }
@@ -98,10 +99,10 @@ public class Ranker<Type extends Ring> {
 //   public final ArrayList<Ring> getRanking(final Node node) {
 //     return null;
 //   }
-// 
+//
 //   public final void finishGetRanking(final Node root) {
 //   }
-// 
+//
 //   public void rankNode(Node node) {
 //   }
 
@@ -167,6 +168,7 @@ public class Ranker<Type extends Ring> {
     return result;
   }
 
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private ArrayList<RankNode<Type>> rankRecursive(final SandNode root, ValueAssignement<Type> map,
       int maxItems) {
     ArrayList<RankNode<Type>> result = new ArrayList<RankNode<Type>>();
@@ -186,13 +188,13 @@ public class Ranker<Type extends Ring> {
       }
       switch (root.getType()) {
       case AND:
-        result = sandDomain.and(list, maxItems);
+        result = ((SandRank) sandDomain).and(list, maxItems);
         break;
       case OR:
-        result = sandDomain.or(list, maxItems);
+        result = ((SandRank)sandDomain).or(list, maxItems);
         break;
       case SAND:
-        result = sandDomain.sand(list, maxItems);
+        result = ((SandRank)sandDomain).sand(list, maxItems);
         break;
       default:
         System.err.println(Options.getMsg("error.evaluation.noType"));
@@ -224,19 +226,15 @@ public class Ranker<Type extends Ring> {
           orChoices.remove(orChoices.size() - 1);
           value = markRecursive(node.getChildren().get(index), consumer, map, orChoices);
           break;
-        case SAND:
-          value = markRecursive(node.getChildren().get(0), consumer, map, orChoices);
-          for (int i = 1; i < node.getChildren().size(); i++) {
-            value = this.sandDomain.sand(value,
-                markRecursive(node.getChildren().get(i), consumer, map, orChoices));
-          }
-          break;
-        case AND:
+//         case SAND:
+//         case AND:
         default:
           value = markRecursive(node.getChildren().get(0), consumer, map, orChoices);
           for (int i = 1; i < node.getChildren().size(); i++) {
-            value = this.sandDomain.and(value,
-                markRecursive(node.getChildren().get(i), consumer, map, orChoices));
+            value = this.sandDomain.calc(value, markRecursive(node.getChildren().get(i), consumer, map, orChoices),
+                                         ((SandNode) node).getType());
+//             value = this.sandDomain.sand(value,
+//                 markRecursive(node.getChildren().get(i), consumer, map, orChoices));
           }
           break;
         }

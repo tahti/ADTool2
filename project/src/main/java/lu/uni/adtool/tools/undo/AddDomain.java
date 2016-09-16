@@ -47,7 +47,7 @@ public class AddDomain extends EditAction {
       dockable.setVisible(false);
     }
     else {
-      Debug.log("Cold not find dockable with ID:" + TreeDockable.TREE_ID + Integer.toString(canvas.getTreeId())
+      Debug.log("Could not find dockable with ID:" + TreeDockable.TREE_ID + Integer.toString(canvas.getTreeId())
           + DomainDockable.DOMAIN_ID + Integer.toString(domainId));
     }
   }

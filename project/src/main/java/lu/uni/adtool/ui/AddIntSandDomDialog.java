@@ -1,5 +1,11 @@
 package lu.uni.adtool.ui;
 
+import lu.uni.adtool.domains.custom.IntParser;
+import lu.uni.adtool.domains.custom.SandIntDomain;
+import lu.uni.adtool.domains.rings.Int;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Options;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -18,8 +24,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -34,20 +38,14 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import lu.uni.adtool.domains.custom.AdtBoolDomain;
-import lu.uni.adtool.domains.custom.BoolParser;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Options;
+public class AddIntSandDomDialog extends JDialog implements ActionListener, DocumentListener {
 
-public class AddBoolDomainDialog extends JDialog implements ActionListener, DocumentListener {
-
-  private static final long serialVersionUID = 5279882898155421759L;
 
   public enum FieldType {
-    AP, AO, OP, OO, CP, CO, NAME, DESCR, NONE
+    OR, AND, SAND, NAME, DESCR, NONE, DEFAULT
   }
 
-  public AddBoolDomainDialog(Frame frame, AdtBoolDomain domain) {
+  public AddIntSandDomDialog(Frame frame, SandIntDomain domain) {
     super(frame, Options.getMsg("adtdomain.custom.dialogtitle"), true);
     this.domain = domain;
     setAlwaysOnTop(true);
@@ -56,9 +54,11 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     setSize(800, 600);
   }
 
-  public AdtBoolDomain showDialog() {
-    this.createLayout();
-    this.setVisible(true);
+  public SandIntDomain showDialog() {
+    if (this.domain != null) {
+      this.createLayout();
+      this.setVisible(true);
+    }
     return this.domain;
   }
 
@@ -81,88 +81,61 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     buttonPane.add(cancelButton);
     buttonPane.add(Box.createRigidArea(new Dimension(10, 30)));
     buttonPane.add(okButton);
-    if (this.domain.getName() != null && !this.domain.getName().equals(Options.getMsg("adtdomain.custom.bool.name"))) {
+    if (this.domain.getName() != null && !this.domain.getName().equals(Options.getMsg("adtdomain.custom.int.name"))) {
       this.name = new JTextField(this.domain.getName());
     }
     else {
       this.name = new JTextField("");
     }
     if (this.domain.getShortDescription() != null
-        && !this.domain.getShortDescription().equals(Options.getMsg("adtdomain.custom.bool.description"))) {
+        && !this.domain.getShortDescription().equals(Options.getMsg("adtdomain.custom.int.description"))) {
       this.description = new JTextField(this.domain.getShortDescription());
     }
     else {
       this.description = new JTextField("");
     }
-    this.cp = new JTextField(this.domain.getCp());
-    this.co = new JTextField(this.domain.getCo());
-    this.ap = new JTextField(this.domain.getAp());
-    this.ao = new JTextField(this.domain.getAo());
-    this.op = new JTextField(this.domain.getOp());
-    this.oo = new JTextField(this.domain.getOo());
-    String[] valueList = { "true", "false" };
-    this.defaulto = new JComboBox<String>(valueList);
-    this.defaultp = new JComboBox<String>(valueList);
-    this.modifiableo = new JCheckBox(Options.getMsg("dialog.adddomain.modifiableo"));
-    this.modifiableo.setSelected(domain.isOppModifiable());
-    this.modifiablep = new JCheckBox(Options.getMsg("dialog.adddomain.modifiablep"));
-    this.modifiablep.setSelected(domain.isProModifiable());
+    this.or = new JTextField(this.domain.getOr());
+    this.and = new JTextField(this.domain.getAnd());
+    this.sand = new JTextField(this.domain.getSand());
+    this.defaultValue = new JTextField(this.domain.getDefault());
+    this.defaultValue.getDocument().addDocumentListener(this);
+    this.defaultValue.getDocument().putProperty("parent", defaultValue);
+    this.defaultValue.addFocusListener(new FocusListener() {
+      public void focusGained(FocusEvent e) {
+        setHelpContent(FieldType.DEFAULT);
+      }
+
+      public void focusLost(FocusEvent e) {
+        setHelpContent(FieldType.NONE);
+      }
+    });
+
     this.name.getDocument().addDocumentListener(this);
     this.description.getDocument().addDocumentListener(this);
-    this.cp.getDocument().addDocumentListener(this);
-    this.cp.addFocusListener(new FocusListener() {
+    this.or.getDocument().addDocumentListener(this);
+    this.or.addFocusListener(new FocusListener() {
       public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.CP);
+        setHelpContent(FieldType.OR);
       }
 
       public void focusLost(FocusEvent e) {
         setHelpContent(FieldType.NONE);
       }
     });
-    this.co.getDocument().addDocumentListener(this);
-    this.co.addFocusListener(new FocusListener() {
+    this.and.getDocument().addDocumentListener(this);
+    this.and.addFocusListener(new FocusListener() {
       public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.CO);
+        setHelpContent(FieldType.AND);
       }
 
       public void focusLost(FocusEvent e) {
         setHelpContent(FieldType.NONE);
       }
     });
-    this.ap.getDocument().addDocumentListener(this);
-    this.ap.addFocusListener(new FocusListener() {
+    this.sand.getDocument().addDocumentListener(this);
+    this.sand.addFocusListener(new FocusListener() {
       public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.AP);
-      }
-
-      public void focusLost(FocusEvent e) {
-        setHelpContent(FieldType.NONE);
-      }
-    });
-    this.ao.getDocument().addDocumentListener(this);
-    this.ao.addFocusListener(new FocusListener() {
-      public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.AO);
-      }
-
-      public void focusLost(FocusEvent e) {
-        setHelpContent(FieldType.NONE);
-      }
-    });
-    this.op.getDocument().addDocumentListener(this);
-    this.op.addFocusListener(new FocusListener() {
-      public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.OP);
-      }
-
-      public void focusLost(FocusEvent e) {
-        setHelpContent(FieldType.NONE);
-      }
-    });
-    this.oo.getDocument().addDocumentListener(this);
-    this.oo.addFocusListener(new FocusListener() {
-      public void focusGained(FocusEvent e) {
-        setHelpContent(FieldType.OO);
+        setHelpContent(FieldType.SAND);
       }
 
       public void focusLost(FocusEvent e) {
@@ -189,13 +162,16 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
         setHelpContent(FieldType.NONE);
       }
     });
-    this.cp.getDocument().putProperty("parent", cp);
-    this.co.getDocument().putProperty("parent", co);
-    this.ap.getDocument().putProperty("parent", ap);
-    this.ao.getDocument().putProperty("parent", ao);
-    this.op.getDocument().putProperty("parent", op);
-    this.oo.getDocument().putProperty("parent", oo);
-
+    this.or.getDocument().putProperty("parent", or);
+    this.and.getDocument().putProperty("parent", and);
+    this.sand.getDocument().putProperty("parent", sand);
+    try {
+      Integer.parseInt(this.defaultValue.getText());
+      this.defaultValue.setBackground(validColor);
+    }
+    catch (NumberFormatException e) {
+      this.defaultValue.setBackground(invalidColor);
+    }
     if (name.getText().length() > 0) {
       name.setBackground(validColor);
     } else {
@@ -206,37 +182,24 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     } else {
       description.setBackground(invalidColor);
     }
-    checkValid(this.cp);
-    checkValid(this.co);
-    checkValid(this.ap);
-    checkValid(this.ao);
-    checkValid(this.op);
-    checkValid(this.oo);
+    checkValid(this.or);
+    checkValid(this.and);
+    checkValid(this.sand);
 
     JPanel inputContent = new JPanel();
     inputContent.setLayout(new GridLayout(0, 2, 10, 10));
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.defaultp")));
-    inputContent.add(this.defaultp);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.defaulto")));
-    inputContent.add(this.defaulto);
-    inputContent.add(this.modifiablep);
-    inputContent.add(this.modifiableo);
+    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.defaultValue")));
+    inputContent.add(this.defaultValue);
     inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.name")));
     inputContent.add(this.name);
     inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.description")));
     inputContent.add(this.description);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.op")));
-    inputContent.add(this.op);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.oo")));
-    inputContent.add(this.oo);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.ap")));
-    inputContent.add(this.ap);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.ao")));
-    inputContent.add(this.ao);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.cp")));
-    inputContent.add(this.cp);
-    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.co")));
-    inputContent.add(this.co);
+    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.or")));
+    inputContent.add(this.or);
+    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.and")));
+    inputContent.add(this.and);
+    inputContent.add(new JLabel(Options.getMsg("dialog.adddomain.sand")));
+    inputContent.add(this.sand);
     JPanel mainContent = new JPanel();
     mainContent.setLayout(new BoxLayout(mainContent, BoxLayout.LINE_AXIS));
     mainContent.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -292,14 +255,9 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
   }
 
   public void enterPressed() {
-    domain.setProDefault(this.defaultp.getSelectedIndex() == 0);
-    domain.setOppDefault(this.defaulto.getSelectedIndex() == 0);
-    domain.setProModifiable(this.modifiablep.isSelected());
-    domain.setOppModifiable(this.modifiableo.isSelected());
-    if ((!this.domain.setName(this.name.getText())) || (!this.domain.setCp(this.cp.getText()))
-        || (!this.domain.setCo(this.co.getText())) || (!this.domain.setAp(this.ap.getText()))
-        || (!this.domain.setAo(this.ao.getText())) || (!this.domain.setOp(this.op.getText()))
-        || (!this.domain.setOo(this.oo.getText()))
+    if ((!this.domain.setName(this.name.getText())) || (!this.domain.setOr(this.or.getText()))
+        || (!this.domain.setAnd(this.and.getText())) || (!this.domain.setSand(this.sand.getText()))
+        || (!domain.setDefault(this.defaultValue.getText()))
         || (!this.domain.setDescription(this.description.getText()))) {
       okButton.setEnabled(false);
     } else {
@@ -317,8 +275,17 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
       } else {
         field.setBackground(invalidColor);
       }
+    } else if (field == this.defaultValue) {
+      Int temp = new Int(0);
+      if (temp.updateFromString(field.getText())) {
+        field.setBackground(validColor);
+      }
+      else {
+        field.setBackground(invalidColor);
+        this.errorLabel.setText(Options.getMsg("dialog.adddomain.wrongint"));
+      }
     } else {
-      BoolParser parser = new BoolParser();
+      IntParser parser = new IntParser();
       if (field.getText().length() > 0 && parser.parseString(field.getText()) != null) {
         field.setBackground(validColor);
       } else {
@@ -326,14 +293,12 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
         field.setBackground(invalidColor);
       }
     }
-    if (this.name.getBackground() == AddBoolDomainDialog.validColor
-        && this.description.getBackground() == AddBoolDomainDialog.validColor
-        && this.ao.getBackground() == AddBoolDomainDialog.validColor
-        && this.ap.getBackground() == AddBoolDomainDialog.validColor
-        && this.oo.getBackground() == AddBoolDomainDialog.validColor
-        && this.op.getBackground() == AddBoolDomainDialog.validColor
-        && this.co.getBackground() == AddBoolDomainDialog.validColor
-        && this.cp.getBackground() == AddBoolDomainDialog.validColor) {
+    if (this.name.getBackground() == AddIntSandDomDialog.validColor
+        && this.defaultValue.getBackground() == AddIntSandDomDialog.validColor
+        && this.description.getBackground() == AddIntSandDomDialog.validColor
+        && this.or.getBackground() == AddIntSandDomDialog.validColor
+        && this.and.getBackground() == AddIntSandDomDialog.validColor
+        && this.sand.getBackground() == AddIntSandDomDialog.validColor) {
       okButton.setEnabled(true);
       return true;
     }
@@ -367,23 +332,14 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
 
   private void setHelpContent(FieldType field) {
     switch (field) {
-    case AP:
-      this.setHelpText("ap");
+    case OR:
+      this.setHelpText("or");
       break;
-    case AO:
-      this.setHelpText("ao");
+    case AND:
+      this.setHelpText("and");
       break;
-    case OP:
-      this.setHelpText("op");
-      break;
-    case OO:
-      this.setHelpText("oo");
-      break;
-    case CP:
-      this.setHelpText("cp");
-      break;
-    case CO:
-      this.setHelpText("co");
+    case SAND:
+      this.setHelpText("sand");
       break;
     case NAME:
       this.setHelpText("name");
@@ -391,6 +347,7 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     case DESCR:
       this.setHelpText("description");
       break;
+    case DEFAULT:
     case NONE:
       this.setHelpText("");
       break;
@@ -408,7 +365,7 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     if (op.length() > 0) {
       if (op.equals("name")) {
       }
-      else if (op.equals("descripiton")) {
+      else if (op.equals("description")) {
       }
       else {
         head = new JLabel(Options.getMsg("dialog.adddomain." + op + ".text"));
@@ -420,8 +377,9 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
         ImageIcon icon = iconFactory.createImageIcon("/images/" + op + ".png");
         this.helpPane.add(new JLabel(icon));
       }
-    } else {
-      head = new JLabel(Options.getMsg("dialog.addbooldomain.syntax"));
+    }
+    else {
+      head = new JLabel(Options.getMsg("dialog.addintdomain.syntax"));
       head.setFont(new Font("Serif", Font.PLAIN, 14));
       margin = new EmptyBorder(5, 10, 5, 5);
       head.setBorder(new CompoundBorder(border, margin));
@@ -431,23 +389,18 @@ public class AddBoolDomainDialog extends JDialog implements ActionListener, Docu
     this.helpPane.repaint();
   }
 
-  private AdtBoolDomain domain;
-  private JTextField name;
-  private JTextField description;
-  private JTextField ao;
-  private JTextField ap;
-  private JTextField oo;
-  private JTextField op;
-  private JTextField cp;
-  private JTextField co;
-  private JComboBox<String> defaulto;
-  private JComboBox<String> defaultp;
-  private JCheckBox modifiableo;
-  private JCheckBox modifiablep;
-  private JButton okButton;
-  private JLabel errorLabel;
-  private JPanel helpPane;
+  private SandIntDomain     domain;
+  private JTextField        name;
+  private JTextField        description;
+  private JTextField        or;
+  private JTextField        and;
+  private JTextField        sand;
+  private JTextField        defaultValue;
+  private JButton           okButton;
+  private JLabel            errorLabel;
+  private JPanel            helpPane;
 
-  private static Color validColor = new Color(170, 255, 170);
-  private static Color invalidColor = new Color(255, 170, 170);
+  private static Color      validColor       = new Color(170, 255, 170);
+  private static Color      invalidColor     = new Color(255, 170, 170);
+  private static final long serialVersionUID = 5891853937349452934L;
 }
