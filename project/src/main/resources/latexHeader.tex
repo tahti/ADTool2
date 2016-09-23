@@ -109,8 +109,8 @@
 \forestset{
   declare boolean={ispro}{false},
   common/.style={
-    edge={line width=1.4pt}, line width=1.4pt,
-    l sep=1cm, align=center, s sep=1cm,
+    edge={line width=1.4pt}, line width=1.4pt, tier/.pgfmath=level(),
+    l sep=35pt, align=center, s sep=15pt, anchor=center,
     on invalid={step}{if={(ispro("!u")&&!ispro())||(!ispro("!u")&&ispro())}
       {edge={line cap=round, dash pattern=on 0pt off 4pt}}{}},
   },

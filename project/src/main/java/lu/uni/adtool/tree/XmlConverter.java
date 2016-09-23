@@ -214,6 +214,8 @@ public class XmlConverter {
       tokens.put("~", "\\\\textasciitilde{}");
       tokens.put("%", "\\\\%");
       tokens.put(",", "{,}");
+      tokens.put("[", "{[}");
+      tokens.put("]", "{]}");
       tokens.put("\n", "\\\\\\\\\n");
       tokens.put("<", "\\\\textless{}");
       tokens.put(">", "\\\\textgreater{}");
@@ -221,7 +223,7 @@ public class XmlConverter {
       tokens.put("\"", "\\\\textquotedbl{}");
       tokens.put("\'", "\\\\textquotesingle{}");
       tokens.put("`", "\\\\textasciigrave{}");
-      pattern = Pattern.compile("(\\\\|\\||`|\\}|\\^|\"|#|%|&|\'|\\$|\n|,|<|~|>|\\{|_)");
+      pattern = Pattern.compile("(\\\\|\\||`|\\}|\\^|\"|#|%|&|\'|\\$|,|\\[|\\]|\n|<|~|>|\\{|_)");
     }
     Matcher matcher = pattern.matcher(label);
     StringBuffer sb = new StringBuffer();
