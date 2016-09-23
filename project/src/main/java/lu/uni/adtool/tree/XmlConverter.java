@@ -168,7 +168,7 @@ public class XmlConverter {
       StringBuilder packages = new StringBuilder();
       String tree = "";
       if (layout.isSand())  {
-//         tree = ((SandNode)layout.getRoot()).toLatex(0);
+        tree = ((SandNode)layout.getRoot()).toLatex(0);
         Debug.log("Exporting sand");
       }
       else {
