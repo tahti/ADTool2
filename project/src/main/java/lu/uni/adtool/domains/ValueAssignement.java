@@ -20,8 +20,12 @@
  */
 package lu.uni.adtool.domains;
 
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Options;
+
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -31,7 +35,7 @@ import java.util.Set;
  * @author Piotr Kordy
  * @version
  */
-public class ValueAssignement<T> implements Serializable {
+public class ValueAssignement<T extends Ring> implements Serializable {
 
   /**
    * {@inheritDoc}
@@ -43,9 +47,43 @@ public class ValueAssignement<T> implements Serializable {
     opponent= new HashMap<String, T>();
   }
 
-//   public String toString() {
-//     return map.values().toString();
-//   }
+  /**
+   * {@inheritDoc}
+   * @see Object#toString()
+   */
+  public String toString() {
+    StringBuffer sbf = new StringBuffer();
+    if(this.opponent.size() ==0) {
+      for (Map.Entry<String, T> entry : this.proponent.entrySet()) {
+        sbf.append(entry.getKey());
+        sbf.append("\t");
+        T value = entry.getValue();
+        sbf.append(value.toString());
+        sbf.append("\n");
+      }
+    }
+    else {
+      for (Map.Entry<String, T> entry : this.proponent.entrySet()) {
+        sbf.append(Options.getMsg("tablemodel.proponent"));
+        sbf.append("\t");
+        sbf.append(entry.getKey());
+        sbf.append("\t");
+        T value = entry.getValue();
+        sbf.append(value.toString());
+        sbf.append("\n");
+      }
+      for (Map.Entry<String, T> entry : this.opponent.entrySet()) {
+        sbf.append(Options.getMsg("tablemodel.opponent"));
+        sbf.append("\t");
+        sbf.append(entry.getKey());
+        sbf.append("\t");
+        T value = entry.getValue();
+        sbf.append(value.toString());
+        sbf.append("\n");
+      }
+    }
+    return sbf.toString();
+  }
 
   /**
    * Assigns value to a label.

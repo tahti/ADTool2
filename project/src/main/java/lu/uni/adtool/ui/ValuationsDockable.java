@@ -306,11 +306,11 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
 
   public static final String ID_VALUATIONVIEW = "val_view";
 
-  private JPanel createTable(AbstractDomainCanvas<Ring> canvas) {
+  private JPanel createTable(AbstractDomainCanvas<Ring> newCanvas) {
     JPanel result = new JPanel();
     result.setLayout(new BoxLayout(result, BoxLayout.Y_AXIS));
-    ValuationTableModel tableModel = new ValuationTableModel(canvas.isSand());
-    tableModel.setCanvas(canvas);
+    ValuationTableModel tableModel = new ValuationTableModel(newCanvas.isSand());
+    tableModel.setCanvas(newCanvas);
     this.table = new JTable(tableModel) {
       private static final long serialVersionUID = -8834465928956864103L;
     };
@@ -400,7 +400,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
       }
       private static final long serialVersionUID = -7359453212974793708L;
     });
-    result.add(new JLabel(((AbstractDomainCanvas<?>) getCanvas()).getDomain().getName()));
+    result.add(new JLabel(((AbstractDomainCanvas<?>) newCanvas).getDomain().getName()));
     result.add(table.getTableHeader());
     result.add(table);
     return result;

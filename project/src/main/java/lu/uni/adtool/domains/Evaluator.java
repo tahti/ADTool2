@@ -21,7 +21,6 @@
 package lu.uni.adtool.domains;
 
 import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.SandNode;

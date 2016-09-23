@@ -398,6 +398,16 @@ public final class MainController implements CControlListener, CFocusListener {
     // fileMenu.add(menuItem);
     JMenu exportTo = new JMenu(Options.getMsg("file.export.txt"));
     exportTo.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.key")).getKeyCode());
+    menuItem = exportTo.add(fileExportToXml);
+    menuItem.setEnabled(false);
+    this.toDisableItems.add(menuItem);
+    menuItem.addMouseListener(mouseHandler);
+    exportTo.add(menuItem);
+    menuItem = exportTo.add(fileExportToTex);
+    menuItem.setEnabled(false);
+    this.toDisableItems.add(menuItem);
+    menuItem.addMouseListener(mouseHandler);
+    exportTo.add(menuItem);
     menuItem = exportTo.add(fileExportToPdf);
     menuItem.addMouseListener(mouseHandler);
     menuItem.setEnabled(false);
@@ -421,11 +431,6 @@ public final class MainController implements CControlListener, CFocusListener {
     this.toDisableItems.add(menuItem);
     menuItem.addMouseListener(mouseHandler);
     exportTo.add(menuItem);
-    menuItem = exportTo.add(fileExportToXml);
-    menuItem.setEnabled(false);
-    this.toDisableItems.add(menuItem);
-    menuItem.addMouseListener(mouseHandler);
-    exportTo.add(menuItem);
     fileMenu.add(exportTo);
 
     JMenu importFrom = new JMenu(Options.getMsg("file.import.txt"));
@@ -436,15 +441,20 @@ public final class MainController implements CControlListener, CFocusListener {
     menuItem.addMouseListener(mouseHandler);
     importFrom.add(menuItem);
     fileMenu.add(importFrom);
-
     menuItem = fileMenu.add(filePrint);
     menuItem.setEnabled(false);
     this.toDisableItems.add(menuItem);
+    menuItem.addMouseListener(mouseHandler);
     menuItem = fileMenu.add(filePrintPreview);
     menuItem.setEnabled(false);
     this.toDisableItems.add(menuItem);
+    menuItem.addMouseListener(mouseHandler);
     fileMenu.addSeparator();
-
+    menuItem = fileMenu.add(fileClose);
+    this.toDisableItems.add(menuItem);
+    menuItem.addMouseListener(mouseHandler);
+    menuItem.setEnabled(false);
+    this.toDisableItems.add(menuItem);
     menuItem = fileMenu.add(fileCloseAll);
     fileCloseAll.setEnabled(false);
     menuItem.addMouseListener(mouseHandler);
@@ -727,6 +737,16 @@ public final class MainController implements CControlListener, CFocusListener {
     fileNewADT.setSmallIcon(iconFac.createImageIcon("/icons/new.png"));
     fileNewADT.setToolTip(Options.getMsg("file.newADT.tooltip"));
 
+    fileExportToXml = new ADAction(Options.getMsg("file.export.xml.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        exportTo("xml");
+      }
+
+      private static final long serialVersionUID = 4409590774645645107L;
+    };
+    fileExportToXml.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.xml.key")));
+    fileExportToXml.setSmallIcon(iconFac.createImageIcon("/icons/xml_16x16.png"));
+
     fileExportToPdf = new ADAction(Options.getMsg("file.export.pdf.txt")) {
       public void actionPerformed(final ActionEvent e) {
         exportTo("pdf");
@@ -737,21 +757,10 @@ public final class MainController implements CControlListener, CFocusListener {
     fileExportToPdf.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.pdf.key")));
     fileExportToPdf.setSmallIcon(iconFac.createImageIcon("/icons/pdf_16x16.png"));
 
-    fileExportToPng = new ADAction(Options.getMsg("file.export.png.txt")) {
-      public void actionPerformed(final ActionEvent e) {
-        exportTo("png");
-      }
-
-      private static final long serialVersionUID = 2398600083840742200L;
-    };
-    fileExportToPng.setSmallIcon(iconFac.createImageIcon("/icons/png_16x16.png"));
-    fileExportToPng.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.png.key")));
-
     fileExportToJpg = new ADAction(Options.getMsg("file.export.jpeg.txt")) {
       public void actionPerformed(final ActionEvent e) {
         exportTo("jpg");
       }
-
       private static final long serialVersionUID = 8409590777160375107L;
     };
     fileExportToJpg.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.jpeg.key")));
@@ -764,24 +773,35 @@ public final class MainController implements CControlListener, CFocusListener {
         exportTo("txt");
       }
 
-      private static final long serialVersionUID = 8409590777160375107L;
+      private static final long serialVersionUID = 2156590777160375107L;
     };
+
+    fileExportToPng = new ADAction(Options.getMsg("file.export.png.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        exportTo("png");
+      }
+      private static final long serialVersionUID = 2398600083840742200L;
+    };
+    fileExportToPng.setSmallIcon(iconFac.createImageIcon("/icons/png_16x16.png"));
+    fileExportToPng.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.png.key")));
+
     fileExportToTxt.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.txt.key")));
     // fileExportToPng.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
     // InputEvent.ALT_MASK));
     fileExportToTxt.setSmallIcon(iconFac.createImageIcon("/icons/txt_16x16.png"));
 
-    fileExportToXml = new ADAction(Options.getMsg("file.export.xml.txt")) {
-      public void actionPerformed(final ActionEvent e) {
-        exportTo("xml");
-      }
 
-      private static final long serialVersionUID = 8409590777160375107L;
+    fileExportToTex = new ADAction(Options.getMsg("file.export.tex.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        exportTo("tex");
+      }
+      private static final long serialVersionUID = -5611960325333019445L;
     };
-    fileExportToXml.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.xml.key")));
+    fileExportToTex.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.export.tex.key")));
     // fileExportToPng.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
     // InputEvent.ALT_MASK));
-    fileExportToXml.setSmallIcon(iconFac.createImageIcon("/icons/xml_16x16.png"));
+    fileExportToTex.setSmallIcon(iconFac.createImageIcon("/icons/tex_16x16.png"));
+
 
     fileImportFromXml = new ADAction(Options.getMsg("file.export.xml.txt")) {
       private static final long serialVersionUID = -3605440604743377670L;
@@ -835,6 +855,25 @@ public final class MainController implements CControlListener, CFocusListener {
     filePrintPreview.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.printPreview.key")));
     filePrintPreview.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.printPreview.acc")));
 
+    fileClose = new ADAction(Options.getMsg("file.close.txt")) {
+      public void actionPerformed(final ActionEvent e) {
+        if (lastFocusedTree != null && lastFocusedTree.getTreeId() != -1) {
+          TreeDockable d = (TreeDockable)control.getMultipleDockable(TreeDockable.getUniqueId(lastFocusedTree.getTreeId()));
+          if (d != null) {
+            d.setVisible(false);
+            if(!d.isVisible()){
+              setLastFocused(null);
+            }
+          }
+        }
+      }
+      private static final long serialVersionUID = 2265646886353219901L;
+    };
+    fileClose.setToolTip(Options.getMsg("file.close.tooltip"));
+    fileClose.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.close.key")));
+    fileClose.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.close.acc")));
+    fileClose.setSmallIcon(iconFac.createImageIcon("/icons/close.png"));
+
     fileCloseAll = new ADAction(Options.getMsg("file.closeall.txt")) {
       public void actionPerformed(final ActionEvent e) {
         closeAllTrees();
@@ -844,7 +883,7 @@ public final class MainController implements CControlListener, CFocusListener {
     fileCloseAll.setToolTip(Options.getMsg("file.closeall.tooltip"));
     fileCloseAll.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("file.closeall.key")));
     fileCloseAll.setAccelerator(KeyStroke.getKeyStroke(Options.getMsg("file.closeall.acc")));
-    fileCloseAll.setSmallIcon(iconFac.createImageIcon("/icons/close.png"));
+    fileCloseAll.setSmallIcon(iconFac.createImageIcon("/icons/closeall.png"));
 
     fileExit = new ADAction(Options.getMsg("file.exit.txt")) {
       public void actionPerformed(final ActionEvent e) {
@@ -1144,7 +1183,9 @@ public final class MainController implements CControlListener, CFocusListener {
       else if (type.equals("xml")) {
         lastFocusedTree.createXml(out);
       }
-      // }
+      else if (type.equals("tex")) {
+        lastFocusedTree.createLatex(out);
+      }
       lastFocusedTree.setFocus(tempFocus);
     }
   }
@@ -1232,9 +1273,11 @@ public final class MainController implements CControlListener, CFocusListener {
   private static ADAction      fileExportToJpg;
   private static ADAction      fileExportToTxt;
   private static ADAction      fileExportToXml;
+  private static ADAction      fileExportToTex;
   private static ADAction      filePrint;
   private static ADAction      filePrintPreview;
   private static ADAction      fileCloseAll;
+  private static ADAction      fileClose;
   private static ADAction      fileExit;
   private static ADAction      fileImportFromXml;
   private static ADAction      fileImportFromAdt;

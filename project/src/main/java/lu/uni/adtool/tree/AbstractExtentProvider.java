@@ -80,18 +80,23 @@ public abstract class AbstractExtentProvider implements NodeExtentProvider<Node>
    *
    */
   protected double correctForOval(double x, Node node) {
-    Options.ShapeType shape;
-    double result = x;
-    shape = Options.canv_ShapeAtt;// allow attacker only for the moment
-    switch (shape) {
-    case OVAL:
-      result = (2 * x) / Math.sqrt(2);
-      break;
-    case RECTANGLE:
-    default:
-      break;
-    }
-    return result;
+//     result = 1.4142136 * x;
+//     Options.ShapeType shape;
+//     double result = x;
+//     shape = Options.canv_ShapeAtt;// allow attacker only for the moment TODO - fix
+//     if ((node instanceof ADTNode) && (((ADTNode) node).getRole() == ADTNode.Role.OPPONENT)) {
+//       shape = Options.canv_ShapeDef;// allow attacker only for the moment
+//     }
+//     switch (shape) {
+//     case OVAL:
+//       result = 1.4142136 * x;
+//       break;
+//     case RECTANGLE:
+//     default:
+//       result = x + 2*X_PADDING;
+//       break;
+//     }
+    return 1.4142136 * x;
   }
 
   private final static int   X_PADDING = 5;

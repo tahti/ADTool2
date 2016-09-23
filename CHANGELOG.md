@@ -4,6 +4,8 @@ All notable changes to the ADTool will be documented in this file.
   - added "Close all trees" menu item
   - fxed positioning of baloon window showing comments
   - added pictures to "Load Example Tree" dialog
+  - added close window menu item
+  - added export to LaTeX
 ## [2.2.0] - 2016-08-16 ##
   - added custom domains
   - added import from terms/txt file

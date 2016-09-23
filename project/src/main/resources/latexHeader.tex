@@ -1,0 +1,126 @@
+\documentclass{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{forest}
+\usetikzlibrary{fpu, arrows, bending}
+%%IMPORTS%%
+\makeatletter
+\newcommand{\arc}[4]{%
+  \pgfsetlinewidth{1.4pt}%
+  \newdimen\a\newdimen\b%
+  \pgf@process{\pgfpointanchor{#1}{center}}%
+  \pgf@xa=\pgf@x\pgf@ya=\pgf@y%
+  \pgf@process{\pgfpointdiff{\pgfpointanchor{#1}{east}}{\pgfpointanchor{#1}{center}}}%
+  \advance\pgf@x by -8pt\relax \a=\pgf@x%
+  \pgf@process{\pgfpointdiff{\pgfpointanchor{#1}{south}}{\pgfpointanchor{#1}{center}}}%
+  \advance\pgf@y by 8pt\relax\b=\pgf@y\relax%
+  \pgfkeys{/pgf/fpu, /pgf/fpu/output format=fixed}
+  \pgf@process{\pgfpointdiff{\pgfpointanchor{#3}{center}}{\pgfpointanchor{#1}{center}}}%
+  \pgfmathsetlengthmacro\rightx{\a*\b/sqrt(\a*\a*\pgf@y*\pgf@y + %
+      \b*\b*\pgf@x*\pgf@x)*\pgf@x + \pgf@xa}%
+  \pgfmathsetlengthmacro\righty{\a*\b/sqrt(\a*\a*\pgf@y*\pgf@y + %
+    \b*\b*\pgf@x*\pgf@x)*\pgf@y + \pgf@ya}%
+  \pgf@process{\pgfpointdiff{\pgfpointanchor{#2}{center}}{\pgfpointanchor{#1}{center}}}%
+  \pgfmathparse{atan((-\a/\b)*(\righty - \pgf@ya)/(\rightx - \pgf@xa))}%
+  \pgfmathsetmacro\rightAngle{\pgfmathresult>0?360-\pgfmathresult:180-\pgfmathresult}%
+  \pgfmathsetmacro\leftAngle{360-atan((-\a/\b)*(\a*\b/sqrt(\a*\a*\pgf@y*\pgf@y + %
+    \b*\b*\pgf@x*\pgf@x)*\pgf@y)/(\a*\b/sqrt(\a*\a*\pgf@y*\pgf@y + %
+      \b*\b*\pgf@x*\pgf@x)*\pgf@x))}%
+  \pgfkeys{/pgf/fpu=false}%
+  \pgfmoveto{\pgfpoint{\rightx}{\righty}}%
+  \ifstrequal{#4}{t}{\pgfsetarrowsstart{angle 45}}{\pgfsetarrowsstart{}}
+  \pgfpatharc{\rightAngle}{\leftAngle}{\a and \b}\pgfusepath{draw}%
+  \pgfusepath{draw}%
+}
+\def\andC{\arc{node@\forestove{id}}{node@\forestove{@first}}%
+  {node@\pgfkeysvalueof{/forest/@node/\forestove{@last}/@previous}}{o}}
+\def\andN{\arc{node@\forestove{id}}%
+  {node@\forestove{@first}}{node@\forestove{@last}}{o}}
+\def\sandN{\arc{node@\forestove{id}}%
+  {node@\forestove{@first}}{node@\forestove{@last}}{t}}
+\def\sandC{\arc{node@\forestove{id}}{node@\forestove{@first}}%
+  {node@\pgfkeysvalueof{/forest/@node/\forestove{@last}/@previous}}{t}}
+
+\def\inheritall#1{
+  \foreach \anchor in {north,north west,north east,center,west,east,mid,center,
+    mid west,mid east,base,base west,base east,south,south west,south east}{%
+    \inheritanchor[from=#1]{\anchor}}%
+  \inheritanchorborder[from=#1]
+  \inheritbackgroundpath[from=#1]
+}
+
+\pgfdeclareshape{attacker}{
+    \inheritsavedanchors[from=ellipse]
+    \savedanchor\radius{%
+    \pgf@y=.5\ht\pgfnodeparttextbox%
+    \advance\pgf@y by.5\dp\pgfnodeparttextbox%
+    \pgfmathsetlength\pgf@yb{\pgfkeysvalueof{/pgf/inner ysep}}%
+    \advance\pgf@y by\pgf@yb%
+    \pgf@x=.5\wd\pgfnodeparttextbox%
+    \pgfmathsetlength\pgf@xb{\pgfkeysvalueof{/pgf/inner xsep}}%
+    \advance\pgf@x by\pgf@xb%
+    \pgf@x=1.4142136\pgf@x%
+    \pgf@y=1.4142136\pgf@y%
+    \pgfmathsetlength\pgf@yc{\pgfkeysvalueof{/pgf/minimum height}}%
+    \ifdim\pgf@y<.5\pgf@yc\pgf@y=.5\pgf@yc\fi%
+    \pgfmathsetlength\pgf@xc{\pgfkeysvalueof{/pgf/minimum width}}%
+    \ifdim\pgf@x<.5\pgf@xc\pgf@x=.5\pgf@xc\fi%
+    \pgfmathsetlength{\pgf@xb}{\pgfkeysvalueof{/pgf/outer xsep}}%  
+    \pgfmathsetlength{\pgf@yb}{\pgfkeysvalueof{/pgf/outer ysep}}%  
+    \advance\pgf@x by\pgf@xb%
+    \advance\pgf@y by\pgf@yb%
+    \ifdim\pgf@x<\pgf@y\pgf@x=\pgf@y\fi
+  }
+  \inheritall{ellipse}
+}
+\let\forest@compute@node@boundary@attacker\forest@compute@node@boundary@circle
+
+\def\squarecorner#1{
+    \pgf@x=\the\wd\pgfnodeparttextbox%
+    \pgfmathsetlength\pgf@xc{\pgfkeysvalueof{/pgf/inner xsep}}%
+    \advance\pgf@x by 2\pgf@xc%
+    \pgfmathsetlength\pgf@xb{\pgfkeysvalueof{/pgf/minimum width}}%
+    \ifdim\pgf@x<\pgf@xb \pgf@x=\pgf@xb\fi%
+    \pgf@y=\ht\pgfnodeparttextbox%
+    \advance\pgf@y by\dp\pgfnodeparttextbox%
+    \pgfmathsetlength\pgf@yc{\pgfkeysvalueof{/pgf/inner ysep}}%
+    \advance\pgf@y by 2\pgf@yc%
+    \pgfmathsetlength\pgf@yb{\pgfkeysvalueof{/pgf/minimum height}}%
+    \ifdim\pgf@y<\pgf@yb\pgf@y=\pgf@yb\fi%
+    \ifdim\pgf@x<\pgf@y\pgf@x=\pgf@y\fi
+    \pgf@x=1.4142136\pgf@x%
+    \pgf@y=1.4142136\pgf@y%
+    \pgf@x=#1.5\pgf@x%
+    \advance\pgf@x by.5\wd\pgfnodeparttextbox%
+    \pgfmathsetlength\pgf@xa{\pgfkeysvalueof{/pgf/outer xsep}}%
+    \advance\pgf@x by#1\pgf@xa%
+    \pgf@y=#1.5\pgf@y%
+    \advance\pgf@y by-.5\dp\pgfnodeparttextbox%
+    \advance\pgf@y by.5\ht\pgfnodeparttextbox%
+    \pgfmathsetlength\pgf@ya{\pgfkeysvalueof{/pgf/outer ysep}}%
+    \advance\pgf@y by#1\pgf@ya%
+}
+\pgfdeclareshape{defender}{
+    \savedanchor\northeast{\squarecorner{}}
+    \savedanchor\southwest{\squarecorner{-}}
+    \inheritall{rectangle}
+}
+\makeatother
+
+\forestset{
+  declare boolean={ispro}{false},
+  common/.style={
+    edge={line width=1.4pt}, line width=1.4pt,
+    l sep=1cm, align=center, s sep=1cm,
+    on invalid={step}{if={(ispro("!u")&&!ispro())||(!ispro("!u")&&ispro())}
+      {edge={line cap=round, dash pattern=on 0pt off 4pt}}{}},
+  },
+%%STYLE%%
+  oppTree/.style={for tree={opp}},
+  proTree/.style={for tree={pro}},
+}
+
+\begin{document}
+\begin{forest}
+%%TREE%%
+\end{forest}
+\end{document}

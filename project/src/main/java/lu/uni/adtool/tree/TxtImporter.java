@@ -11,21 +11,16 @@ import java.io.InputStreamReader;
 
 public class TxtImporter {
   public void importFrom(InputStream in, MainController controller) throws IOException {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-    StringBuilder out = new StringBuilder();
-    String line;
-    while ((line = reader.readLine()) != null) {
-      out.append(line);
-    }
+    String input = read(in);
     Node newRoot = null;
     Parser parser = null;
     boolean isAdt = false;
 
     parser = new SandParser();
-    newRoot = (Node)parser.parseString(out.toString());
+    newRoot = (Node)parser.parseString(input);
     if (newRoot == null) {
       parser = new ADTParser();
-      newRoot = (Node)parser.parseString(out.toString());
+      newRoot = (Node)parser.parseString(input);
       if (newRoot == null) {
         throw (new IOException("Wrong format of the file"));
       }
@@ -37,7 +32,16 @@ public class TxtImporter {
     if(!isAdt) {
       controller.report(Options.getMsg("status.status.importTxt"));
     }
+  }
 
+  public static String read(InputStream in) throws IOException{
+    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+    StringBuilder out = new StringBuilder();
+    String line;
+    while ((line = reader.readLine()) != null) {
+      out.append(line + System.getProperty("line.separator"));
+    }
     reader.close();
+    return out.toString();
   }
 }

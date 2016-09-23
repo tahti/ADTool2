@@ -178,6 +178,34 @@ public class SandNode extends GuiNode {
     return result;
   }
 
+  public String toLatex(int depth) {
+    StringBuilder texStr = new StringBuilder();
+    StringBuilder indent = new StringBuilder();
+    for (int i = 0; i<depth; i++) {indent.append("  ");}
+    texStr.append(indent.toString()+"[");
+    texStr.append(XmlConverter.escape2Latex(this.getName()));
+    if (this.getParent()== null) { //root
+      texStr.append(", proTree");
+    }
+    if (this.getChildren() != null && this.getChildren().size() > 0) {
+      texStr.append(System.getProperty("line.separator"));
+      for (Node node : this.getNotNullChildren()) {
+        texStr.append(((SandNode)node).toLatex(depth + 1));
+      }
+      texStr.append(indent.toString());
+    }
+    texStr.append("]");
+    if (this.getChildren() != null && this.getChildren().size() > 1) {
+      if (getType() == SandNode.Type.AND) {
+        texStr.append("\\andN");
+      }
+      else if (getType() == SandNode.Type.SAND) {
+        texStr.append("\\sandN");
+      }
+    }
+    texStr.append(System.getProperty("line.separator"));
+    return texStr.toString();
+  }
 
   public String toString() {
     return "not implemented";

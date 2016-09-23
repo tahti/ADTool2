@@ -21,6 +21,8 @@
 package lu.uni.adtool.tools;
 
 import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.tree.CCP;
+import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.OptionPane;
 import lu.uni.adtool.ui.TreeDockable;
 
@@ -226,6 +228,9 @@ public final class Options {
           SingleCDockable dockable = (SingleCDockable) control.getSingleDockable("tree" + i + "_treeView");
           if (dockable != null) {
             dockable.setWorkingArea(workArea);
+            MainController c = frame.getController();
+            c.getCopyHandler().setFocus(dockable);
+            c.setLastFocused(CCP.getCanvas(dockable, control));
           }
           dockable = (SingleCDockable) control.getSingleDockable("tree" + i + "_termView");
           if (dockable != null) {

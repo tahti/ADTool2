@@ -218,6 +218,10 @@ public final class ADToolMain extends JFrame {
     return detailsView;
   }
 
+  public MainController getController() {
+    return this.controller;
+  }
+
   /**
    * Status bar
    */

@@ -152,6 +152,47 @@ public class ADTNode extends GuiNode {
     }
   }
 
+  public String toLatex(int depth) {
+    StringBuilder texStr = new StringBuilder();
+    StringBuilder indent = new StringBuilder();
+    for (int i = 0; i<depth; i++) {indent.append("  ");}
+    texStr.append(indent.toString()+"[");
+    texStr.append(XmlConverter.escape2Latex(this.getName()));
+    if (this.getParent()== null) { //root
+      texStr.append(", proTree");
+    }
+    else {
+      if (((ADTNode)this.getParent()).isCountered()){
+        if (getRole() == ADTNode.Role.PROPONENT) {
+          texStr.append(", proTree");
+        }
+        else {
+          texStr.append(", oppTree");
+        }
+      }
+    }
+    if (this.getChildren() != null && this.getChildren().size() > 0) {
+      texStr.append(System.getProperty("line.separator"));
+      for (Node node : this.getNotNullChildren()) {
+        texStr.append(((ADTNode)node).toLatex(depth + 1));
+      }
+      texStr.append(indent.toString());
+    }
+    texStr.append("]");
+    if (this.getChildren() != null && this.getChildren().size() > 1 &&
+       (getType() == ADTNode.Type.AND_OPP ||getType() == ADTNode.Type.AND_PRO) ) {
+      ADTNode lastChild = (ADTNode)this.getChildren().get((this.getChildren().size() -1));
+      if (lastChild.getRole() == getRole()) {
+        texStr.append("\\andN");
+      }
+      else if (this.getChildren().size()>2) {
+        texStr.append("\\andC");
+      }
+    }
+    texStr.append(System.getProperty("line.separator"));
+    return texStr.toString();
+  }
+
   /**
    * Export to XML using format used by the first version of ADTool.
    *
@@ -163,7 +204,7 @@ public class ADTNode extends GuiNode {
   public XElement exportXml(Collection<ValuationDomain> domains, ArrayList<RankExporter> rankers, Set<Integer> idToExport) {
     XElement result = new XElement("node");
     result.addString("refinement", typeToXml(type));
-    if (getParent() != null && (((ADTNode) getParent()).getRole() != getRole())) {
+    if (this.getParent() != null && (((ADTNode) getParent()).getRole() != getRole())) {
       result.addString("switchRole", "yes");
     }
     result.addElement("label").setString(getName());
@@ -390,7 +431,7 @@ public class ADTNode extends GuiNode {
     for (int i = 0; i < level; i++) {
       currIndent += indent;
     }
-    eol = "\n";
+    eol = System.getProperty("line.separator");
     if (children != null && children.size() > 0) {
       int c = 0;
       int nextLevel = level + 1;

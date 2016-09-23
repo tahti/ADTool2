@@ -39,6 +39,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.io.StringReader;
 
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
@@ -174,7 +175,8 @@ public class CCP {
               return true;
             }
             else if (canv.getFocused() instanceof SandNode) {
-              cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
+              SandNode copy = ((SandNode) canv.getFocused()).deepCopy();
+              cb.setContents(new NodeSelection(copy), null);
               return true;
             }
           }
@@ -236,6 +238,7 @@ public class CCP {
       this.node = node;
     }
 
+    @SuppressWarnings("deprecation")
     public Object getTransferData(DataFlavor df) throws UnsupportedFlavorException, IOException {
       // If text/rtf flavor is requested
       if (adtFlavor.equals(df)) {
@@ -264,22 +267,34 @@ public class CCP {
           return ((SandNode) node).toTerms();
         }
       }
+      else if (DataFlavor.plainTextFlavor.equals(df)) {
+        if (node instanceof ADTNode) {
+          return new StringReader(((ADTNode) node).toTerms());
+        }
+        else {
+          return new StringReader(((SandNode) node).toTerms());
+        }
+      }
       else {
         throw new UnsupportedFlavorException(df);
       }
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isDataFlavorSupported(DataFlavor df) {
       // If the flavor is text/rtf or tet/plain return true
-      if (adtFlavor.equals(df) || sandFlavor.equals(df) || DataFlavor.stringFlavor.equals(df)) {
+      if (adtFlavor.equals(df) || sandFlavor.equals(df) ||
+          DataFlavor.stringFlavor.equals(df) ||
+          DataFlavor.plainTextFlavor.equals(df)) {
         return true;
       }
       return false;
     }
 
+    @SuppressWarnings("deprecation")
     public DataFlavor[] getTransferDataFlavors() {
       // Return array of flavors
-      return new DataFlavor[] {adtFlavor, sandFlavor, DataFlavor.stringFlavor};
+      return new DataFlavor[] {adtFlavor, sandFlavor, DataFlavor.stringFlavor, DataFlavor.plainTextFlavor};
     }
 
     // ADTNode
@@ -312,27 +327,38 @@ public class CCP {
       this.values = va;
     }
 
+    @SuppressWarnings("deprecation")
     public Object getTransferData(DataFlavor df) throws UnsupportedFlavorException, IOException {
       // If text/rtf flavor is requested
       if (valuationFlavor.equals(df)) {
         return this.values;
+      }
+      else if (DataFlavor.stringFlavor.equals(df)) {
+        return this.values.toString();
+      }
+      else if (DataFlavor.plainTextFlavor.equals(df)) {
+        return new StringReader(this.values.toString());
       }
       else {
         throw new UnsupportedFlavorException(df);
       }
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isDataFlavorSupported(DataFlavor df) {
       // If the flavor is text/rtf or tet/plain return true
-      if (valuationFlavor.equals(df)) {
+      if (valuationFlavor.equals(df) ||
+          DataFlavor.stringFlavor.equals(df) ||
+          DataFlavor.plainTextFlavor.equals(df)) {
         return true;
       }
       return false;
     }
 
+    @SuppressWarnings("deprecation")
     public DataFlavor[] getTransferDataFlavors() {
       // Return array of flavors
-      return new DataFlavor[] {valuationFlavor};
+      return new DataFlavor[] {valuationFlavor, DataFlavor.stringFlavor, DataFlavor.plainTextFlavor};
     }
 
     private ValueAssignement<?>    values;
@@ -359,27 +385,38 @@ public class CCP {
       this.value = value;
     }
 
+    @SuppressWarnings("deprecation")
     public Object getTransferData(DataFlavor df) throws UnsupportedFlavorException, IOException {
       // If text/rtf flavor is requested
       if (valueFlavor.equals(df)) {
         return this.value;
+      }
+      else if (DataFlavor.stringFlavor.equals(df)) {
+        return this.value.toString();
+      }
+      else if (DataFlavor.plainTextFlavor.equals(df)) {
+        return new StringReader(this.value.toString());
       }
       else {
         throw new UnsupportedFlavorException(df);
       }
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isDataFlavorSupported(DataFlavor df) {
       // If the flavor is text/rtf or tet/plain return true
-      if (valueFlavor.equals(df)) {
+      if (valueFlavor.equals(df) ||
+          DataFlavor.stringFlavor.equals(df) ||
+          DataFlavor.plainTextFlavor.equals(df)) {
         return true;
       }
       return false;
     }
 
+    @SuppressWarnings("deprecation")
     public DataFlavor[] getTransferDataFlavors() {
       // Return array of flavors
-      return new DataFlavor[] {valueFlavor};
+      return new DataFlavor[] {valueFlavor, DataFlavor.stringFlavor, DataFlavor.plainTextFlavor};
     }
 
     // ADTNode

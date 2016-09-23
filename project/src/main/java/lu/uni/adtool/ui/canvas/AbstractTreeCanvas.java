@@ -750,6 +750,23 @@ public abstract class AbstractTreeCanvas extends JPanel
   }
 
   /**
+   * Save tree in Latex format
+   *
+   * @param fileStream
+   *          stream to which we write
+   */
+  public void createLatex(FileOutputStream fileStream) {
+    XmlConverter converter = new XmlConverter();
+    try {
+      TreeLayout layout = tree.getLayout();
+      converter.exportLatex(fileStream, layout);
+    }
+    catch (IOException e) {
+      reportError(Options.getMsg("error.latexexport.fail") + e);
+    }
+  }
+
+  /**
    * Get string representing term of the tree.
    */
   public String getTermsString() {
