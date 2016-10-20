@@ -97,14 +97,13 @@ public class DiffLMHE extends RankingDomain<LMHEValue> {
       return new LMHEValue(LMHEValue.INF);
     }
   }
-
   /**
    * {@inheritDoc}
    *
-   * @see AdtDomain#isValueModifiable(ADTNode)
+   * @see AdtDomain#isValueModifiable(boolean)
    */
-  public final boolean isValueModifiable(ADTNode node) {
-    return node.getRole() == ADTNode.Role.PROPONENT;
+  public final boolean isValueModifiable(boolean isProponent) {
+    return isProponent;
   }
 
   /**

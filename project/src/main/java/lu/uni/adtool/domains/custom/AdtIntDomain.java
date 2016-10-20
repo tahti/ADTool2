@@ -20,10 +20,11 @@ public class AdtIntDomain implements AdtDomain<Int>, AdtCustomDomain {
     this.proponentModifiable = true;
   }
 
-  public boolean isValueModifiable(ADTNode node) {
-    if (node.getRole() == ADTNode.Role.PROPONENT) {
+  public boolean isValueModifiable(boolean isProponent) {
+    if(isProponent) {
       return this.proponentModifiable;
-    } else {
+    }
+    else {
       return this.opponnentModifiable;
     }
   }

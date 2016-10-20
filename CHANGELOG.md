@@ -6,6 +6,8 @@ All notable changes to the ADTool will be documented in this file.
   - added pictures to "Load Example Tree" dialog
   - added close window menu item
   - added export to LaTeX
+  - fixed possibility to modify unmodifiable values from Valuations View
+  - added undo operation for copy/paste for valuations view
 ## [2.2.0] - 2016-08-16 ##
   - added custom domains
   - added import from terms/txt file

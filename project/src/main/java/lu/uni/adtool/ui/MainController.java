@@ -901,7 +901,7 @@ public final class MainController implements CControlListener, CFocusListener {
     editCut = new ADAction(Options.getMsg("edit.cut.txt")) {
 
       public void actionPerformed(final ActionEvent e) {
-        copyHandler.cut();
+        copyHandler.cut(lastFocusedTree);
       }
 
       private static final long serialVersionUID = 229256580368467602L;
@@ -912,7 +912,7 @@ public final class MainController implements CControlListener, CFocusListener {
     editPaste = new ADAction(Options.getMsg("edit.paste.txt")) {
 
       public void actionPerformed(final ActionEvent e) {
-        copyHandler.paste();
+        copyHandler.paste(lastFocusedTree);
       }
 
       private static final long serialVersionUID = -9187280429559390662L;
@@ -1004,7 +1004,7 @@ public final class MainController implements CControlListener, CFocusListener {
           AddBoolSandDomDialog dialog = new AddBoolSandDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
-            c.valuesUpdated();
+            c.valuesUpdated(false);
           }
         }
         else if ((Object)domain instanceof SandIntDomain) {
@@ -1012,7 +1012,7 @@ public final class MainController implements CControlListener, CFocusListener {
           AddIntSandDomDialog dialog = new AddIntSandDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
-            c.valuesUpdated();
+            c.valuesUpdated(false);
           }
         }
         else if ((Object)domain instanceof SandRealDomain) {
@@ -1020,7 +1020,7 @@ public final class MainController implements CControlListener, CFocusListener {
           AddRealSandDomDialog dialog = new AddRealSandDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
-            c.valuesUpdated();
+            c.valuesUpdated(false);
           }
         }
       }
@@ -1031,7 +1031,7 @@ public final class MainController implements CControlListener, CFocusListener {
           AddBoolAdtDomDialog dialog = new AddBoolAdtDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
-            c.valuesUpdated();
+            c.valuesUpdated(false);
           }
         }
         else if ((Object)domain instanceof AdtIntDomain) {
@@ -1039,7 +1039,7 @@ public final class MainController implements CControlListener, CFocusListener {
           AddIntAdtDomDialog dialog = new AddIntAdtDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
-            c.valuesUpdated();
+            c.valuesUpdated(false);
           }
         }
         else if ((Object)domain instanceof AdtRealDomain) {
@@ -1047,7 +1047,7 @@ public final class MainController implements CControlListener, CFocusListener {
           AddRealAdtDomDialog dialog = new AddRealAdtDomDialog(this.frame, d);
           if (dialog.showDialog() != null) {
             this.lastFocusedTree.addEditAction(action);
-            c.valuesUpdated();
+            c.valuesUpdated(false);
           }
         }
       }

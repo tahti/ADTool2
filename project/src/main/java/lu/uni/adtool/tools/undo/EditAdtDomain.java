@@ -66,7 +66,7 @@ public class EditAdtDomain extends EditAction {
       t = domain.isOppModifiable();
       domain.setOppModifiable(this.oppModifiable);
       oppModifiable = t;
-      domainCanvas.valuesUpdated();
+      domainCanvas.valuesUpdated(false);
     }
   }
 

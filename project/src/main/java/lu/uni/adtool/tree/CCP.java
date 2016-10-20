@@ -20,19 +20,6 @@
  */
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.domains.ValuationDomain;
-import lu.uni.adtool.domains.ValueAssignement;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.Debug;
-import lu.uni.adtool.ui.DomainDockable;
-import lu.uni.adtool.ui.PermaDockable;
-import lu.uni.adtool.ui.TreeDockable;
-import lu.uni.adtool.ui.ValuationsDockable;
-import lu.uni.adtool.ui.canvas.ADTreeCanvas;
-import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
-import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
-import lu.uni.adtool.ui.canvas.SandTreeCanvas;
-
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -44,6 +31,21 @@ import java.io.StringReader;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.intern.CDockable;
+
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.ValueAssignement;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.undo.SetValuation;
+import lu.uni.adtool.ui.DomainDockable;
+import lu.uni.adtool.ui.PermaDockable;
+import lu.uni.adtool.ui.TreeDockable;
+import lu.uni.adtool.ui.ValuationsDockable;
+import lu.uni.adtool.ui.canvas.ADTreeCanvas;
+import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
+import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
+import lu.uni.adtool.ui.canvas.SandTreeCanvas;
 
 /**
  * class to hold Cut Copy Paste structure
@@ -86,7 +88,7 @@ public class CCP {
   }
 
 @SuppressWarnings("unchecked")
-  public void paste() {
+  public void paste(AbstractTreeCanvas lastFocusedTree) {
     if (lastFocused != null) {
       Debug.log("paste");
       try {
@@ -108,8 +110,33 @@ public class CCP {
             if (canv instanceof AbstractDomainCanvas
                 && contents.isDataFlavorSupported(ValueSelection.valueFlavor)) {
               Ring copy = ((Ring) contents.getTransferData(ValueSelection.valueFlavor));
-              ((AbstractDomainCanvas<Ring>) canv).getValues().setValue(canv.getFocused(), copy);
-              ((AbstractDomainCanvas<Ring>) canv).valuesUpdated();
+              ValuationDomain vd =((AbstractDomainCanvas<Ring>) canv).getValues();
+              Ring oldValue;
+              if (canv.getFocused() instanceof ADTNode) {
+                oldValue = vd.getValue((ADTNode)canv.getFocused());
+              }
+              else {
+                oldValue = vd.getValue((SandNode)canv.getFocused());
+              }
+              if (copy != oldValue) {
+                String key = canv.getFocused().getName();
+                boolean proponent = true;
+                if (canv.getFocused() instanceof ADTNode) {
+                  proponent = (((ADTNode)canv.getFocused()).getRole() == ADTNode.Role.PROPONENT);
+                }
+                if (canv.getFocused() instanceof SandNode ||
+                    ((AdtDomain<Ring>)vd.getDomain()).isValueModifiable(proponent)) {
+
+                  canv.addEditAction(new SetValuation( copy,
+                                                       oldValue,
+                                                       key,
+                                                       proponent,
+                                                       vd.getDomainId()));
+                  vd.setValue(canv.getFocused(), copy);
+
+                  ((AbstractDomainCanvas<Ring>) canv).valuesUpdated(false);
+                }
+              }
             }
             else if (canv.isSand() && contents.isDataFlavorSupported(NodeSelection.sandFlavor)) {
               SandNode copy = ((SandNode) contents.getTransferData(NodeSelection.sandFlavor));
@@ -187,7 +214,7 @@ public class CCP {
   }
 
 @SuppressWarnings("unchecked")
-  public void cut() {
+  public void cut(AbstractTreeCanvas lastFocusedTree) {
     if (lastFocused != null) {
       Debug.log("cut");
       Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -207,24 +234,44 @@ public class CCP {
             Ring copy;
             ValuationDomain values = ((AbstractDomainCanvas<Ring>) canv).getValues();
             if (canv.getFocused() instanceof ADTNode) {
-              copy = values.getValue((ADTNode) canv.getFocused());
-              values.setDefaultValue((ADTNode) canv.getFocused());
+              ADTNode node =(ADTNode) canv.getFocused();
+              copy = values.getValue(node);
+              Ring newValue = values.getDomain().getDefaultValue(node);
+              values.setDefaultValue(node);
+              if (newValue != (Ring)copy) {
+                canv.addEditAction(new SetValuation(newValue,
+                                                    (Ring) copy,
+                                                   node.getName(),
+                                                   node.getRole() == ADTNode.Role.PROPONENT,
+                                                   values.getDomainId()));
+                ((AbstractDomainCanvas<Ring>) canv).valuesUpdated(false);
+              }
             }
             else {
-              copy = ((AbstractDomainCanvas<Ring>) canv).getValues().getValue((SandNode) canv.getFocused());
-              values.setDefaultValue((SandNode) canv.getFocused());
+              SandNode node =(SandNode) canv.getFocused();
+              copy = ((AbstractDomainCanvas<Ring>) canv).getValues().getValue(node);
+              Ring newValue = values.getDomain().getDefaultValue(node);
+              values.setDefaultValue(node);
+              if (newValue != (Ring)copy) {
+                canv.addEditAction(new SetValuation(newValue,
+                                                    (Ring) copy,
+                                                   node.getName(),
+                                                   true,
+                                                   values.getDomainId()));
+                ((AbstractDomainCanvas<Ring>) canv).valuesUpdated(false);
+              }
+
             }
-            ((AbstractDomainCanvas<Ring>) canv).valuesUpdated();
             cb.setContents(new ValueSelection(copy), null);
           }
-          else {
+          else { //not domain canvas but tree canvas
             if (canv.getFocused() instanceof ADTNode) {
               cb.setContents(new NodeSelection(((ADTNode) canv.getFocused()).deepCopy()), null);
-              ((ADTreeCanvas<Ring>) canv).removeTree((ADTNode) canv.getFocused());
+              ((ADTreeCanvas<Ring>) canv).removeTree((ADTNode) canv.getFocused()); //undo actions added from canvas
             }
             else if (canv.getFocused() instanceof SandNode) {
               cb.setContents(new NodeSelection(((SandNode) canv.getFocused()).deepCopy()), null);
-              ((SandTreeCanvas<Ring>) canv).removeTree((SandNode) canv.getFocused());
+              ((SandTreeCanvas<Ring>) canv).removeTree((SandNode) canv.getFocused()); //undo actions added from canvas
             }
           }
         }

@@ -38,8 +38,8 @@ public class AdtBoolDomain implements AdtDomain<Bool>, AdtCustomDomain {
     this.oppDefault = new Bool(true);
   }
 
-  public boolean isValueModifiable(ADTNode node) {
-    if(node.getRole() == ADTNode.Role.PROPONENT) {
+  public boolean isValueModifiable(boolean isProponent) {
+    if(isProponent) {
       return this.proponentModifiable;
     }
     else {

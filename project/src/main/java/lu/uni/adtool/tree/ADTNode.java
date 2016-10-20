@@ -264,7 +264,7 @@ public class ADTNode extends GuiNode {
   }
 
   public boolean isEditable(AdtDomain<Ring> domain) {
-    return hasDefault() && domain.isValueModifiable(this);
+    return hasDefault() && domain.isValueModifiable(this.getRole()==ADTNode.Role.PROPONENT);
   }
 
   /**

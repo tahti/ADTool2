@@ -190,7 +190,7 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
       if (value != null) {
         addEditAction(new SetValuation(value, oldValue, key, proponent, getDomainId()));
         this.values.setValue(proponent, key, value);
-        this.valuesUpdated();
+        this.valuesUpdated(false);
       }
     }
   }
@@ -298,11 +298,21 @@ public class AbstractDomainCanvas<Type extends Ring> extends AbstractTreeCanvas 
   /**
    * Function called whenever a new value is assigned to leaf node
    */
-  public void valuesUpdated() {
+  public void valuesUpdated(boolean removeOld) {
     if (this.isSand()) {
-      this.values.valuesUpdated((SandNode) tree.getRoot(true));
+      if (removeOld) {
+        this.values.treeChanged((SandNode) tree.getRoot(true));
+      }
+      else {
+        this.values.valuesUpdated((SandNode) tree.getRoot(true));
+      }
     } else {
-      this.values.valuesUpdated((ADTNode) tree.getRoot(true));
+      if (removeOld) {
+        this.values.treeChanged((ADTNode) tree.getRoot(true));
+      }
+      else {
+        this.values.valuesUpdated((ADTNode) tree.getRoot(true));
+      }
     }
     if (controller != null) {
       ValuationsDockable valuationsDockable = (ValuationsDockable) controller.getControl()

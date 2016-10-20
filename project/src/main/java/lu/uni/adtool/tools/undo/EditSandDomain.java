@@ -42,7 +42,7 @@ public class EditSandDomain extends EditAction {
       temp = domain.getDefault();
       domain.setDefault(this.defaultValue);
       this.defaultValue= temp;
-      domainCanvas.valuesUpdated();
+      domainCanvas.valuesUpdated(false);
     }
   }
 

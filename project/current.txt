@@ -1,0 +1,2 @@
+copy paste not allow changing value in valuation view
+do not allow changing value in valuation view

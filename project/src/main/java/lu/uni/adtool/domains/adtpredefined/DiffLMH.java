@@ -100,10 +100,10 @@ public class DiffLMH  extends RankingDomain<LMHValue> {
   /**
    * {@inheritDoc}
    *
-   * @see AdtDomain#isValueModifiable(ADTNode)
+   * @see AdtDomain#isValueModifiable(boolean)
    */
-  public final boolean isValueModifiable(ADTNode node) {
-    return ((ADTNode) node).getRole() == ADTNode.Role.PROPONENT;
+  public final boolean isValueModifiable(boolean isProponent) {
+    return isProponent;
   }
 
   /**

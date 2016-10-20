@@ -359,6 +359,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
 
   public void notifyAllTreeChanged(Integer treeId) {
     ArrayList<DomainDockable> domains = domainDockables.get(treeId);
+    Debug.log("treeId:" + treeId);
     if (domains != null) {
       Debug.log("domains size:" + domains.size());
       for (DomainDockable domain : domains) {

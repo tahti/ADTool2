@@ -42,7 +42,7 @@ public interface AdtDomain<Type extends Ring> extends Domain<Type>, Serializable
    *          otherwise.
    * @return true if user can modify the value and false otherwise.
    */
-  public boolean isValueModifiable(ADTNode node);
+  public boolean isValueModifiable(boolean isProponent);
   public Type calc(Type a, Type b, ADTNode.Type type);
   /**
    * Counter of the proponent type of node.

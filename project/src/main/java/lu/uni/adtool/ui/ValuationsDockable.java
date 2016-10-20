@@ -20,28 +20,6 @@
  */
 package lu.uni.adtool.ui;
 
-import lu.uni.adtool.domains.ValueAssignement;
-import lu.uni.adtool.domains.rings.Bool;
-import lu.uni.adtool.domains.rings.BoundedInteger;
-import lu.uni.adtool.domains.rings.LMHEValue;
-import lu.uni.adtool.domains.rings.LMHValue;
-import lu.uni.adtool.domains.rings.RealG0;
-import lu.uni.adtool.domains.rings.RealZeroOne;
-import lu.uni.adtool.domains.rings.Ring;
-import lu.uni.adtool.tools.IconFactory;
-import lu.uni.adtool.tools.Options;
-import lu.uni.adtool.tree.ADTNode;
-import lu.uni.adtool.tree.CCP;
-import lu.uni.adtool.tree.SandNode;
-import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
-import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
-import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
-import lu.uni.adtool.ui.inputdialogs.InputDialog;
-import lu.uni.adtool.ui.inputdialogs.LMHDialog;
-import lu.uni.adtool.ui.inputdialogs.LMHEDialog;
-import lu.uni.adtool.ui.inputdialogs.RealG0Dialog;
-import lu.uni.adtool.ui.inputdialogs.RealZeroOneDialog;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -70,6 +48,32 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import bibliothek.util.Path;
+
+import lu.uni.adtool.domains.AdtDomain;
+import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.ValueAssignement;
+import lu.uni.adtool.domains.rings.Bool;
+import lu.uni.adtool.domains.rings.BoundedInteger;
+import lu.uni.adtool.domains.rings.LMHEValue;
+import lu.uni.adtool.domains.rings.LMHValue;
+import lu.uni.adtool.domains.rings.RealG0;
+import lu.uni.adtool.domains.rings.RealZeroOne;
+import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.tools.Debug;
+import lu.uni.adtool.tools.IconFactory;
+import lu.uni.adtool.tools.Options;
+import lu.uni.adtool.tools.undo.SetValuations;
+import lu.uni.adtool.tree.ADTNode;
+import lu.uni.adtool.tree.CCP;
+import lu.uni.adtool.tree.SandNode;
+import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
+import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
+import lu.uni.adtool.ui.inputdialogs.BoundedIntegerDialog;
+import lu.uni.adtool.ui.inputdialogs.InputDialog;
+import lu.uni.adtool.ui.inputdialogs.LMHDialog;
+import lu.uni.adtool.ui.inputdialogs.LMHEDialog;
+import lu.uni.adtool.ui.inputdialogs.RealG0Dialog;
+import lu.uni.adtool.ui.inputdialogs.RealZeroOneDialog;
 
 public class ValuationsDockable extends PermaDockable implements ListSelectionListener {
 
@@ -110,43 +114,58 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
   }
 
   public boolean edit(int row) {
+    Debug.log("edit1");
     if (!table.isCellSelected(row, 1)) {
       return false;
     }
-    if (getCanvas().isSand()) {
-      String key = (String) table.getValueAt(row, 0);
-      int[] selection = table.getSelectedRows();
-      if (selection.length > 0) {
-        Ring value = editValue(true, key);
-        if (value != null) {
-          for (int i = 0; i < selection.length; i++) {
-            key = (String) table.getValueAt(selection[i], 0);
-            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(true, key, value);
-          }
-          ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
-        }
-      }
+    Debug.log("edit2");
+
+    ValuationDomain vd = ((AbstractDomainCanvas<?>) getCanvas()).getValues();
+    String key = (String) table.getValueAt(row, 0);
+    int[] selection = table.getSelectedRows();
+    ValueAssignement<Ring> oldKeys = new ValueAssignement<Ring>();
+    ValueAssignement<Ring> newKeys = new ValueAssignement<Ring>();
+    boolean addUndo = false;
+    AbstractDomainCanvas<?> c = (AbstractDomainCanvas<?>) getCanvas();
+    boolean proponent = true;
+    if (!getCanvas().isSand()) {
+      proponent = key.equals(Options.getMsg("tablemodel.proponent"));
+      key = (String) table.getValueAt(row, 1);
     }
-    else {
-      String key = (String) table.getValueAt(row, 1);
-      boolean proponent = table.getValueAt(row, 0).equals(Options.getMsg("tablemodel.proponent"));
-      int[] selection = table.getSelectedRows();
-      if (selection.length > 0) {
-        Ring value = editValue(proponent, key);
-        if (value != null) {
-          for (int i = 0; i < selection.length; i++) {
-            key = (String) table.getValueAt(selection[i], 1);
+    Ring value = editValue(proponent, key);
+    if (selection.length > 0) {
+      Debug.log("edit3");
+      if (value != null) {
+        Debug.log("edit4");
+        for (int i = 0; i < selection.length; i++) {
+          Debug.log("edit i:"+ i);
+          if (!getCanvas().isSand()) {
             proponent =
-                table.getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
-            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(proponent, key, value);
+              table.getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
+            key = (String) table.getValueAt(selection[i], 1);
           }
-          ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
+          else {
+            key = (String) table.getValueAt(selection[i], 0);
+          }
+          if (getCanvas().isSand() ||
+              ((AdtDomain<Ring>)vd.getDomain()).isValueModifiable(proponent)) {
+            Debug.log("inside edit key:"+ key);
+            Ring oldValue = vd.get(proponent, key);
+            oldKeys.put(proponent, key, oldValue);
+            newKeys.put(proponent, key, value);
+            vd.setValue(proponent, key, value);
+            addUndo = true;
+          }
         }
+        ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated(false);
+        if (addUndo) {
+          c.getTreeCanvas().addEditAction(new SetValuations(newKeys, oldKeys, vd.getDomainId(), false));
+        }
+
       }
     }
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        // table.requestFocusInWindow();
         table.requestFocus();
       }
     });
@@ -154,9 +173,17 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
   }
 
   public Ring editValue(boolean proponent, String key) {
+    Debug.log("editvalue prop:"+proponent);
     Ring value;
     InputDialog dialog;
-    value = ((AbstractDomainCanvas<?>) getCanvas()).getValues().get(proponent, key);
+    ValuationDomain vd = ((AbstractDomainCanvas<?>) getCanvas()).getValues();
+    if (!getCanvas().isSand()) {
+      if (!((AdtDomain<Ring>)vd.getDomain()).isValueModifiable(proponent)) {
+        return null;
+      }
+    }
+    Debug.log("editvalue key:"+key);
+    value = vd.get(proponent, key);
 
     if (value instanceof Bool) {
       value = (Ring) Bool.not((Bool) value);
@@ -178,73 +205,92 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
       value = (Ring) (dialog.showInputDialog(value));
     }
     else if (value instanceof BoundedInteger) {
-      // if(getDomain() instanceof MinSkill){
-      // dialog = new BoundedIntegerInfDialog(getMainWindow());
-      // }
-      // else{
       dialog = new BoundedIntegerDialog(getCanvas().getFrame());
-      // }
       value = (Ring) (dialog.showInputDialog(value));
     }
     return value;
   }
 
+  /**
+   * Paste Ring value to the selected rows. Adds Undo action and checks if values are modifiable in current domain.
+   *
+   * @param copy - value to be pasted
+   */
   public void paste(Ring copy) {
     int[] selection = table.getSelectedRows();
+    boolean proponent = true;
     if (selection.length > 0) {
+      ValuationDomain vd = ((AbstractDomainCanvas<?>) getCanvas()).getValues();
       Ring v = null;
       if (getCanvas().isSand()) {
         SandNode node = new SandNode();
-        v = ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
+        v = vd.getDomain().getDefaultValue(node);
         if (!v.updateFromString(copy.toString())) {
           return;
         }
       }
       else {
         ADTNode node = new ADTNode();
-        v = ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
+        v = vd.getDomain().getDefaultValue(node);
         if (!v.updateFromString(copy.toString())) {
           return;
         }
       }
+      ValueAssignement<Ring> oldKeys = new ValueAssignement<Ring>();
+      ValueAssignement<Ring> newKeys = new ValueAssignement<Ring>();
+      boolean addUndo = false;
+      String key;
       for (int i = 0; i < selection.length; i++) {
-        if (getCanvas().isSand()) {
-          String key = (String) (table.getModel().getValueAt(selection[i], 0));
-          ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(true, key, v);
+        if (!getCanvas().isSand()) {
+          proponent =
+            table.getValueAt(selection[i], 0).equals(Options.getMsg("tablemodel.proponent"));
+          key = (String) table.getValueAt(selection[i], 1);
         }
         else {
-          boolean proponent = table.getModel().getValueAt(selection[i], 0)
-              .equals(Options.getMsg("tablemodel.proponent"));
-          String key = (String) (table.getModel().getValueAt(selection[i], 1));
-          ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(proponent, key, v);
+          key = (String) table.getValueAt(selection[i], 0);
+        }
+        if (getCanvas().isSand() ||
+            ((AdtDomain<Ring>)vd.getDomain()).isValueModifiable(proponent)) {
+          Ring oldValue = vd.get(proponent, key);
+          oldKeys.put(proponent, key, oldValue);
+          newKeys.put(proponent, key, v);
+          vd.setValue(proponent, key, v);
+          addUndo = true;
         }
       }
-      ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
+      if (addUndo) {
+        ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated(false);
+        ((AbstractDomainCanvas<?>) getCanvas()).getTreeCanvas().
+          addEditAction(new SetValuations(newKeys, oldKeys, vd.getDomainId(), false));
+      }
     }
   }
 
   public void paste(ValueAssignement<Ring> copy) {
     ValuationTableModel tm = (ValuationTableModel) table.getModel();
+    ValueAssignement<Ring> oldKeys = new ValueAssignement<Ring>();
+    ValueAssignement<Ring> newKeys = new ValueAssignement<Ring>();
+    ValuationDomain vd = ((AbstractDomainCanvas<?>) getCanvas()).getValues();
+
     boolean changed = false;
+    boolean proponent;
     for (int i = 0; i < tm.getRowCount(); i++) {
+      String key;
       if (getCanvas().isSand()) {
-        String key = (String) (tm.getValueAt(i, 0));
-        Ring value = copy.get(true, key);
-        if (value != null) {
-          SandNode node = new SandNode();
-          Ring v =
-              ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
-          if (v.updateFromString(value.toString())) {
-            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(true, key, v);
-            changed = true;
-          }
-        }
+        proponent = true;
+        key = (String) (tm.getValueAt(i, 0));
       }
       else {
-        boolean proponent = tm.getValueAt(i, 0).equals(Options.getMsg("tablemodel.proponent"));
-        String key = (String) tm.getValueAt(i, 1);
-        Ring value = copy.get(proponent, key);
-        if (value != null) {
+        proponent = tm.getValueAt(i, 0).equals(Options.getMsg("tablemodel.proponent"));
+        key = (String) (tm.getValueAt(i, 1));
+      }
+      Ring value = copy.get(proponent, key);
+      if (value != null) {
+        Ring v = null;
+        if (getCanvas().isSand()) {
+          v = vd.getDomain().getDefaultValue(new SandNode());
+        }
+        else {
           ADTNode node = new ADTNode();
           if (proponent) {
             node.setType(ADTNode.Type.AND_PRO);
@@ -252,17 +298,23 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
           else {
             node.setType(ADTNode.Type.AND_OPP);
           }
-          Ring v =
-              ((AbstractDomainCanvas<?>) getCanvas()).getValues().getDomain().getDefaultValue(node);
-          if (v.updateFromString(value.toString())) {
-            ((AbstractDomainCanvas<?>) getCanvas()).getValues().setValue(proponent, key, v);
-            changed = true;
-          }
+          v = vd.getDomain().getDefaultValue(node);
+        }
+        if (v.updateFromString(value.toString()) &&
+            (getCanvas().isSand() ||
+             ((AdtDomain<Ring>)vd.getDomain()).isValueModifiable(proponent))) {
+          Ring oldValue = vd.get(proponent, key);
+          oldKeys.put(proponent, key, oldValue);
+          newKeys.put(proponent, key, v);
+          vd.setValue(proponent, key, v);
+          changed = true;
         }
       }
     }
     if (changed) {
-      ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated();
+      ((AbstractDomainCanvas<?>) getCanvas()).valuesUpdated(false);
+      ((AbstractDomainCanvas<?>) getCanvas()).getTreeCanvas().
+        addEditAction(new SetValuations(newKeys, oldKeys, vd.getDomainId(), false));
     }
   }
 
@@ -373,7 +425,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
     });
     am.put("cut", new AbstractAction() {
       public void actionPerformed(ActionEvent evt) {
-        copyHandler.cut();
+        copyHandler.cut(canvas);
         SwingUtilities.invokeLater(new Runnable() {
           public void run() {
             table.requestFocus();
@@ -385,7 +437,7 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
     am.put("paste", new AbstractAction() {
 
       public void actionPerformed(ActionEvent evt) {
-        copyHandler.paste();
+        copyHandler.paste(canvas);
         SwingUtilities.invokeLater(new Runnable() {
           public void run() {
             table.requestFocus();
@@ -413,7 +465,6 @@ public class ValuationsDockable extends PermaDockable implements ListSelectionLi
   }
 
   class ValuationTableModel extends DefaultTableModel {
-
 
     public ValuationTableModel(boolean sand) {
       super();

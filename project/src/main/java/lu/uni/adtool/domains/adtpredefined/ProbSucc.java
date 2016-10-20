@@ -70,9 +70,9 @@ public class ProbSucc implements AdtDomain<RealZeroOne> {
   /**
    * {@inheritDoc}
    *
-   * @see AdtDomain#isValueModifiable(ADTNode)
+   * @see AdtDomain#isValueModifiable(boolean)
    */
-  public final boolean isValueModifiable(ADTNode node) {
+  public final boolean isValueModifiable(boolean isProponent) {
     return true;
   }
 

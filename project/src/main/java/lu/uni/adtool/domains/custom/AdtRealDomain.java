@@ -23,8 +23,8 @@ public class AdtRealDomain  implements AdtDomain<Real>, AdtCustomDomain {
     this.precision = new DecimalFormat("#0.###");
   }
 
-  public boolean isValueModifiable(ADTNode node) {
-    if (node.getRole() == ADTNode.Role.PROPONENT) {
+  public boolean isValueModifiable(boolean isProponent) {
+    if(isProponent) {
       return this.proponentModifiable;
     }
     else {

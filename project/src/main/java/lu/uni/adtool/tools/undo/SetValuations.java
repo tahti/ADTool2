@@ -21,49 +21,70 @@
 package lu.uni.adtool.tools.undo;
 
 import lu.uni.adtool.domains.ValuationDomain;
+import lu.uni.adtool.domains.ValueAssignement;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.TreeDockable;
 import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 
-public class SetValuation extends EditAction {
+public class SetValuations extends EditAction {
 
 
-  public SetValuation(Ring newValue, Ring oldValue, String key, boolean proponent, int domainId) {
-    this.newValue = newValue;
-    this.oldValue = oldValue;
-    this.key = key;
-    this.proponent = proponent;
+  public SetValuations(ValueAssignement<Ring> newKeys, ValueAssignement<Ring> oldKeys, int domainId, boolean clearOld) {
+    this.newKeys = newKeys;
+    this.oldKeys = oldKeys;
     this.domainId = domainId;
+    this.clearOld = clearOld;
   }
 
   public void undo(AbstractTreeCanvas canvas) {
     ValuationDomain vd = canvas.getTree().getLayout().getDomain(domainId);
-    vd.setValue(proponent, key, oldValue);
+    for (String key : this.oldKeys.keySet(true)) {
+      vd.setValue(true, key, this.oldKeys.get(true, key));
+    }
+    for (String key : this.oldKeys.keySet(false)) {
+      vd.setValue(false, key, this.oldKeys.get(false, key));
+    }
+    for (String key : this.oldKeys.keySet(true)) {
+      vd.setValue(true, key, this.oldKeys.get(true, key));
+    }
+    for (String key : this.oldKeys.keySet(false)) {
+      vd.setValue(false, key, this.oldKeys.get(false, key));
+    }
     DomainDockable dockable = (DomainDockable) canvas.getController().getControl()
         .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(vd.getTreeId())
             + DomainDockable.DOMAIN_ID + Integer.toString(vd.getDomainId()));
-    dockable.getCanvas().valuesUpdated(false);
+    dockable.getCanvas().valuesUpdated(this.clearOld);
   }
 
   public void redo(AbstractTreeCanvas canvas) {
     ValuationDomain vd = canvas.getTree().getLayout().getDomain(domainId);
-    vd.setValue(proponent, key, newValue);
+    for (String key : this.newKeys.keySet(true)) {
+      vd.setValue(true, key, this.newKeys.get(true, key));
+    }
+    for (String key : this.newKeys.keySet(false)) {
+      vd.setValue(false, key, this.newKeys.get(false, key));
+    }
+    for (String key : this.newKeys.keySet(true)) {
+      vd.setValue(true, key, this.newKeys.get(true, key));
+    }
+    for (String key : this.newKeys.keySet(false)) {
+      vd.setValue(false, key, this.newKeys.get(false, key));
+    }
     DomainDockable dockable = (DomainDockable) canvas.getController().getControl()
         .getMultipleDockable(TreeDockable.TREE_ID + Integer.toString(vd.getTreeId())
             + DomainDockable.DOMAIN_ID + Integer.toString(vd.getDomainId()));
-    dockable.getCanvas().valuesUpdated(false);
+    dockable.getCanvas().valuesUpdated(this.clearOld);
   }
 
 
   public String getName(){
-    return Options.getMsg("action.setvaluation");
+    return Options.getMsg("action.setvaluations");
   }
 
-  private Ring oldValue;
-  private Ring newValue;
-  private String key;
-  private boolean proponent;
+  private ValueAssignement<Ring> oldKeys;
+  private ValueAssignement<Ring> newKeys;
   private int domainId;
+  private boolean clearOld;
 }

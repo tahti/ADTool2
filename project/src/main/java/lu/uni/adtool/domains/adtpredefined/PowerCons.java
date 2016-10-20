@@ -72,9 +72,9 @@ public class PowerCons implements AdtDomain<RealG0> {
   /**
    * {@inheritDoc}
    *
-   * @see AdtDomain#isValueModifiable(Node)
+   * @see AdtDomain#isValueModifiable(boolean)
    */
-  public final boolean isValueModifiable(ADTNode node) {
+  public final boolean isValueModifiable(boolean isProponent) {
     return true;
   }
 

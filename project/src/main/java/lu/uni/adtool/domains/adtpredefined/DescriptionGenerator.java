@@ -33,10 +33,10 @@ public class DescriptionGenerator {
     ADTNode node = new ADTNode();
     node.setType(ADTNode.Type.AND_PRO);
     Ring proDefault = ((Ring) d.getDefaultValue(node));
-    boolean proModifiable = d.isValueModifiable(node);
+    boolean proModifiable = d.isValueModifiable(true);
     node.setType(ADTNode.Type.AND_OPP);
     Ring opDefault = ((Ring) d.getDefaultValue(node));
-    boolean opModifiable = d.isValueModifiable(node);
+    boolean opModifiable = d.isValueModifiable(false);
     return "<html><table align=\"left\" border=0>" + "<tr><th align=\"left\">" + name + "</th></tr>"
         + "<tr align=\"left\"><table border=0 cellpadding=7>"
         + "<tr border=0><th align=\"left\">Value&nbsp;domain:</th>" + "    <td colspan=1><nbr>"
