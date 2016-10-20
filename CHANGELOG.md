@@ -1,6 +1,6 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
-## Unreleased
+## [2.2.1] - 2016-10-20 ##
   - added "Close all trees" menu item
   - fxed positioning of baloon window showing comments
   - added pictures to "Load Example Tree" dialog
