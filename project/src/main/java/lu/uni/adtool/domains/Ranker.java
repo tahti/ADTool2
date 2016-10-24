@@ -20,6 +20,8 @@
  */
 package lu.uni.adtool.domains;
 
+import java.util.ArrayList;
+
 import lu.uni.adtool.domains.adtpredefined.RankingDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
@@ -28,8 +30,6 @@ import lu.uni.adtool.tree.ADTNode;
 import lu.uni.adtool.tree.Node;
 import lu.uni.adtool.tree.SandNode;
 import lu.uni.adtool.ui.canvas.AbstractDomainCanvas;
-
-import java.util.ArrayList;
 
 public class Ranker<Type extends Ring> {
   public Ranker(AdtDomain<Type> domain) {
@@ -47,9 +47,11 @@ public class Ranker<Type extends Ring> {
    *
    * @param root
    *          node from which we do evaluation
-   * @param newmap
+   * @param valuesMap
    *          mapping between node names and values.
-   * @return true if evaluation was successful.
+   * @param maxItems
+   *          maximum number of results when doing ranking
+   * @return Array of best maxItems attacks.
    */
   public final ArrayList<RankNode<Type>> rank(final ADTNode root,
       final ValueAssignement<Type> valuesMap, int maxItems) {
