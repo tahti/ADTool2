@@ -32,9 +32,9 @@ import java.util.ArrayList;
  *
  */
 
-public abstract class RankingDomain<Type extends Ring> implements AdtDomain<Type> {
+public abstract class AdtRankingDomain<Type extends Ring> implements AdtDomain<Type> {
 
-  public RankingDomain() {
+  public AdtRankingDomain() {
   }
 
   public abstract boolean isOrType(ADTNode.Type operation);

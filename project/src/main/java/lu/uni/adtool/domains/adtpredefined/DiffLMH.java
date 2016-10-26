@@ -31,7 +31,7 @@ import lu.uni.adtool.tree.Node;
  *
  * @author Piotr Kordy
  */
-public class DiffLMH  extends RankingDomain<LMHValue> {
+public class DiffLMH  extends AdtRankingDomain<LMHValue> {
   /**
    * Constructs a new instance.
    */

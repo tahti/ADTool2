@@ -32,7 +32,7 @@ import lu.uni.adtool.tree.Node;
  *
  * @author Piotr Kordy
  */
-public class MinSkill extends RankingDomain<BoundedInteger> implements Parametrized {
+public class MinSkill extends AdtRankingDomain<BoundedInteger> implements Parametrized {
 
   /**
    * Constructs a new instance.

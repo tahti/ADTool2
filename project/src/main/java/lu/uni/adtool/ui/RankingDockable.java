@@ -26,7 +26,7 @@ import lu.uni.adtool.domains.Ranker;
 import lu.uni.adtool.domains.SandDomain;
 import lu.uni.adtool.domains.SandRank;
 import lu.uni.adtool.domains.ValueAssignement;
-import lu.uni.adtool.domains.adtpredefined.RankingDomain;
+import lu.uni.adtool.domains.adtpredefined.AdtRankingDomain;
 import lu.uni.adtool.domains.rings.Ring;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.IconFactory;
@@ -94,7 +94,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
       if (canvas.getTree() != null && (((AbstractDomainCanvas<Ring>) canvas)
               .getValues().getDomain() instanceof SandRank
           || (((AbstractDomainCanvas<Ring>) canvas)
-              .getValues().getDomain() instanceof RankingDomain))) {
+              .getValues().getDomain() instanceof AdtRankingDomain))) {
         JScrollPane scrollPane =
             new JScrollPane(this.createTable((AbstractDomainCanvas<Ring>) canvas));
         pane.add(scrollPane);
@@ -118,7 +118,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
     }
     else {
       if (canvas instanceof AbstractDomainCanvas && (((AbstractDomainCanvas<Ring>) canvas)
-          .getValues().getDomain() instanceof RankingDomain) ||
+          .getValues().getDomain() instanceof AdtRankingDomain) ||
           ((AbstractDomainCanvas<Ring>) canvas)
               .getValues().getDomain() instanceof SandRank) {
         Debug.log("Root used with name:" + root.getName());
@@ -352,7 +352,7 @@ public class RankingDockable extends PermaDockable implements KeyListener, ListS
         }
       }
       else if (((AbstractDomainCanvas<Ring>) canvas).getValues()
-          .getDomain() instanceof RankingDomain) {
+          .getDomain() instanceof AdtRankingDomain) {
         ValueAssignement<Ring> va = canvas.getValues().getValueMap();
         ArrayList<RankNode<Ring>> ranking;
         ranking = ranker.rank((ADTNode) root, va, Options.rank_noRanked);

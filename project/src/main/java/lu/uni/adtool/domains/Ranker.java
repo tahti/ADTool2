@@ -22,8 +22,9 @@ package lu.uni.adtool.domains;
 
 import java.util.ArrayList;
 
-import lu.uni.adtool.domains.adtpredefined.RankingDomain;
+import lu.uni.adtool.domains.adtpredefined.AdtRankingDomain;
 import lu.uni.adtool.domains.rings.Ring;
+import lu.uni.adtool.domains.sandpredefined.SandRankingDomain;
 import lu.uni.adtool.tools.Debug;
 import lu.uni.adtool.tools.Options;
 import lu.uni.adtool.tree.ADTNode;
@@ -57,7 +58,7 @@ public class Ranker<Type extends Ring> {
       final ValueAssignement<Type> valuesMap, int maxItems) {
     this.lastNode = root;
     if (valuesMap == null || root == null || this.atdDomain == null
-        || !(this.atdDomain instanceof RankingDomain)) {
+        || !(this.atdDomain instanceof AdtRankingDomain)) {
       Debug.log("NULL result");
       return null;
     }
@@ -67,46 +68,28 @@ public class Ranker<Type extends Ring> {
     // return rankRecursive(root, newProMap, newOppMap, maxItems);
   }
 
+  /**
+   * Do bottom up evaluation.
+   *
+   * @param root
+   *          node from which we do evaluation
+   * @param valuesMap
+   *          mapping between node names and values.
+   * @param maxItems
+   *          maximum number of results when doing ranking
+   * @return Array of best maxItems attacks.
+   */
   public final ArrayList<RankNode<Type>> rank(final SandNode root,
       final ValueAssignement<Type> valueAssigment, int maxItems) {
     this.lastNode = root;
     if (valueAssigment == null || root == null || sandDomain == null ||
-        !(this.sandDomain instanceof SandRank<?>)) {
+        !(this.sandDomain instanceof SandRankingDomain<?>)) {
       Debug.log("NULL result");
       return null;
     }
     this.lastResult = rankRecursive(root, valueAssigment, maxItems);
     return this.lastResult;
   }
-
-  public final void initGetRanking(final Node root, final ValueAssignement<Type> valuesMap,
-      int maxItems) {
-    if (valuesMap == null || root == null || this.atdDomain == null
-        || !(this.atdDomain instanceof RankingDomain)) {
-      Debug.log("NULL result");
-      return;
-    }
-    if (root instanceof SandNode) {
-      rankRecursive((SandNode) root, valuesMap, maxItems);
-    }
-    else {
-      rankRecursive((ADTNode) root, valuesMap, maxItems);
-    }
-  }
-
-//   /**
-//    * Function used when exporting ranking to XML file. Should be called after
-//    * initGetRanking(Node root)
-//    */
-//   public final ArrayList<Ring> getRanking(final Node node) {
-//     return null;
-//   }
-//
-//   public final void finishGetRanking(final Node root) {
-//   }
-//
-//   public void rankNode(Node node) {
-//   }
 
   private ArrayList<RankNode<Type>> rankRecursive(final ADTNode root,
       ValueAssignement<Type> valuesMap, int maxItems) {
@@ -130,12 +113,12 @@ public class Ranker<Type extends Ring> {
       for (int i = 0; i < (root.getChildren().size() - c); i++) {
         list.add(rankRecursive((ADTNode) root.getChildren().get(i), valuesMap, maxItems));
       }
-      if (((RankingDomain<Type>) this.atdDomain).isOrType(root.getType())) {
-        result = ((RankingDomain<Type>) this.atdDomain).minOp(list, maxItems, root.getType());
+      if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(root.getType())) {
+        result = ((AdtRankingDomain<Type>) this.atdDomain).minOp(list, maxItems, root.getType());
       }
       else {
         result =
-            ((RankingDomain<Type>) this.atdDomain).conjunctiveOp(list, maxItems, root.getType());
+            ((AdtRankingDomain<Type>) this.atdDomain).conjunctiveOp(list, maxItems, root.getType());
       }
     }
     if (c == 1) {
@@ -146,23 +129,23 @@ public class Ranker<Type extends Ring> {
           valuesMap, maxItems));
       if (root.getRole() == ADTNode.Role.OPPONENT) {
         // assuming AND_OPP == CO
-        if (((RankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
+        if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
           result =
-              ((RankingDomain<Type>) this.atdDomain).minOp(list, maxItems, ADTNode.Type.AND_OPP);
+              ((AdtRankingDomain<Type>) this.atdDomain).minOp(list, maxItems, ADTNode.Type.AND_OPP);
         }
         else {
-          result = ((RankingDomain<Type>) this.atdDomain).conjunctiveOp(list, maxItems,
+          result = ((AdtRankingDomain<Type>) this.atdDomain).conjunctiveOp(list, maxItems,
               ADTNode.Type.AND_OPP);
         }
       }
       else {
         // assuming AND_OPP == CP
-        if (((RankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_PRO)) {
+        if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_PRO)) {
           result =
-              ((RankingDomain<Type>) this.atdDomain).minOp(list, maxItems, ADTNode.Type.AND_PRO);
+              ((AdtRankingDomain<Type>) this.atdDomain).minOp(list, maxItems, ADTNode.Type.AND_PRO);
         }
         else {
-          result = ((RankingDomain<Type>) this.atdDomain).conjunctiveOp(list, maxItems,
+          result = ((AdtRankingDomain<Type>) this.atdDomain).conjunctiveOp(list, maxItems,
               ADTNode.Type.AND_PRO);
         }
       }
@@ -170,7 +153,6 @@ public class Ranker<Type extends Ring> {
     return result;
   }
 
-  @SuppressWarnings({"rawtypes", "unchecked"})
   private ArrayList<RankNode<Type>> rankRecursive(final SandNode root, ValueAssignement<Type> map,
       int maxItems) {
     ArrayList<RankNode<Type>> result = new ArrayList<RankNode<Type>>();
@@ -185,22 +167,15 @@ public class Ranker<Type extends Ring> {
     else {
       ArrayList<ArrayList<RankNode<Type>>> list = new ArrayList<ArrayList<RankNode<Type>>>();
       list.ensureCapacity(root.getChildren().size());
-      for (Node child : root.getChildren()) {
-        list.add(rankRecursive((SandNode) child, map, maxItems));
+      for (int i = 0; i < (root.getChildren().size()); i++) {
+        list.add(rankRecursive((SandNode) root.getChildren().get(i), map, maxItems));
       }
-      switch (root.getType()) {
-      case AND:
-        result = ((SandRank) sandDomain).and(list, maxItems);
-        break;
-      case OR:
-        result = ((SandRank)sandDomain).or(list, maxItems);
-        break;
-      case SAND:
-        result = ((SandRank)sandDomain).sand(list, maxItems);
-        break;
-      default:
-        System.err.println(Options.getMsg("error.evaluation.noType"));
-        return null;
+      if (((SandRankingDomain<Type>) this.sandDomain).isOrType(root.getType())) {
+        result = ((SandRankingDomain<Type>) this.sandDomain).minOp(list, maxItems, root.getType());
+      }
+      else {
+        result =
+            ((SandRankingDomain<Type>) this.sandDomain).conjunctiveOp(list, maxItems, root.getType());
       }
     }
     return result;
@@ -219,26 +194,22 @@ public class Ranker<Type extends Ring> {
 
   public Type markRecursive(Node node, NodeRanker consumer, ValueAssignement<Type> map,
       ArrayList<Integer> orChoices) {
-    Type value;
+    Type value = null;
     if (node.getChildren() != null && node.getChildren().size() > 0) {
       if (node instanceof SandNode) {
-        switch (((SandNode) node).getType()) {
-        case OR:
+        if (((SandRankingDomain<Type>) this.sandDomain).isOrType(((SandNode)node).getType())) {
           int index = orChoices.get(orChoices.size() - 1);
           orChoices.remove(orChoices.size() - 1);
           value = markRecursive(node.getChildren().get(index), consumer, map, orChoices);
-          break;
-//         case SAND:
-//         case AND:
-        default:
-          value = markRecursive(node.getChildren().get(0), consumer, map, orChoices);
+        }
+        else {
           for (int i = 1; i < node.getChildren().size(); i++) {
-            value = this.sandDomain.calc(value, markRecursive(node.getChildren().get(i), consumer, map, orChoices),
-                                         ((SandNode) node).getType());
+            value = this.sandDomain.calc(value
+                                         , markRecursive(node.getChildren().get(i) , consumer, map , orChoices)
+                                         , ((SandNode) node).getType());
 //             value = this.sandDomain.sand(value,
 //                 markRecursive(node.getChildren().get(i), consumer, map, orChoices));
           }
-          break;
         }
       }
       else {
@@ -246,12 +217,12 @@ public class Ranker<Type extends Ring> {
         if (n.isCountered()) {
           boolean doOr = false;
           if (n.getRole() == ADTNode.Role.PROPONENT) {
-            if (((RankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_PRO)) {
+            if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_PRO)) {
               doOr = true;
             }
           }
           else {
-            if (((RankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
+            if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(ADTNode.Type.AND_OPP)) {
               doOr = true;
             }
           }
@@ -263,7 +234,7 @@ public class Ranker<Type extends Ring> {
                 value = this.atdDomain.getDefaultValue(node);
               }
               else {
-                if (((RankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
+                if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
                   ind = orChoices.get(orChoices.size() - 1);
                   orChoices.remove(orChoices.size() - 1);
                   value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);
@@ -289,7 +260,7 @@ public class Ranker<Type extends Ring> {
               value = this.atdDomain.getDefaultValue(node);
             }
             else {
-              if (((RankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
+              if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
                 int ind = orChoices.get(orChoices.size() - 1);
                 orChoices.remove(orChoices.size() - 1);
                 value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);
@@ -314,7 +285,7 @@ public class Ranker<Type extends Ring> {
           }
         }
         else {
-          if (((RankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
+          if (((AdtRankingDomain<Type>) this.atdDomain).isOrType(n.getType())) {
             int ind = orChoices.get(orChoices.size() - 1);
             orChoices.remove(orChoices.size() - 1);
             value = markRecursive(node.getChildren().get(ind), consumer, map, orChoices);

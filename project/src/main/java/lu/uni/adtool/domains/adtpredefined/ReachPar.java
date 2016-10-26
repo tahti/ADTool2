@@ -32,7 +32,7 @@ import lu.uni.adtool.tree.Node;
  *
  * @author Piotr Kordy
  */
-public class ReachPar extends RankingDomain<BoundedInteger> implements Parametrized {
+public class ReachPar extends AdtRankingDomain<BoundedInteger> implements Parametrized {
   static final long serialVersionUID = 154666564465361444L;
   private int       bound;
 

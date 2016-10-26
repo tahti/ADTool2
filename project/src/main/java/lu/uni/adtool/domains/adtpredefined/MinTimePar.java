@@ -31,7 +31,7 @@ import lu.uni.adtool.tree.Node;
  *
  * @author Piotr Kordy
  */
-public class MinTimePar extends RankingDomain<RealG0> {
+public class MinTimePar extends AdtRankingDomain<RealG0> {
   // number 5
 
   /**
