@@ -184,7 +184,7 @@ public class XmlConverter {
 //       header = header.replaceAll("\n", System.getProperty("line.separator"));
       header = header.replaceAll("\r", System.getProperty("line.separator"));
       header = header.replaceAll("%%IMPORTS%%", Matcher.quoteReplacement(packages.toString()));
-      header = header.replaceAll("%%TREE%%\\n", Matcher.quoteReplacement(tree));
+      header = header.replaceAll("%%TREE%%", Matcher.quoteReplacement(tree));
       PrintWriter pstream = new PrintWriter(new OutputStreamWriter(fileStream, StandardCharsets.UTF_8), true);
       String[] lines = header.split(System.getProperty("line.separator"));
       for(String line: lines){
