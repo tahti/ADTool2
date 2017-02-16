@@ -32,13 +32,13 @@
   \pgfusepath{draw}%
 }
 \def\andC{\arc{node@\forestove{id}}{node@\forestove{@first}}%
-  {node@\pgfkeysvalueof{/forest/@node/\forestove{@last}/@previous}}{o}}
+  {node@\forestOve{\forestove{@last}}{@previous}}{o}}
 \def\andN{\arc{node@\forestove{id}}%
   {node@\forestove{@first}}{node@\forestove{@last}}{o}}
 \def\sandN{\arc{node@\forestove{id}}%
   {node@\forestove{@first}}{node@\forestove{@last}}{t}}
 \def\sandC{\arc{node@\forestove{id}}{node@\forestove{@first}}%
-  {node@\pgfkeysvalueof{/forest/@node/\forestove{@last}/@previous}}{t}}
+  {node@\forestOve{\forestove{@last}}{@previous}}{t}}
 
 \def\inheritall#1{
   \foreach \anchor in {north,north west,north east,center,west,east,mid,center,
@@ -47,7 +47,6 @@
   \inheritanchorborder[from=#1]
   \inheritbackgroundpath[from=#1]
 }
-
 \pgfdeclareshape{attacker}{
     \inheritsavedanchors[from=ellipse]
     \savedanchor\radius{%
@@ -73,7 +72,6 @@
   \inheritall{ellipse}
 }
 \let\forest@compute@node@boundary@attacker\forest@compute@node@boundary@circle
-
 \def\squarecorner#1{
     \pgf@x=\the\wd\pgfnodeparttextbox%
     \pgfmathsetlength\pgf@xc{\pgfkeysvalueof{/pgf/inner xsep}}%
@@ -105,7 +103,6 @@
     \inheritall{rectangle}
 }
 \makeatother
-
 \forestset{
   declare boolean={ispro}{false},
   common/.style={
@@ -118,7 +115,6 @@
   oppTree/.style={for tree={opp}},
   proTree/.style={for tree={pro}},
 }
-
 \begin{document}
 \begin{forest}
 %%TREE%%
