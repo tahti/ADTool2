@@ -14,8 +14,6 @@ public class TxtImporter {
     String input = read(in);
     Node newRoot = null;
     Parser parser = null;
-    boolean isAdt = false;
-
     parser = new SandParser();
     newRoot = (Node)parser.parseString(input);
     if (newRoot == null) {
@@ -24,14 +22,11 @@ public class TxtImporter {
       if (newRoot == null) {
         throw (new IOException("Wrong format of the file"));
       }
-      isAdt = true;
     }
     final TreeLayout layout = new TreeLayout(controller.getFrame().getTreeFactory().getNewUniqueId(), newRoot);
     final TreeDockable treeDockable = new TreeDockable(controller.getFrame().getTreeFactory(), layout, false);
     controller.addTreeDockable(treeDockable);
-    if(!isAdt) {
-      controller.report(Options.getMsg("status.status.importTxt"));
-    }
+    controller.report(Options.getMsg("status.importTxt"));
   }
 
   public static String read(InputStream in) throws IOException{
