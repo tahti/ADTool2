@@ -1,10 +1,11 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
 ## Unreleased
-## [2.2.2] - 2017-02-16 ##
+## [2.2.2] - 2017-02-20 ##
   - updated Latex export to the forest package 2
   - fixed Latex export issue under windows
   - fixed bug when adding domain
+  - fixed ranking for Sand trees
 ## [2.2.1] - 2016-10-20 ##
   - added "Close all trees" menu item
   - fxed positioning of baloon window showing comments
