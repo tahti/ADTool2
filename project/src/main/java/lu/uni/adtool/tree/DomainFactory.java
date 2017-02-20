@@ -132,7 +132,11 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       result.add(new SandRealDomain());
       Reflections reflections = new Reflections(sandDomainsPrefix);
       Set<Class<? extends SandDomain>> m = reflections.getSubTypesOf(SandDomain.class);
+
       for (Class<? extends SandDomain> c : m) {
+        if (c.getSimpleName().equals("SandRankingDomain")) {
+          continue;
+        }
         SandDomain<Ring> d = null;
         Constructor<SandDomain<Ring>>[] ct = (Constructor<SandDomain<Ring>>[]) c.getDeclaredConstructors();
         try {
@@ -169,7 +173,7 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       Set<Class<? extends AdtDomain>> m = reflections.getSubTypesOf(AdtDomain.class);
       for (Class<? extends AdtDomain> c : m) {
         Debug.log(" for c:" + c);
-        if (c.getSimpleName().equals("RankingDomain")) {
+        if (c.getSimpleName().equals("AdtRankingDomain")) {
           continue;
         }
 
