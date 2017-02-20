@@ -132,7 +132,6 @@ public class DomainFactory implements MultipleCDockableFactory<DomainDockable, V
       result.add(new SandRealDomain());
       Reflections reflections = new Reflections(sandDomainsPrefix);
       Set<Class<? extends SandDomain>> m = reflections.getSubTypesOf(SandDomain.class);
-
       for (Class<? extends SandDomain> c : m) {
         if (c.getSimpleName().equals("SandRankingDomain")) {
           continue;
