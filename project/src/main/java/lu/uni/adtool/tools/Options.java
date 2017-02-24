@@ -149,6 +149,7 @@ public final class Options {
     RECTANGLE, OVAL
   }
 
+
   /**
    * Saved options
    */

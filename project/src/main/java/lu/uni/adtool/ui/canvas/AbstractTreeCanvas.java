@@ -599,8 +599,39 @@ public abstract class AbstractTreeCanvas extends JPanel
         tree.getTreeForLayout(), (NodeExtentProvider<Node>) extentProvider, configuration);
     bufferedLayout = treeLayout.getNodeBounds();
     for (Rectangle2D.Double rect : bufferedLayout.values()) {
-      sizeX = Math.max(sizeX, rect.getMaxX());
-      sizeY = Math.max(sizeY, rect.getMaxY());
+       sizeX = Math.max(sizeX, rect.getMaxX());
+       sizeY = Math.max(sizeY, rect.getMaxY());
+    }
+    if(this.nodeLayout == NodeLayout.RADIAL) {
+      Node root = this.tree.getRoot(false);
+      Rectangle2D.Double rect = bufferedLayout.get(root);
+      radialX = rect.getMaxX() - rect.getWidth()/2;
+      radialY = rect.getMaxY() - rect.getHeight()/2;
+      double minX = Double.MAX_VALUE;
+      double maxX = Double.MIN_VALUE;
+      double minY = Double.MAX_VALUE;
+      double maxY = Double.MIN_VALUE;
+      for (Node node: bufferedLayout.keySet()) {
+        rect = bufferedLayout.get(node);
+        double angle = (((rect.getX() + rect.getWidth()/2) - radialX)/sizeX)*2*Math.PI;
+        double r = (rect.getY() + rect.getHeight()/2) - radialY;
+//         Debug.log("r:" + r + " angle:"+angle);
+//         Debug.log("getX:" + rect.getX() + " getY:"+rect.getY() + " w:"+ rect.getWidth()+ " h:"+ rect.getHeight()+ " name:" + node.getName());
+        rect.setRect(r*Math.cos(angle) + radialX - rect.getWidth()/2, r*Math.sin(angle) + radialY- rect.getHeight()/2, rect.getWidth(), rect.getHeight());
+        minX = Math.min(minX, rect.getMinX());
+        minY = Math.min(minY, rect.getMinY());
+        maxX = Math.max(maxX, rect.getMaxX());
+        maxY = Math.max(maxY, rect.getMaxY());
+        bufferedLayout.put(node, rect);
+      }
+      for (Node node: bufferedLayout.keySet()) {
+        rect = bufferedLayout.get(node);
+        rect.setRect(rect.getX() - minX, rect.getY() - minY, rect.getWidth(), rect.getHeight());
+      }
+      sizeX = maxX - minX;
+      sizeY = maxY - minY;
+      radialX = radialX - minX;
+      radialY = radialY - minY;
     }
     setScale(scale);
   }
@@ -1214,6 +1245,7 @@ public abstract class AbstractTreeCanvas extends JPanel
           drawArc = true;
         }
       }
+//       if (
       if (drawArc) {
         double tangens1 = (b2.getCenterY() - (double) y1) / (minX - (double) x1);
         double tangens2 = (b2.getCenterY() - (double) y1) / (maxX - (double) x1 - 1);
@@ -1430,5 +1462,16 @@ public abstract class AbstractTreeCanvas extends JPanel
   protected int                           labelCounter;
 
   protected static final String           LABEL_PREFIX     = "N_";
-
+  public static enum NodeLayout{
+    NORMAL, RADIAL
+  }
+  protected NodeLayout                    nodeLayout = NodeLayout.RADIAL;
+  /**
+   * Center of root node when using RADIAL display layout - x component
+   */
+  protected double                        radialX = 0;
+  /**
+   * Center of root node when using RADIAL display layout - y component
+   */
+  protected double                        radialY = 0;
 }
