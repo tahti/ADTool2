@@ -17,6 +17,59 @@
  */
 package lu.uni.adtool.ui.canvas;
 
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.print.PageFormat;
+import java.awt.print.Pageable;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.imageio.ImageIO;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.MediaSizeName;
+import javax.print.attribute.standard.PageRanges;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
+
+import org.abego.treelayout.NodeExtentProvider;
+import org.abego.treelayout.util.DefaultConfiguration;
+
+import com.itextpdf.awt.PdfGraphics2D;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import lu.uni.adtool.ADToolMain;
 import lu.uni.adtool.domains.AdtDomain;
 import lu.uni.adtool.domains.Domain;
@@ -47,58 +100,6 @@ import lu.uni.adtool.ui.ADAction;
 import lu.uni.adtool.ui.DomainDockable;
 import lu.uni.adtool.ui.MainController;
 import lu.uni.adtool.ui.TreeDockable;
-
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RoundRectangle2D;
-import java.awt.image.BufferedImage;
-import java.awt.print.PageFormat;
-import java.awt.print.Pageable;
-import java.awt.print.Printable;
-import java.awt.print.PrinterException;
-import java.awt.print.PrinterJob;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.imageio.ImageIO;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.MediaSizeName;
-import javax.print.attribute.standard.PageRanges;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.Scrollable;
-import javax.swing.SwingConstants;
-
-import org.abego.treelayout.NodeExtentProvider;
-import org.abego.treelayout.util.DefaultConfiguration;
-
-import com.itextpdf.awt.PdfGraphics2D;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfWriter;
 
 public abstract class AbstractTreeCanvas extends JPanel
     implements Scrollable, TreeChangeListener, Printable, Pageable {
@@ -605,16 +606,16 @@ public abstract class AbstractTreeCanvas extends JPanel
     if(this.nodeLayout == NodeLayout.RADIAL) {
       Node root = this.tree.getRoot(false);
       Rectangle2D.Double rect = bufferedLayout.get(root);
-      radialX = rect.getMaxX() - rect.getWidth()/2;
-      radialY = rect.getMaxY() - rect.getHeight()/2;
+      radialX = rect.getCenterX();
+      radialY = rect.getCenterY();
       double minX = Double.MAX_VALUE;
       double maxX = Double.MIN_VALUE;
       double minY = Double.MAX_VALUE;
       double maxY = Double.MIN_VALUE;
       for (Node node: bufferedLayout.keySet()) {
         rect = bufferedLayout.get(node);
-        double angle = (((rect.getX() + rect.getWidth()/2) - radialX)/sizeX)*2*Math.PI;
-        double r = (rect.getY() + rect.getHeight()/2) - radialY;
+        double angle = ((rect.getCenterX() - radialX)/sizeX)*2*Math.PI;
+        double r = rect.getCenterY() - radialY;
 //         Debug.log("r:" + r + " angle:"+angle);
 //         Debug.log("getX:" + rect.getX() + " getY:"+rect.getY() + " w:"+ rect.getWidth()+ " h:"+ rect.getHeight()+ " name:" + node.getName());
         rect.setRect(r*Math.cos(angle) + radialX - rect.getWidth()/2, r*Math.sin(angle) + radialY- rect.getHeight()/2, rect.getWidth(), rect.getHeight());
@@ -1204,32 +1205,14 @@ public abstract class AbstractTreeCanvas extends JPanel
       final Rectangle2D.Double b1 = bufferedLayout.get(parent);
       final double x1 = b1.getCenterX();
       final double y1 = b1.getCenterY();
-      double maxX = 0;
-      double minX = x1;
-      int noChildren = 0;
       g2.setColor(Options.canv_EdgesColor);
-      Rectangle2D.Double b2 = new Rectangle2D.Double(0, 0, 0, 0);
-      for (Node child : tree.getChildrenList(parent, false)) {
-        b2 = bufferedLayout.get(child);
-        if (parent instanceof ADTNode
-            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole()) {
-          g2.setStroke(counterStroke);
-        }
-        else {
-          g2.setStroke(basicStroke);
-        }
-        if (!(parent instanceof ADTNode
-            && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole())) {
-          maxX = Math.max(maxX, b2.getCenterX());
-          minX = Math.min(minX, b2.getCenterX());
-          noChildren++;
-        }
-        g2.drawLine((int) x1, (int) y1, (int) b2.getCenterX(), (int) b2.getCenterY());
-      }
-      g2.setStroke(basicStroke);
+      List<Node> children = tree.getChildrenList(parent, false);
+      int noChildren = children.size();
       boolean drawArc = false;
       boolean drawArrow = false;
-
+      if (parent instanceof ADTNode && ((ADTNode)parent).isCountered()) {
+        noChildren--;
+      }
       if (parent instanceof SandNode) {
         if ((((SandNode) parent).getType() == SandNode.Type.AND
             || ((SandNode) parent).getType() == SandNode.Type.SAND) && noChildren > 1) {
@@ -1245,41 +1228,71 @@ public abstract class AbstractTreeCanvas extends JPanel
           drawArc = true;
         }
       }
-//       if (
-      if (drawArc) {
-        double tangens1 = (b2.getCenterY() - (double) y1) / (minX - (double) x1);
-        double tangens2 = (b2.getCenterY() - (double) y1) / (maxX - (double) x1 - 1);
-        double shear = (double) (b1.getWidth() + Options.canv_ArcPadding)
-            / (double) (b1.getHeight() + Options.canv_ArcPadding);
-        double startAngle = -Math.toDegrees(Math.atan(tangens2 * shear));
-        g2.setColor(Options.canv_ArcColor);
-        if (startAngle > 0) {
-          startAngle = startAngle - 180;
+      if (nodeLayout == NodeLayout.RADIAL) {
+        double maxX = 0;
+        double minX = x1;
+        Rectangle2D.Double b2 = new Rectangle2D.Double(0, 0, 0, 0);
+        //paint edges
+        for (Node child : children) {
+          b2 = bufferedLayout.get(child);
+          if (parent instanceof ADTNode
+              && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole()) {
+            g2.setStroke(counterStroke);
+          }
+          else {
+            g2.setStroke(basicStroke);
+          }
+          if (!(parent instanceof ADTNode
+              && ((ADTNode) child).getRole() != ((ADTNode) parent).getRole())) {
+            maxX = Math.max(maxX, b2.getCenterX());
+            minX = Math.min(minX, b2.getCenterX());
+          }
+          g2.drawLine((int) x1, (int) y1, (int) b2.getCenterX(), (int) b2.getCenterY());
         }
-        double endAngle = -180 - Math.toDegrees(Math.atan(tangens1 * shear));
-        double a = b1.getWidth() + Options.canv_ArcPadding;
-        double b = b1.getHeight() + Options.canv_ArcPadding;
-        Arc2D arc = new Arc2D.Double(b1.getX() - Options.canv_ArcPadding / 2,
-            b1.getY() - Options.canv_ArcPadding / 2, a, b, startAngle, endAngle - startAngle,
-            Arc2D.OPEN);
+        g2.setStroke(basicStroke);
 
-        if (arc != null) {
-          g2.draw(arc);
-        }
-        if (drawArrow) {
-          double cos = Math.cos(Math.toRadians(startAngle));
-          double sin = Math.sin(Math.toRadians(startAngle));
-          double cos2 = Math.cos(Math.toRadians(startAngle - 75));
-          double sin2 = Math.sin(Math.toRadians(startAngle - 75));
-          double cos3 = Math.cos(Math.toRadians(startAngle - 125));
-          double sin3 = Math.sin(Math.toRadians(startAngle - 125));
-          g2.draw(new Line2D.Double(x1 + a * cos / (double) 2, y1 - b * sin / (double) 2,
-              x1 + a * cos / (double) 2 + 8 * cos2, y1 - b * sin / (double) 2 - 8 * sin2));
-          g2.draw(new Line2D.Double(x1 + a * cos / (double) 2, y1 - b * sin / (double) 2,
-              x1 + a * cos / (double) 2 + 8 * cos3, y1 - b * sin / (double) 2 - 8 * sin3));
+//         if (
+        if (drawArc) {
+          double tangens1 = (b2.getCenterY() - (double) y1) / (minX - (double) x1);
+          double tangens2 = (b2.getCenterY() - (double) y1) / (maxX - (double) x1 - 1);
+          double shear = (double) (b1.getWidth() + Options.canv_ArcPadding)
+              / (double) (b1.getHeight() + Options.canv_ArcPadding);
+          double startAngle = -Math.toDegrees(Math.atan(tangens2 * shear));
+          g2.setColor(Options.canv_ArcColor);
+          if (startAngle > 0) {
+            startAngle = startAngle - 180;
+          }
+          double endAngle = -180 - Math.toDegrees(Math.atan(tangens1 * shear));
+          double a = b1.getWidth() + Options.canv_ArcPadding;
+          double b = b1.getHeight() + Options.canv_ArcPadding;
+          Arc2D arc = new Arc2D.Double(b1.getX() - Options.canv_ArcPadding / 2,
+              b1.getY() - Options.canv_ArcPadding / 2, a, b, startAngle, endAngle - startAngle,
+              Arc2D.OPEN);
+
+          if (arc != null) {
+            g2.draw(arc);
+          }
+          if (drawArrow) {
+            double cos = Math.cos(Math.toRadians(startAngle));
+            double sin = Math.sin(Math.toRadians(startAngle));
+            double cos2 = Math.cos(Math.toRadians(startAngle - 75));
+            double sin2 = Math.sin(Math.toRadians(startAngle - 75));
+            double cos3 = Math.cos(Math.toRadians(startAngle - 125));
+            double sin3 = Math.sin(Math.toRadians(startAngle - 125));
+            g2.draw(new Line2D.Double(x1 + a * cos / (double) 2, y1 - b * sin / (double) 2,
+                x1 + a * cos / (double) 2 + 8 * cos2, y1 - b * sin / (double) 2 - 8 * sin2));
+            g2.draw(new Line2D.Double(x1 + a * cos / (double) 2, y1 - b * sin / (double) 2,
+                x1 + a * cos / (double) 2 + 8 * cos3, y1 - b * sin / (double) 2 - 8 * sin3));
+          }
         }
       }
-      for (Node child : tree.getChildrenList(parent, false)) {
+      else { //RADIAL layout
+//         g2.drawLine((int) x1, (int) y1, (int) radialX, (int) b2.getCenterY());
+//         rect.setRect(r*Math.cos(angle) + radialX - rect.getWidth()/2, r*Math.sin(angle) + radialY- rect.getHeight()/2, rect.getWidth(), rect.getHeight());
+        double r = Math.sqrt(m;
+        double angle1 = Math.acos(
+      }
+      for (Node child : children) {
         paintEdges(g2, child);
       }
     }

@@ -46,7 +46,7 @@ public class NodeTree {
    * Gets the children list.
    *
    * @param node
-   * @param ignoreFold
+   * @param ignoreFold - if true the function will report children even if they are folded
    * @return
    */
   public List<Node> getChildrenList(Node node, boolean ignoreFold) {
