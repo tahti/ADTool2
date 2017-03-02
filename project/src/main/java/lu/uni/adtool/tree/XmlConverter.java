@@ -152,17 +152,19 @@ public class XmlConverter {
    */
   public void exportLatex(FileOutputStream fileStream, TreeLayout layout) throws IOException {
     InputStream headerStream = getClass().getResourceAsStream("/latexHeader.tex");
+    String ls = System.getProperty("line.separator");
+
     if (headerStream != null) {
       Debug.log("Exporting latex 2");
       String header = TxtImporter.read(headerStream);
       if (layout.getSwitchRole()) {
         header = header.replaceAll("%%STYLE%%", "  opp/.style={draw=red, attacker, ispro=false, common, inner sep=2pt},"
-                                   + System.getProperty("line.separator")
+                                   + ls
                                    + "  pro/.style={draw=green, defender, ispro=true, common, inner sep=1pt},");
       }
       else {
         header = header.replaceAll("%%STYLE%%", "  pro/.style={draw=red, attacker, ispro=true, common, inner sep=2pt},"
-                                   + System.getProperty("line.separator")
+                                   + ls
                                    + "  opp/.style={draw=green, defender,ispro=false, common, inner sep=1pt},");
       }
       StringBuilder packages = new StringBuilder();
@@ -176,19 +178,20 @@ public class XmlConverter {
         Debug.log("Exporting adt" + tree);
       }
       if (tree.indexOf("\\textquotesingle") != -1) {
-        packages.append("\\usepackage{textcomp}" + System.getProperty("line.separator"));
+        packages.append("\\usepackage{textcomp}" + ls);
       }
       if (tree.indexOf("\\textquotedbl") != -1) {
-        packages.append("\\usepackage[T1]{fontenc}"+ System.getProperty("line.separator"));
+        packages.append("\\usepackage[T1]{fontenc}"+ ls);
       }
 //       header = header.replaceAll("\n", System.getProperty("line.separator"));
-      header = header.replaceAll("\r", System.getProperty("line.separator"));
       header = header.replaceAll("%%IMPORTS%%", Matcher.quoteReplacement(packages.toString()));
       header = header.replaceAll("%%TREE%%", Matcher.quoteReplacement(tree));
       PrintWriter pstream = new PrintWriter(new OutputStreamWriter(fileStream, StandardCharsets.UTF_8), true);
-      String[] lines = header.split(System.getProperty("line.separator"));
+      String[] lines = header.split(ls);
       for(String line: lines){
-        pstream.println(line);
+        if (line.length() > 0) {
+          pstream.println(line);
+        }
       }
       if (pstream.checkError()) {
         throw new IOException(Options.getMsg("error.write"));
