@@ -20,10 +20,10 @@
  */
 package lu.uni.adtool.tree;
 
-import lu.uni.adtool.tools.Debug;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import lu.uni.adtool.tools.Debug;
 
 public class NodeTree {
   public NodeTree(TreeLayout layout) {
@@ -49,7 +49,7 @@ public class NodeTree {
    * @param ignoreFold - if true the function will report children even if they are folded
    * @return
    */
-  public List<Node> getChildrenList(Node node, boolean ignoreFold) {
+  public ArrayList<Node> getChildrenList(Node node, boolean ignoreFold) {
     if (!ignoreFold && ((GuiNode) node).isFolded()) {
       return new ArrayList<Node>();
     }

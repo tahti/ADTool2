@@ -46,7 +46,7 @@ import java.awt.print.PrinterJob;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -1206,7 +1206,7 @@ public abstract class AbstractTreeCanvas extends JPanel
       final double x1 = b1.getCenterX();
       final double y1 = b1.getCenterY();
       g2.setColor(Options.canv_EdgesColor);
-      List<Node> children = tree.getChildrenList(parent, false);
+      ArrayList<Node> children = tree.getChildrenList(parent, false);
       int noChildren = children.size();
       boolean drawArc = false;
       boolean drawArrow = false;
@@ -1228,7 +1228,7 @@ public abstract class AbstractTreeCanvas extends JPanel
           drawArc = true;
         }
       }
-      if (nodeLayout == NodeLayout.RADIAL) {
+      if (this.nodeLayout == NodeLayout.NORMAL) {
         double maxX = 0;
         double minX = x1;
         Rectangle2D.Double b2 = new Rectangle2D.Double(0, 0, 0, 0);
@@ -1289,8 +1289,91 @@ public abstract class AbstractTreeCanvas extends JPanel
       else { //RADIAL layout
 //         g2.drawLine((int) x1, (int) y1, (int) radialX, (int) b2.getCenterY());
 //         rect.setRect(r*Math.cos(angle) + radialX - rect.getWidth()/2, r*Math.sin(angle) + radialY- rect.getHeight()/2, rect.getWidth(), rect.getHeight());
-        double r = Math.sqrt(m;
-        double angle1 = Math.acos(
+        if (children.size() > 0) {
+          Rectangle2D.Double bParen = bufferedLayout.get(parent);
+          double tempX = bParen.getCenterX() - radialX;
+          double tempY = bParen.getCenterY() - radialY;
+          double parenR = Math.sqrt((tempX*tempX + tempY*tempY));
+          double minAngle = Double.MAX_VALUE;
+          double lastAngle = Double.MIN_VALUE;
+          double maxAngle = Double.MIN_VALUE;
+          double r = -1;
+          double halfR = -1;
+          double meanX = 0;
+          double meanY = 0;
+
+          int i = 1;
+          for (Node child : children) {
+            Rectangle2D.Double b2 = bufferedLayout.get(child);
+            tempX = b2.getCenterX() - radialX;
+            tempY = b2.getCenterY() - radialY;
+            meanX = meanX + tempX;
+            meanY = meanY + tempY;
+            if (r < 0) {
+              //assumnig r is the same for all children
+              r = Math.sqrt(tempX*tempX + tempY*tempY);
+              halfR = (parenR + r)/2;
+            }
+//             double angle = Math.signum(tempY)*Math.acos(Math.max(Math.min(tempX/r, 1), -1));
+            double angle = (Math.atan2(-tempY, tempX) + 2 * Math.PI) % (2*Math.PI);
+//             Debug.log("child no"+Integer.toString(i) + " r=" +Double.toString(r)+ " tempaX=" +Double.toString(tempX)+ " angle=" +Double.toString(angle));
+            Debug.log("angle="+Double.toString(Math.toDegrees(angle)) + " i:"+Integer.toString(i) + " child.size():"+Integer.toString( children.size())+ " label:"+child.getName());
+
+            if (i == 1) {
+              minAngle = angle;
+            }
+            if (i == children.size()) {
+              lastAngle = angle;
+            }
+            if (i == noChildren ) {
+              maxAngle = angle;
+            }
+            if (i > noChildren) {
+              g2.setStroke(counterStroke);
+            }
+            else {
+              g2.setStroke(basicStroke);
+            }
+            g2.drawLine((int)(r*Math.cos(angle) + radialX), (int)(-r*Math.sin(angle) + radialY), (int)(halfR*Math.cos(angle) + radialX), (int)(-halfR*Math.sin(angle) + radialY));
+            i = i + 1;
+          }
+          if (maxAngle == Double.MIN_VALUE) {
+            maxAngle = (minAngle + lastAngle)/2;
+          }
+          if (noChildren==0) {
+            g2.setStroke(counterStroke);
+          }
+//           double midAngle = (minAngle - maxAngle)/2;
+          meanX = meanX/i;
+          meanY = meanY/i;
+          double midAngle = (Math.atan2(-meanY, meanX) + 2 * Math.PI) % (2*Math.PI);
+          Arc2D arc = new Arc2D.Double(radialX - halfR,
+                                       radialY - halfR,
+                                       2*halfR, 2*halfR,
+                                       Math.toDegrees(minAngle),
+                                       -Math.toDegrees((minAngle - maxAngle + 2*Math.PI)%(2*Math.PI)),
+                                       Arc2D.OPEN);
+//           Arc2D arc = new Arc2D.Double(radialX - halfR,
+//                                        radialY - halfR,
+//                                        2*halfR, 2*halfR,
+//                                        Math.toDegrees(minAngle),
+//                                        90,
+//                                        Arc2D.OPEN);
+
+          Debug.log("minAngle="+Double.toString(Math.toDegrees(minAngle)) +  "maxAngle="+Double.toString(Math.toDegrees(maxAngle)));
+          Debug.log("lastAngle="+Double.toString(Math.toDegrees(lastAngle)) +  "midAngle="+Double.toString(Math.toDegrees(midAngle)));
+          g2.draw(arc);
+
+          g2.drawLine((int)(parenR*Math.cos(midAngle) + radialX), (int)(-parenR*Math.sin(midAngle) + radialY), (int)(halfR*Math.cos(midAngle) + radialX), (int)(-halfR*Math.sin(midAngle) + radialY));
+
+//           Rectangle2D.Double bFirst = bufferedLayout.get(children.get(0));
+//           Rectangle2D.Double bLast = bufferedLayout.get(children.get(noChildren - 1));
+//           double firstX = bFirst.getCenterX() - radialX;
+//           double firstY = bFirst.getCenterY() - radialY;
+//           double firstR = Math.sqrt((firstX*firstX + firstY*firstY));
+//           double firstAngl = Math.signum((tempY-radialY)) * Math.acos(firstX/firstR);
+//           double lastAngl = Math.signum((tempY-radialY)) * Math.acos(bLast.getCenterX() - radialX/firstR);
+        }
       }
       for (Node child : children) {
         paintEdges(g2, child);
