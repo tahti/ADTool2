@@ -40,6 +40,7 @@ public class RemoveTree extends EditAction {
     Node parent = tree.getRoot(true).fromPath(parentPath, 0);
     parent.addChildAt(this.child, index);
     tree.getLayout().refreshValues();
+    tree.recalculateSiblings();
     tree.getSharedExtentProvider().updateTreeSize(parent);
     canvas.notifyAllTreeChanged();
     canvas.updateTerms();

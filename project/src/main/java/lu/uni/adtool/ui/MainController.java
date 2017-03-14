@@ -131,6 +131,14 @@ public final class MainController implements CControlListener, CFocusListener {
     }
     if (this.lastFocusedTree != null) {
       lastFocusedTree.updateUndoRedoItems();
+      if (lastFocusedTree.getNodeLayout() == AbstractTreeCanvas.NodeLayout.RADIAL) {
+        viewRadial.setSelected(true);
+        viewNormal.setSelected(false);
+      }
+      else {
+        viewRadial.setSelected(false);
+        viewNormal.setSelected(true);
+      }
     }
     else {
       editUndo.setEnabled(false);
@@ -604,9 +612,9 @@ public final class MainController implements CControlListener, CFocusListener {
     IconFactory iconFac = new IconFactory();
     JMenu viewMenu = new JMenu(Options.getMsg("view.txt"));
     viewMenu.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.key")).getKeyCode());
-    JMenu themesMenu = new JMenu(Options.getMsg("view.themes.txt"));
-    themesMenu.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.themes.key")).getKeyCode());
-    themesMenu.setIcon(iconFac.createImageIcon("/icons/themes_16x16.png"));
+    JMenu metaMenu = new JMenu(Options.getMsg("view.themes.txt"));
+    metaMenu.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.themes.key")).getKeyCode());
+    metaMenu.setIcon(iconFac.createImageIcon("/icons/themes_16x16.png"));
     // RootMenuPiece layout = new RootMenuPiece( "Layout", false );
     //
     // layout.add(new CLayoutChoiceMenuPiece( control, true ));
@@ -615,7 +623,7 @@ public final class MainController implements CControlListener, CFocusListener {
     ButtonGroup group = new ButtonGroup();
     JRadioButtonMenuItem item = new JRadioButtonMenuItem(Options.getMsg("view.themes.basicTheme.txt"));
     item.setSelected(false);
-    themesMenu.add(item).addActionListener(new ActionListener() {
+    metaMenu.add(item).addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         getControl().setTheme(ThemeMap.KEY_BASIC_THEME);
       }
@@ -624,7 +632,7 @@ public final class MainController implements CControlListener, CFocusListener {
 
     item = new JRadioButtonMenuItem(Options.getMsg("view.themes.bubbleTheme.txt"));
     item.setSelected(false);
-    themesMenu.add(item).addActionListener(new ActionListener() {
+    metaMenu.add(item).addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         getControl().setTheme(ThemeMap.KEY_BUBBLE_THEME);
       }
@@ -632,7 +640,7 @@ public final class MainController implements CControlListener, CFocusListener {
     group.add(item);
     item = new JRadioButtonMenuItem(Options.getMsg("view.themes.smoothTheme.txt"));
     item.setSelected(false);
-    themesMenu.add(item).addActionListener(new ActionListener() {
+    metaMenu.add(item).addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         getControl().setTheme(ThemeMap.KEY_SMOOTH_THEME);
       }
@@ -641,7 +649,7 @@ public final class MainController implements CControlListener, CFocusListener {
 
     item = new JRadioButtonMenuItem(Options.getMsg("view.themes.flatTheme.txt"));
     item.setSelected(false);
-    themesMenu.add(item).addActionListener(new ActionListener() {
+    metaMenu.add(item).addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         getControl().setTheme(ThemeMap.KEY_FLAT_THEME);
       }
@@ -649,13 +657,62 @@ public final class MainController implements CControlListener, CFocusListener {
     group.add(item);
     item = new JRadioButtonMenuItem(Options.getMsg("view.themes.eclipseTheme.txt"));
     item.setSelected(true);
-    themesMenu.add(item).addActionListener(new ActionListener() {
+    metaMenu.add(item).addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         getControl().setTheme(ThemeMap.KEY_ECLIPSE_THEME);
       }
     });
     group.add(item);
-    viewMenu.add(themesMenu);
+    viewMenu.add(metaMenu);
+
+    metaMenu = new JMenu(Options.getMsg("view.layout.txt"));
+    metaMenu.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.layout.key")).getKeyCode());
+    metaMenu.setIcon(iconFac.createImageIcon("/icons/layout.png"));
+
+    group = new ButtonGroup();
+    item = new JRadioButtonMenuItem(Options.getMsg("view.layout.normal.txt"));
+    item.setSelected(false);
+    item.setIcon(iconFac.createImageIcon("/icons/normal.png"));
+    item.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.layout.normal.key")).getKeyCode());
+
+    metaMenu.add(item).addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        if (lastFocusedTree!= null) {
+          lastFocusedTree.setNodeLayout(AbstractTreeCanvas.NodeLayout.NORMAL);
+        }
+      }
+    });
+    this.viewNormal = item;
+    group.add(item);
+    item = new JRadioButtonMenuItem(Options.getMsg("view.layout.radial.txt"));
+    item.setMnemonic(KeyStroke.getKeyStroke(Options.getMsg("view.layout.radial.key")).getKeyCode());
+    item.setSelected(false);
+    item.setIcon(iconFac.createImageIcon("/icons/radial.png"));
+    metaMenu.add(item).addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        if (lastFocusedTree != null) {
+          lastFocusedTree.setNodeLayout(AbstractTreeCanvas.NodeLayout.RADIAL);
+        }
+      }
+    });
+    this.viewRadial = item;
+    group.add(item);
+    viewMenu.add(metaMenu);
+    this.toDisableItems.add(metaMenu);
+    if (lastFocusedTree != null) {
+      if (lastFocusedTree.getNodeLayout() == AbstractTreeCanvas.NodeLayout.RADIAL) {
+        viewRadial.setSelected(true);
+        viewNormal.setSelected(false);
+      }
+      else {
+        viewRadial.setSelected(false);
+        viewNormal.setSelected(true);
+      }
+    }
+    else {
+      metaMenu.setEnabled(false);
+    }
+
     JMenuItem menuItem = new JMenuItem(Options.getMsg("view.fitToWindow.txt"));
     menuItem.setIcon(iconFac.createImageIcon("/icons/fit_16x16.png"));
     this.toDisableItems.add(menuItem);
@@ -1288,7 +1345,8 @@ public final class MainController implements CControlListener, CFocusListener {
   private static ADAction      editUndo;
   private static ADAction      editRedo;
   private static ADAction      editEditDomain;
-
+  private static JRadioButtonMenuItem viewNormal;
+  private static JRadioButtonMenuItem viewRadial;
   private AbstractTreeCanvas   lastFocusedTree;
 
   /**

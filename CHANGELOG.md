@@ -1,6 +1,7 @@
 # Change Log #
 All notable changes to the ADTool will be documented in this file.
 ## Unreleased
+  - added option to display nodes in radial layout
 ## [2.2.2] - 2017-02-20 ##
   - updated Latex export to the forest package 2
   - fixed Latex export issue under windows

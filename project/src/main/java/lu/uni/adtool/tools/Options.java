@@ -20,12 +20,6 @@
  */
 package lu.uni.adtool.tools;
 
-import lu.uni.adtool.ADToolMain;
-import lu.uni.adtool.tree.CCP;
-import lu.uni.adtool.ui.MainController;
-import lu.uni.adtool.ui.OptionPane;
-import lu.uni.adtool.ui.TreeDockable;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
@@ -42,6 +36,13 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CWorkingArea;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.SingleCDockable;
+
+import lu.uni.adtool.ADToolMain;
+import lu.uni.adtool.tree.CCP;
+import lu.uni.adtool.ui.MainController;
+import lu.uni.adtool.ui.OptionPane;
+import lu.uni.adtool.ui.TreeDockable;
+import lu.uni.adtool.ui.canvas.AbstractTreeCanvas;
 
 /**
  * Class to store program options.
@@ -88,6 +89,15 @@ public final class Options {
    * The height of the level when drawing a tree.
    */
   public static int           canv_gapBetweenLevels     = 50;
+ /**
+  * The default layout for placing the nodes
+  */
+  public static AbstractTreeCanvas.NodeLayout canv_defaultLayout   = AbstractTreeCanvas.NodeLayout.NORMAL;
+
+  /**
+   * The increase ratio when drawing radial layout.
+   */
+  public static double           canv_radialRadiusScale    = 1.5;
 
   /**
    * Gui opitons
@@ -110,12 +120,10 @@ public final class Options {
   public static Color         canv_rankNodeMark         = new Color(50, 170, 50);
   public static Color         canv_rankLeafMark         = new Color(150, 255, 150);
   public static DecimalFormat canv_precision            = new DecimalFormat("#.###");
-  public static int           canv_tooltipTime          = 1000;                                // time
-                                                                                               // in
-                                                                                               // milisecodns
-                                                                                               // before
-                                                                                               // tooltip
-                                                                                               // appears
+  /**
+   * Time in miliseconds before the tooltip appears.
+   */
+  public static int           canv_tooltipTime          = 1000;
   public static Color         canv_tooltipBackground    = new Color(255, 255, 204);
   // public static ADTNode.Role canv_Defender = ADTNode.Role.OPPONENT; // moved
   // to treeLayout
