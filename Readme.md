@@ -24,10 +24,9 @@ and installed maven tool:
 - clone the github repository: (`git clone git://github.com/tahti/ADTool2.git`)
 - goto `project` directory (`cd project`)
 - compile using maven (`mvn package`)
-- after successful compilation there should be new directory `target` with ADTool-2.0-full.jar among other files
-- run the tool using command `java -jar target/ADTool-2.0-full.jar`
+- after successful compilation there should be new directory `target` with ADTool-2.2-full.jar among other files
+- run the tool using command `java -jar target/ADTool-2.2-full.jar`
 
 The latest compiled jar file can be downloaded from
-[here](http://satoss.uni.lu/members/piotr/adtool/) - look in Development
-Version section.
+[here](http://satoss.uni.lu/members/piotr/adtool/) - look in Download section. 
 
