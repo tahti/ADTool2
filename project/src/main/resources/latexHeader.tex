@@ -31,6 +31,21 @@
   \pgfpatharc{\rightAngle}{\leftAngle}{\a and \b}\pgfusepath{draw}%
   \pgfusepath{draw}%
 }
+\newcommand{\rec}[3]{%
+  \pgfsetlinewidth{1.4pt}%
+  \newdimen\a\newdimen\b%
+  \pgf@process{\pgfpointdiff{\pgfpointanchor{#3}{center}}{\pgfpointanchor{#2}{center}}}%
+  \a=\pgf@x%
+  \pgf@process{\pgfpointanchor{#2}{center}}%
+  \pgfmathsetlength\a{\pgf@x-\a/2}
+  \b=\pgf@y%
+  \pgf@process{\pgfpointanchor{#1}{center}}%
+  \pgfmathsetlength\a{(3*\pgf@x+2*\a)/5-3pt}
+  \pgfmathsetlength\b{(3*\pgf@y+2*\b)/5+3pt}
+  \pgfpathrectangle{\pgfpoint{\a}{\b}}{\pgfpoint{6pt}{-6pt}}%
+  \pgfusepath{draw}%
+}
+
 \def\andC{\arc{node@\forestove{id}}{node@\forestove{@first}}%
   {node@\forestOve{\forestove{@last}}{@previous}}{o}}
 \def\andN{\arc{node@\forestove{id}}%
@@ -39,6 +54,10 @@
   {node@\forestove{@first}}{node@\forestove{@last}}{t}}
 \def\sandC{\arc{node@\forestove{id}}{node@\forestove{@first}}%
   {node@\forestOve{\forestove{@last}}{@previous}}{t}}
+\def\oreC{\rec{node@\forestove{id}}{node@\forestove{@first}}%
+  {node@\forestOve{\forestove{@last}}{@previous}}}
+\def\oreN{\rec{node@\forestove{id}}%
+  {node@\forestove{@first}}{node@\forestove{@last}}}
 
 \def\inheritall#1{
   \foreach \anchor in {north,north west,north east,center,west,east,mid,center,
